@@ -1,0 +1,155 @@
+<div id="de-paras" class="default-list-page page-layout simple inner-scroll">
+    <!-- CENTER -->
+    <div class="center" fxFlex>
+        <!-- HEADER -->
+        <div
+            class="header accent-500 p-16 p-sm-24"
+            fxLayout="column"
+            fxLayoutAlign="start"
+            fxLayout.gt-xs="row"
+            fxLayoutAlign.gt-xs="space-between center"
+        >
+            <!-- APP TITLE -->
+            <div fxLayout="row" fxLayoutAlign="start center">
+                <div class="logo" fxLayout="row" fxLayoutAlign="start center">
+                    <mat-icon
+                        class="logo-icon mr-16"
+                        [@animate]="{
+                            value: '*',
+                            params: { delay: '50ms', scale: '0.2' }
+                        }"
+                    >
+                        ballot
+                    </mat-icon>
+                    <span
+                        class="logo-text h1"
+                        [@animate]="{
+                            value: '*',
+                            params: { delay: '100ms', x: '-25px' }
+                        }"
+                    >
+                        De Para
+                    </span>
+                </div>
+            </div>
+            <!-- / APP TITLE -->
+            <!-- SEARCH -->
+            <div
+                class="ml-sm-64 mr-sm-128"
+                fxLayout="row"
+                fxLayoutAlign="center center"
+                fxFlex
+            >
+                <div class="search-wrapper mt-16 mt-sm-0">
+                    <div
+                        class="search"
+                        fxFlex
+                        fxLayout="row"
+                        fxLayoutAlign="start center"
+                    >
+                        <mat-icon>search</mat-icon>
+                        <input
+                            #searchInputEl
+                            [formControl]="searchInput"
+                            placeholder="Pesquise aqui..."
+                        />
+                    </div>
+                </div>
+            </div>
+            <!-- / SEARCH -->
+
+            <!-- ADD FILE BUTTON -->
+            <div class="file-uploader">
+                <button
+                    mat-fab
+                    color="accent"
+                    class="add-file-button"
+                    [routerLink]="'./novo'"
+                    aria-label="Novo"
+                    [@animate]="{
+                        value: '*',
+                        params: { delay: '300ms', scale: '0.2' }
+                    }"
+                >
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+            <!-- / ADD FILE BUTTON -->
+        </div>
+        <!-- / HEADER -->
+        <!-- CONTENT -->
+        <div class="content" fusePerfectScrollbar>
+            <mat-table
+                #table
+                [dataSource]="dataSource"
+                [@animateStagger]="{ value: '50' }"
+            >
+                <ng-container matColumnDef="credenciadora">
+                    <mat-header-cell *matHeaderCellDef
+                        >Credenciadora</mat-header-cell
+                    >
+                    <mat-cell *matCellDef="let row">
+                        {{ row.credenciadora }}</mat-cell
+                    >
+                </ng-container>
+
+                <ng-container matColumnDef="de">
+                    <mat-header-cell *matHeaderCellDef>De</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.de }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="para">
+                    <mat-header-cell *matHeaderCellDef>Para</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.para }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="buttons" stickyEnd>
+                    <mat-header-cell *matHeaderCellDef></mat-header-cell>
+                    <mat-cell *matCellDef="let item">
+                        <button
+                            mat-icon-button
+                            [matMenuTriggerFor]="moreMenu"
+                            aria-label="More"
+                            (click)="$event.stopPropagation()"
+                        >
+                            <mat-icon class="secondary-text"
+                                >more_vert</mat-icon
+                            >
+                        </button>
+                        <mat-menu #moreMenu="matMenu">
+                            <button
+                                mat-menu-item
+                                aria-label="remove"
+                                (click)="delete(item)"
+                            >
+                                <mat-icon>delete</mat-icon>
+                                <span>Deletar</span>
+                            </button>
+                        </mat-menu>
+                    </mat-cell>
+                </ng-container>
+
+                <mat-header-row
+                    *matHeaderRowDef="displayedColumns; sticky: true"
+                ></mat-header-row>
+                <mat-row
+                    *matRowDef="let item; columns: displayedColumns"
+                    (click)="abrir(item)"
+                    matRipple
+                    [@animate]="{ value: '*', params: { y: '100%' } }"
+                >
+                </mat-row>
+            </mat-table>
+        </div>
+        <mat-paginator
+            #paginator
+            [length]="dataSource.count"
+            [pageIndex]="dataSource.pageIndex"
+            [pageSize]="dataSource.pageSize"
+            [pageSizeOptions]="[5, 10, 25, 100]"
+        >
+        </mat-paginator>
+        <!-- / CONTENT -->
+    </div>
+    <!-- / CENTER -->
+</div>

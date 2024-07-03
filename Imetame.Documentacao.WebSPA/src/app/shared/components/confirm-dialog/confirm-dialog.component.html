@@ -1,0 +1,6 @@
+<h1 matDialogTitle>Confirme antes de realizar</h1>
+<div mat-dialog-content>{{confirmMessage}}</div>
+<div mat-dialog-actions class="pt-24"  fxLayout="row" fxLayoutAlign="space-between center">
+    <button mat-raised-button class="mat-accent mr-16" (click)="dialogRef.close(true)">Sim, pode continuar</button>
+    <button mat-button (click)="dialogRef.close(false)">Cancelar</button>
+</div>

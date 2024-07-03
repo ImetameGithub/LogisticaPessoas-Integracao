@@ -1,0 +1,86 @@
+<div id="credenciadora" class="default-form-page page-layout simple inner-scroll ">
+    <!-- CENTER -->
+    <div class="center" fxFlex>
+        <!-- HEADER -->
+        <div class="header accent-500 p-16 p-sm-24" fxLayout="column" fxLayoutAlign="start" fxLayout.gt-xs="row"
+            fxLayoutAlign.gt-xs="space-between end">
+            <!-- APP TITLE -->
+            <div fxLayout="row" fxLayoutAlign="start center">
+                <div class="logo" fxLayout="row" fxLayoutAlign="start center">
+
+                    <span class="logo-text h1 ml-16" [@animate]="{value:'*',params:{delay:'200ms',x:'-25px'}}">
+                        Cadastro de colaboradores
+                    </span>
+                </div>
+
+            </div>
+            <!-- / APP TITLE -->
+            <div>
+            </div>
+        </div>
+        <!-- / HEADER -->
+        <!-- CONTENT -->
+        <form class="content" name="filtroForm" [formGroup]="filtroForm">
+            <div class="content">
+                <mat-tab-group dynamicHeight="true">
+                    <mat-tab label="Cadastro">
+                        <div class="tab-content" fusePerfectScrollbar fxLayout="row wrap" fxLayoutAlign="center">
+
+                            <mat-form-field fxFlex="51" appearance="outline">
+                                <mat-label>Pedido</mat-label>
+                                <mat-select formControlName="pedido" required>
+                                    <mat-option *ngFor="let pedido of pedidos" [value]="pedido.id">
+                                        {{pedido.numPedido}} - {{pedido.unidade}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+                            <!-- <mat-form-field fxFlex="51" appearance="outline">
+                                <mat-label>Credenciadora</mat-label>
+                                <mat-select formControlName="credenciadora" required>
+                                    <mat-option>--</mat-option>
+                                    <mat-option *ngFor="let c of credenciadoras" [value]="c.id">
+                                        {{c.nome}}
+                                    </mat-option>
+                                </mat-select>
+
+                            </mat-form-field> -->
+
+                            <mat-form-field fxFlex="51" appearance="outline">
+                                <mat-label>Ordem de serviço</mat-label>
+                                <mat-chip-list #chipList aria-label="Ordem de serviço">
+                                    <mat-chip *ngFor="let os of oss" [selectable]="selectable" [removable]="removable"
+                                        (removed)="remove(os)">
+                                        {{os}}
+                                        <mat-icon matChipRemove>cancel</mat-icon>
+                                    </mat-chip>
+                                    <input placeholder="Ordem de serviço" required #osInput [formControl]="osCtrl"
+                                        [matAutocomplete]="auto" [matChipInputFor]="chipList"
+                                        [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                                        (matChipInputTokenEnd)="add($event)">
+                                </mat-chip-list>
+                                <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+                                    <mat-option *ngFor="let os of filteredOss | async" [value]="os">
+                                        {{os.numero}} - {{os.descricao}}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
+
+                            <div fxFlex="51" fxLayout="row wrap" fxLayoutAlign="end">
+
+                                <button class="mr-8" mat-raised-button color="primary"
+                                    [disabled]="filtroForm.invalid || isBusy" (click)="avancar()">Avançar</button>
+                            </div>
+
+                        </div>
+                    </mat-tab>
+
+                </mat-tab-group>
+
+            </div>
+        </form>
+        <!-- / CONTENT -->
+
+    </div>
+    <!-- / CENTER -->
+</div>

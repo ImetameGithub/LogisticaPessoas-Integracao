@@ -1,0 +1,131 @@
+<mat-tab-group style="display: flex; width: 100%;">
+    <mat-tab label="Seleção de Colaboradores">
+        <div id="colaboradores" class="default-list-page page-layout simple inner-scroll">
+            <!-- CENTER -->
+            <div class="center" fxFlex>
+                <!-- HEADER -->
+                <div class="header accent-500 p-16 p-sm-24" fxLayout="column" fxLayoutAlign="start" fxLayout.gt-xs="row"
+                    fxLayoutAlign.gt-xs="space-between center">
+                    <!-- APP TITLE -->
+                    <div fxLayout="row" fxLayoutAlign="start center">
+                        <div class="logo" fxLayout="row" fxLayoutAlign="start center">
+                            <mat-icon class="logo-icon mr-16 navi" [@animate]="{
+                            value: '*',
+                            params: { delay: '50ms', scale: '0.2' }
+                        }" [routerLink]="'../../../'">
+                                arrow_back
+                            </mat-icon>
+                            <span class="logo-text h1" [@animate]="{
+                            value: '*',
+                            params: { delay: '100ms', x: '-25px' }
+                        }">
+                                Seleção de Colaboradores
+                            </span>
+                        </div>
+                    </div>
+                    <!-- / APP TITLE -->
+                    <!-- SEARCH -->
+                    <div class="ml-sm-64 mr-sm-128" fxLayout="row" fxLayoutAlign="center center" fxFlex>
+                        <div class="search-wrapper mt-16 mt-sm-0">
+                            <div class="search" fxFlex fxLayout="row" fxLayoutAlign="start center">
+                                <mat-icon>search</mat-icon>
+                                <input #searchInputEl [formControl]="searchInput" placeholder="Pesquise aqui..." />
+                            </div>
+                        </div>
+                    </div>
+                    <!-- / SEARCH -->
+                    <!-- ADD FILE BUTTON -->
+                    <div>
+                        <button mat-raised-button (click)="cadastrar()" [disabled]="isBusy || isResult"
+                            aria-label="Cadastrar" [@animate]="{
+                        value: '*',
+                        params: { delay: '300ms', scale: '0.2' }
+                    }">
+                            Cadastrar
+                        </button>
+                    </div>
+                    <!-- / ADD FILE BUTTON -->
+                </div>
+                <!-- / HEADER -->
+                <!-- CONTENT -->
+                <div class="content" fusePerfectScrollbar>
+                    <mat-table #table [dataSource]="dataSource" [@animateStagger]="{ value: '50' }">
+                        <ng-container matColumnDef="check" stickyStart>
+                            <mat-header-cell *matHeaderCellDef class="w-100">
+                                <mat-checkbox [disabled]="isBusy || isResult" [(ngModel)]="todoMundo" [color]="Accent"
+                                    (ngModelChange)="toggleAllSelection()">
+                                </mat-checkbox>
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let item" class="w-100">
+                                <mat-checkbox [disabled]="isBusy || isResult" [(ngModel)]="item.check" [color]="Accent"
+                                    (ngModelChange)="toggleSelection(item)">
+                                </mat-checkbox>
+                            </mat-cell>
+                        </ng-container>
+
+                        <ng-container matColumnDef="numCad">
+                            <mat-header-cell *matHeaderCellDef class="w-100">NumCad</mat-header-cell>
+                            <mat-cell *matCellDef="let row" class="w-100">
+                                {{ row.numCad }}</mat-cell>
+                        </ng-container>
+
+                        <ng-container matColumnDef="nome">
+                            <mat-header-cell *matHeaderCellDef>Nome</mat-header-cell>
+                            <mat-cell *matCellDef="let row"> {{ row.nome }}</mat-cell>
+                        </ng-container>
+
+                        <ng-container matColumnDef="funcao">
+                            <mat-header-cell *matHeaderCellDef>Função</mat-header-cell>
+                            <mat-cell *matCellDef="let row">
+                                {{ row.funcaoAtual }}</mat-cell>
+                        </ng-container>
+
+                        <ng-container matColumnDef="cracha">
+                            <mat-header-cell *matHeaderCellDef>Crachá</mat-header-cell>
+                            <mat-cell *matCellDef="let row">
+                                {{ row.numCracha }}</mat-cell>
+                        </ng-container>
+
+                        <ng-container matColumnDef="equipe">
+                            <mat-header-cell *matHeaderCellDef>Equipe</mat-header-cell>
+                            <mat-cell *matCellDef="let row"> {{ row.equipe }}</mat-cell>
+                        </ng-container>
+
+                        <ng-container matColumnDef="status">
+                            <mat-header-cell *matHeaderCellDef>Status Documento</mat-header-cell>
+                            <mat-cell *matCellDef="let row"></mat-cell>
+                        </ng-container>
+
+                        <ng-container matColumnDef="documento">
+                            <mat-header-cell *matHeaderCellDef></mat-header-cell>
+                            <mat-cell  *matCellDef="let item; let i = index">
+                                <button mat-raised-button style="background-color: darkgray; color: white;" (click)="getDocumentosProtheus()" [@animate]="{ value: '*', params: { delay: '300ms', scale: '0.2' }}">
+                                    Visualizar Documento
+                                </button>
+                            </mat-cell>
+                        </ng-container>
+
+                        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+                        <mat-row *matRowDef="let item; columns: displayedColumns" matRipple
+                            [@animate]="{ value: '*', params: { y: '100%' } }">
+                        </mat-row>
+                    </mat-table>
+                </div>
+
+                <!-- / CONTENT -->
+            </div>
+            <!-- / CENTER -->
+        </div>
+    </mat-tab>
+
+    <mat-tab label="Logs">
+        <div>
+            <app-logs></app-logs>
+        </div>
+    </mat-tab>
+    <mat-tab label="Finalizados">
+        <div>
+            <app-finalizados></app-finalizados>
+        </div>
+    </mat-tab>
+</mat-tab-group>

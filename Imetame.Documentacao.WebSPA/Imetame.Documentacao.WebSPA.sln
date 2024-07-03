@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Imetame.MonitoramentoDragagem.WebSPA", "Imetame.MonitoramentoDragagem.WebSPA.csproj", "{BEB380D3-A142-43DC-A457-3D470FC53C6E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BEB380D3-A142-43DC-A457-3D470FC53C6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEB380D3-A142-43DC-A457-3D470FC53C6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEB380D3-A142-43DC-A457-3D470FC53C6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEB380D3-A142-43DC-A457-3D470FC53C6E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0874949B-F5B5-42D7-8F49-E6F5D6A99166}
+	EndGlobalSection
+EndGlobal

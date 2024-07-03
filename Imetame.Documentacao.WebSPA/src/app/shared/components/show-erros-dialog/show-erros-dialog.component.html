@@ -1,0 +1,28 @@
+
+    <h2 mat-dialog-title>{{error.title}}</h2>
+
+<mat-dialog-content>
+
+    <mat-list>
+        <mat-list-item *ngFor="let erro of error.errors['DomainValidations'] ">
+            <mat-icon mat-list-icon class="warn-fg">error_outline</mat-icon>
+            <h4 mat-line >{{erro}}</h4>
+        </mat-list-item>
+
+        <mat-list-item *ngFor="let erro of error.errors['ServerError'] ">
+            <mat-icon mat-list-icon >error</mat-icon>
+            <h4 mat-line class="warn-fg">{{erro}}</h4>
+        </mat-list-item>
+
+
+    </mat-list>
+    <div class="totvs-erro" *ngFor="let erro of error.errors['TotvsError'] " [innerHTML]="erro" >
+        
+    </div>
+    <br />
+
+
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-raised-button color="primary" [mat-dialog-close]="true" cdkFocusInitial>OK</button>
+</mat-dialog-actions>

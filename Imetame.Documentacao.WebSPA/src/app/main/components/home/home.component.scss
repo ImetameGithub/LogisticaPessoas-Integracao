@@ -1,0 +1,48 @@
+@import "src/@fuse/scss/fuse";
+
+home {
+
+    #home {
+        width: 100%;
+        
+        background-size: cover;
+
+        #home-form-wrapper {
+            flex: 1 0 auto;
+            padding: 32px;
+
+            @include media-breakpoint('xs') {
+                padding: 16px;
+            }
+
+            #home-form {
+                max-width: 384px;
+                padding: 48px;
+                text-align: center;
+                @include mat-elevation(16);
+
+                @include media-breakpoint('xs') {
+                    padding: 24px;
+                    width: 100%;
+                }
+
+                .logo {
+                    width: 256px;
+                    margin: 8px auto;
+                }
+
+                .title {
+                    font-size: 28px;
+                    margin-top: 16px;
+                }
+
+                .subtitle {
+                    margin: 16px 0;
+                    max-width: 300px;
+                    color: rgba(0, 0, 0, 0.54);
+                    font-size: 15px;
+                }
+            }
+        }
+    }
+}

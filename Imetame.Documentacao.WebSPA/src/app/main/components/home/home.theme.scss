@@ -1,0 +1,22 @@
+@mixin home-theme($theme) {
+
+    $background: map-get($theme, background);
+    $foreground: map-get($theme, foreground);
+
+    home {
+
+        #home {
+
+            #home-form-wrapper {
+
+                #home-form {
+                    background: map-get($background, card);
+
+                    .subtitle {
+                        color: map-get($foreground, secondary-text);
+                    }
+                }
+            }
+        }
+    }
+}

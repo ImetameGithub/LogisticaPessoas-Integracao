@@ -1,0 +1,114 @@
+<div id="de-paras" class="default-list-page page-layout simple inner-scroll">
+    <!-- CENTER -->
+    <div class="center" fxFlex>
+        <!-- HEADER -->
+        <div
+            class="header accent-500 p-16 p-sm-24"
+            fxLayout="column"
+            fxLayoutAlign="start"
+            fxLayout.gt-xs="row"
+            fxLayoutAlign.gt-xs="space-between center"
+        >
+            <!-- APP TITLE -->
+            <div fxLayout="row" fxLayoutAlign="start center">
+                <div class="logo" fxLayout="row" fxLayoutAlign="start center">
+                    <mat-icon
+                        class="logo-icon mr-16"
+                        [@animate]="{
+                            value: '*',
+                            params: { delay: '50ms', scale: '0.2' }
+                        }"
+                    >
+                        ballot
+                    </mat-icon>
+                    <span
+                        class="logo-text h1"
+                        [@animate]="{
+                            value: '*',
+                            params: { delay: '100ms', x: '-25px' }
+                        }"
+                    >
+                        Processamento
+                    </span>
+                </div>
+            </div>
+            <!-- / APP TITLE -->
+            <!-- SEARCH -->
+            <div
+                class="ml-sm-64 mr-sm-128"
+                fxLayout="row"
+                fxLayoutAlign="center center"
+                fxFlex
+            >
+                <div class="search-wrapper mt-16 mt-sm-0">
+                    <div
+                        class="search"
+                        fxFlex
+                        fxLayout="row"
+                        fxLayoutAlign="start center"
+                    >
+                        <mat-icon>search</mat-icon>
+                        <input
+                            #searchInputEl
+                            [formControl]="searchInput"
+                            placeholder="Pesquise aqui..."
+                        />
+                    </div>
+                </div>
+            </div>
+            <!-- / SEARCH -->
+
+        </div>
+        <!-- / HEADER -->
+        <!-- CONTENT -->
+        <div class="content" fusePerfectScrollbar>
+            <mat-table
+                #table
+                [dataSource]="dataSource"
+                [@animateStagger]="{ value: '50' }"
+            >
+
+                <ng-container matColumnDef="ossString">
+                    <mat-header-cell *matHeaderCellDef>Oss</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.ossString }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="inicioProcessamento">
+                    <mat-header-cell *matHeaderCellDef>Inicio Processamento</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.inicioProcessamento }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="finalProcessamento">
+                    <mat-header-cell *matHeaderCellDef>Fim Processamento</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.finalProcessamento }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="status">
+                    <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.status }}</mat-cell>
+                </ng-container>
+
+                <mat-header-row
+                    *matHeaderRowDef="displayedColumns; sticky: true"
+                ></mat-header-row>
+                <mat-row
+                    *matRowDef="let item; columns: displayedColumns"
+                    (click)="abrir(item)"
+                    matRipple
+                    [@animate]="{ value: '*', params: { y: '100%' } }"
+                >
+                </mat-row>
+            </mat-table>
+        </div>
+        <mat-paginator
+            #paginator
+            [length]="dataSource.count"
+            [pageIndex]="dataSource.pageIndex"
+            [pageSize]="dataSource.pageSize"
+            [pageSizeOptions]="[5, 10, 25, 100]"
+        >
+        </mat-paginator>
+        <!-- / CONTENT -->
+    </div>
+    <!-- / CENTER -->
+</div>

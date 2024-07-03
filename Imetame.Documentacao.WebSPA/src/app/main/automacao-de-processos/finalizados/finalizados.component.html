@@ -1,0 +1,74 @@
+<div id="finalizados" class="default-list-page page-layout simple inner-scroll">
+    <div class="center" fxFlex>
+        <div class="header accent-500 p-16 p-sm-24" fxLayout="column" fxLayoutAlign="start" fxLayout.gt-xs="row"
+            fxLayoutAlign.gt-xs="space-between center">
+            <div fxLayout="row" fxLayoutAlign="start center">
+                <div class="logo" fxLayout="row" fxLayoutAlign="start center">
+                    <mat-icon class="logo-icon mr-16 navi" [@animate]="{
+                        value: '*',
+                        params: { delay: '50ms', scale: '0.2' }
+                    }" [routerLink]="'../../../'">
+                            arrow_back
+                        </mat-icon>
+                    <span class="logo-text h1" [@animate]="{
+                            value: '*',
+                            params: { delay: '100ms', x: '-25px' }
+                        }">
+                        Finalizados
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="content" fusePerfectScrollbar>
+            <mat-table #table [dataSource]="dataSource" [@animateStagger]="{ value: '50' }">
+                <ng-container matColumnDef="numCad">
+                    <mat-header-cell *matHeaderCellDef class="w-100">NumCad</mat-header-cell>
+                    <mat-cell *matCellDef="let row" class="w-100">
+                        {{ row.numCad }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="nome">
+                    <mat-header-cell *matHeaderCellDef>Nome</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.nome }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="funcao">
+                    <mat-header-cell *matHeaderCellDef>Função</mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        {{ row.funcaoAtual }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="cracha">
+                    <mat-header-cell *matHeaderCellDef>Crachá</mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        {{ row.numCracha }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="equipe">
+                    <mat-header-cell *matHeaderCellDef>Equipe</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.equipe }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="buttons" stickyEnd>
+                    <mat-header-cell *matHeaderCellDef class="w-160">
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let item" class="w-160">
+                        <button mat-raised-button color="accent" (click)="detalhar(item)" *ngIf="item.sucesso">
+                            <mat-icon class="mr-8">person_add</mat-icon>
+                            <span>Sucesso</span>
+                        </button>
+
+                        <button mat-raised-button color="warn" (click)="detalhar(item)" *ngIf="!item.sucesso">
+                            <mat-icon class="mr-8">person_add_disabled</mat-icon>
+                            <span>Desafio</span>
+                        </button>
+                    </mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+                <mat-row *matRowDef="let item; columns: displayedColumns" matRipple>
+                </mat-row>
+            </mat-table>
+        </div>
+    </div>
+</div>

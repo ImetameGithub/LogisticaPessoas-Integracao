@@ -1,0 +1,205 @@
+<div id="grupo" class="default-form-page page-layout simple inner-scroll ">
+
+
+    <!-- CENTER -->
+    <div class="center" fxFlex>
+
+        <!-- HEADER -->
+        <div class="header accent-500 p-16 p-sm-24" fxLayout="column" fxLayoutAlign="start"
+             fxLayout.gt-xs="row" fxLayoutAlign.gt-xs="space-between center">
+
+            <!-- APP TITLE -->
+            <div fxLayout="row" fxLayoutAlign="start center">
+
+
+                <div class="logo" fxLayout="row" fxLayoutAlign="start center">
+                    <mat-icon class="logo-icon mr-16 navi"
+                              [@animate]="{value:'*',params:{delay:'50ms',scale:'0.2'}}"
+                              [routerLink]="'../'">
+                        arrow_back
+                    </mat-icon>
+                    <span class="logo-text h1 navi" [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}" [routerLink]="'../'">
+                        Grupos
+                    </span>
+                    <mat-icon class="separator">chevron_right</mat-icon>
+                    <span class="logo-text h1" [@animate]="{value:'*',params:{delay:'200ms',x:'-25px'}}" *ngIf="pageType ==='new'">
+                        Novo
+                    </span>
+                    <span class="logo-text h1" [@animate]="{value:'*',params:{delay:'200ms',x:'-25px'}}" *ngIf="pageType ==='edit'">
+                        {{detailForm.controls.nome.value}}
+                    </span>
+                </div>
+
+
+
+            </div>
+            <!-- / APP TITLE -->
+            
+
+        </div>
+        <!-- / HEADER -->
+        <!-- CONTENT -->
+        <div class="content">
+            <mat-tab-group dynamicHeight="true">
+                <mat-tab label="Básico">
+                    <div class="tab-content" fusePerfectScrollbar fxLayout="row wrap" fxLayoutAlign="space-between">
+                        <form name="detailForm" [formGroup]="detailForm" class="w-100-p" fxLayout="row wrap" fxLayoutAlign="space-between">
+                            <div class="mb-16" fxFlex="100" fxLayout="row" fxLayoutAlign="end">
+
+                                <button mat-raised-button
+                                        class="reference-button  mt-16 mt-sm-0"
+                                        color="accent"
+                                        [disabled]="detailForm.invalid || detailForm.pristine || isBusy"
+                                        (click)="saveOrAdd()">
+                                    <mat-icon class="mr-8">save</mat-icon>
+                                    <span>Salvar</span>
+                                </button>
+                            </div>
+                            <mat-form-field fxFlex="100" appearance="outline">
+                                <mat-label>Nome</mat-label>
+                                <input matInput
+                                       name="nome"
+                                       formControlName="nome"
+                                       placeholder="Nome"
+                                       required>
+                                <mat-error *ngFor="let msg of displayMessage.nome">
+                                    {{msg.key}}
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-form-field fxFlex="100" appearance="outline">
+                                <mat-label>Descrição</mat-label>
+                                <input matInput
+                                       name="descricao"
+                                       formControlName="descricao"
+                                       placeholder="Descrição"
+                                       required>
+                                <mat-error *ngFor="let msg of displayMessage.descricao">
+                                    {{msg.key}}
+                                </mat-error>
+                            </mat-form-field>
+
+
+
+                        </form>
+                    </div>
+                </mat-tab>
+
+                <mat-tab label="Portas" *ngIf="pageType ==='edit'">
+                    <div class="tab-content" fusePerfectScrollbar fxLayout="row wrap" fxLayoutAlign="space-between">
+
+                        <mat-form-field fxFlex="100" appearance="outline">
+                            <mat-label>Porta</mat-label>
+                            <input matInput
+                                   placeholder="Pesquise pelo nome da porta para adicionar "
+                                   aria-label="Porta"
+                                   [matAutocomplete]="portaAuto"
+                                   [formControl]="portaCtrl"
+                                   #portaInput>
+                            <mat-autocomplete #portaAuto="matAutocomplete" (optionSelected)="selectedPorta($event)">
+                                <mat-option *ngFor="let porta of portasList | async" [value]="porta">
+                                    {{porta.nome}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+
+                        
+
+                        <table class="simple w-100-p py-8" fxFlex="100">
+                            <thead>
+                                <tr>
+
+                                    <th>Nome</th>
+                                    <th class="w-48"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let porta of portas">
+                                    <td>
+                                        <span class="text-truncate">{{porta.nome}}</span>
+                                    </td>
+
+                                    <td class="w-48 pr-24">
+                                        <button mat-icon-button [matMenuTriggerFor]="moreMenu" aria-label="More"
+                                                (click)="$event.stopPropagation();">
+                                            <mat-icon class="secondary-text">more_vert</mat-icon>
+                                        </button>
+                                        <mat-menu #moreMenu="matMenu">
+                                            <button mat-menu-item aria-label="remove" (click)="deletePorta(porta)">
+                                                <mat-icon>delete</mat-icon>
+                                                <span>Remover</span>
+                                            </button>
+                                        </mat-menu>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+
+                    </div>
+                </mat-tab>
+                <mat-tab label="Colaboradores" *ngIf="pageType ==='edit'">
+                    <div class="tab-content" fusePerfectScrollbar fxLayout="row wrap" fxLayoutAlign="space-between">
+
+                        <mat-form-field fxFlex="100" appearance="outline">
+                            <mat-label>Colaborador</mat-label>
+                            <input matInput
+                                   placeholder="Pesquise pelo nome ou matricula do Colaborador "
+                                   aria-label="Colaborador"
+                                   [matAutocomplete]="colaboradorAuto"
+                                   [formControl]="colaboradorCtrl"
+                                   #colaboradorInput>
+                            <mat-autocomplete #colaboradorAuto="matAutocomplete" (optionSelected)="selectedColaborador($event)">
+                                <mat-option *ngFor="let colaborador of colaboradoresList | async" [value]="colaborador">
+                                    {{colaborador.numCad}} - {{colaborador.nome}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+
+
+                        <table class="simple w-100-p py-8" fxFlex="100">
+                            <thead>
+                                <tr>
+                                    <th>Matrícula</th>
+                                    <th>Nome</th>
+                                    <th class="w-48"></th>                                
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let colaborador of colaboradores">
+                                    <td>
+                                        <span class="text-truncate">{{colaborador.numCad}}</span>
+                                    </td>
+                                    <td>
+                                        <span class="text-truncate">{{colaborador.nome}}</span>
+                                    </td>
+
+                                    <td class="w-48 pr-24">
+                                        <button mat-icon-button [matMenuTriggerFor]="moreMenu" aria-label="More"
+                                                (click)="$event.stopPropagation();">
+                                            <mat-icon class="secondary-text">more_vert</mat-icon>
+                                        </button>
+                                        <mat-menu #moreMenu="matMenu">
+                                            <button mat-menu-item aria-label="remove" (click)="deleteColaborador(colaborador)">
+                                                <mat-icon>delete</mat-icon>
+                                                <span>Remover</span>
+                                            </button>
+                                        </mat-menu>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+            
+
+        </div>
+       
+        <!-- / CONTENT -->
+
+    </div>
+    <!-- / CENTER -->
+
+
+</div>

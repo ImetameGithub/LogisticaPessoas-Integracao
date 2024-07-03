@@ -1,0 +1,322 @@
+.mat-header-cell {
+    font-size: 17px !important;
+    background-color: #e0e0e0 !important;
+    color: black !important;
+    text-align: center !important;
+}
+
+.cell-calculo-juros {
+    font-size: 13px !important;
+    background-color: #e0e0e0 !important;
+    color: black !important;
+    text-align: center;
+}
+
+table {
+    width: 100% !important;
+}
+
+.mat-tooltip {
+    font-size: 12px; 
+}
+
+.table-t {
+    max-height: calc(100vh - 200px) !important;
+    min-height: calc(100vh - 200px) !important;
+}
+
+.mat-pag {
+    width: 100% !important;
+    position: absolute !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    z-index: 999 !important;
+  }
+  
+  .mat-paginator-container {
+    height: 50px !important;
+  }
+  
+  .mat-paginator-range-actions
+  {
+    margin-top: 50px !important;
+  }
+  
+  .mat-form-field-underline {
+    display: none !important;
+  }
+  
+  .mat-paginator .mat-select-trigger {
+    position: relative;
+    top: 30px;
+  }
+  
+  .mat-paginator-page-size-label {
+    position: relative;
+    top: 30px;
+  }
+  
+.mat-mdc-form-field {
+    font-size: 20px !important;
+    width: 100% !important;
+}
+
+td, th {
+    width: 10% !important;
+    text-align: center !important;
+}
+
+.space-b {
+    justify-content: space-between !important
+}
+
+.line-green {
+    background-color: palegreen !important;
+}
+
+.line-red {
+    background-color: rgb(255, 87, 87) !important;
+}
+
+.numeric-cell {
+    text-align:right !important;
+}
+
+.head {
+    text-align: center !important;
+    padding-top: 10px !important;
+}
+
+.mat-cell {
+    text-align: center;
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    color: #4b5563 !important;
+}
+
+.mat-cell-green {
+    border-radius: 100px;
+    border: 0px solid black;
+    text-align: center !important;
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    padding-right: 12px !important;
+    padding-left: 12px !important;
+    background-color: green;
+    color: white !important;
+    display: inline-block;
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+}
+
+.mat-cell-red {
+    border-radius: 100px;
+    border: 0px solid black;
+    text-align: center !important;
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    padding-right: 12px !important;
+    padding-left: 12px !important;
+    background-color: red;
+    color: white !important;
+    display: inline-block;
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+}
+
+.search-input {
+    width: 100% !important;
+    height: 30px !important;
+    background-color: white !important;
+    border-radius: 10px !important;
+    border: 0 !important;
+}
+
+ng-container {
+    padding: 10px !important;
+}
+
+.myDialog .mat-dialog-container  {
+    padding: 0;
+}
+
+.div-diag{
+    padding: 20px !important;
+}
+
+.div-buttons {
+    padding-top: 20px !important; 
+    padding-left: 10px !important;
+}
+
+.btn-green {
+    background-color: rgb(22, 163, 74) !important; 
+    color: rgb(255, 255, 255) !important;
+}
+
+.btn-white {
+    background-color: rgb(255, 255, 255) !important; 
+    color: black !important;
+}
+
+.btn-red {
+    background-color: rgb(157, 27, 27) !important; 
+    color: rgb(255, 255, 255) !important;
+}
+
+.status-label {
+    border-radius: 100px;
+    border: 0px solid black;
+    text-align: center;
+    padding: 0px 12px;
+    color: white;
+    display: inline-block;
+}
+
+.status-Inativo {
+    background-color: #bb0000;
+}
+
+.status-Ativo {
+    background-color: green;
+}
+
+.W-100{
+    width: 100% !important;
+}
+
+.H-100{
+    height: 100% !important;
+}
+
+.flex-grow-2 {
+    flex-grow: 2 !important;
+}
+
+.swap-diag {
+    height: 80px !important;
+    width: 100% !important;
+    background-color: #00984a !important;
+    color: white !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    padding: 20px 20px !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+.header-list-div{
+    display: flex !important;
+    flex-flow: column wrap !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.header-list-screen{
+    height: 80px !important;
+     width: 100% !important;
+     background-color: #00984a !important;
+     color: white !important;
+     display: flex !important;
+     flex-wrap: nowrap !important;
+    padding: 20px 20px !important;
+    align-items: center !important;
+
+    position: sticky;
+    top: 0;
+    z-index: 2
+}
+
+.div-btn {
+    padding-top: 5px !important;
+    padding-left: 10px !important;
+}
+
+.div-icon-header {
+    display: inline-block !important;
+}
+
+.div-text-header {
+    display: inline-block !important;
+    margin-bottom: 10px !important;
+}
+
+.P-0 {
+    padding: 0px !important;
+}
+
+.spinnerContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+  }
+  
+  .spinnerContainer mat-spinner{
+    width: 60px;
+    height: 60px;
+  }
+
+.spinnerContainer mat-spinner circle {
+    color: #00984a !important;
+    stroke: #00984a !important;
+}
+
+.MT-0 {
+    margin-top: 0px !important;
+}
+
+.MT-1_2 {
+    margin-top: 4px !important;
+}
+
+.ML-1 {
+    margin-left: 8px !important;
+}
+
+.justify-content-between {
+    justify-content: space-between !important;
+}
+
+tr.mat-row {
+    min-height: 24px !important;
+    height: 24px !important;
+}
+
+.mat-header-cell-1 {
+    min-width: 100px !important;
+}
+
+.mat-header-cell-1_2 {
+    min-width: 150px !important;
+}
+
+.mat-header-cell-2 {
+    min-width: 200px !important;
+}
+
+.mat-elevation-z8 {
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
+  }
+
+.chamadaSpan {
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* .mat-select-value .mat-select-value-text{
+    color: black !important;
+} */
+
+.fixed_chamada{
+    position: sticky;
+    top: 0;
+    z-index: 1;
+ }

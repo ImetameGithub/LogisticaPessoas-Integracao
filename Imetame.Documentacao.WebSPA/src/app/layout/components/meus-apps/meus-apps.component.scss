@@ -1,0 +1,58 @@
+@use '@angular/material' as mat;
+@import "src/@fuse/scss/fuse";
+
+meus-apps {
+    min-height: 100%;
+
+    #meus-aplicativos {
+        width: 100%;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+
+        .header {
+
+            h1 {
+                font-size: 40px;
+                font-weight: 300;
+            }
+        }
+
+        .board-list {
+            padding: 32px 0;
+            max-height: none !important;
+
+            .board-list-item {
+                min-width: 90px;
+                min-height: 120px;
+                width: 90px;
+                height: 120px;
+                padding: 4px 0;
+                margin: 8px;
+                border-radius: 8px;
+                background: rgba(0, 0, 0, 0.02);
+                transition: box-shadow 150ms ease-in;
+                cursor: pointer;
+
+                &:hover:not(.add-new-board) {
+                    @include mat.elevation(8);
+                }
+
+                img {
+                    width: 80px;
+                }
+
+                .board-name {
+                    padding: 4px 2px 0 2px;
+                    font-weight: 300;
+                    font-size: 12px;
+                    text-align: center;
+                }
+
+                &.add-new-board {
+                    background: rgba(0, 0, 0, 0.06);
+                    border: 2px dashed rgba(255, 255, 255, 0.37);
+                }
+            }
+        }
+    }
+}

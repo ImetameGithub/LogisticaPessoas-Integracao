@@ -1,0 +1,11 @@
+@import "src/@fuse/scss/fuse";
+
+tarefa-list {
+    .download-file-button {
+        position: absolute;
+        bottom: -28px;
+        right: 80px;
+        z-index: 999;
+    }
+}
+
