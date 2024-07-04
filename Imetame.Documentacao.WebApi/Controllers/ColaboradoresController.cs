@@ -11,7 +11,7 @@ using Microsoft.Extensions.Configuration;
 namespace Imetame.Documentacao.WebApi.Controllers
 {
     //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class ColaboradoresController : ControllerBase
     {
@@ -30,11 +30,11 @@ namespace Imetame.Documentacao.WebApi.Controllers
         }
 
         [HttpGet("{idProcessamento}")]
-        public async Task<IActionResult> Get(Guid idProcessamento, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetColaboradores(Guid idProcessamento, CancellationToken cancellationToken)
         {
             try
             {
-                //var resp = await _repository.ListaAsync(idProcessamento, cancellationToken);
+                var resp = await _repository.ListaAsync(idProcessamento, cancellationToken);
 
                 Domain.Entities.Processamento? processamento = await _repProcessamento.SelectContext().Where(m => m.Id == idProcessamento).FirstOrDefaultAsync();
 
@@ -86,5 +86,46 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 throw;
             }
         }
+
+        [HttpGet("{matricula}")]
+        public async Task<IActionResult> GetDocumentosProtheus(string matricula, CancellationToken cancellationToken)
+        {
+            try
+            {
+                conn.Open();
+                var sql = @"SELECT 
+                        Id = UZJ.R_E_C_N_O_,	
+		                UZI_DESC as DescArquivo,
+		                UZJ_VENC as DtVencimento,
+                        SRA.RA_NOME as NomeColaborador,
+                        UZJ_DOC as NomeArquivo,
+                        UZJ_IMG as Bytes
+                FROM	DADOSADV..UZJ010 UZJ
+                        INNER JOIN DADOSADV..UZI010 UZI	ON UZI.D_E_L_E_T_ = '' AND UZI_FILIAL = UZJ_FILIAL AND UZI.UZI_CODIGO = UZJ.UZJ_CODTDO 
+                        INNER JOIN DADOSADV..SRA010 SRA ON SRA.D_E_L_E_T_ = ''AND SRA.RA_MAT = UZJ.UZJ_MAT
+                WHERE   UZJ.D_E_L_E_T_ = ''
+                        AND UZJ.UZJ_CODTDO <> '01'
+                        AND SRA.RA_MAT = @Matricula AND UZJ_SEQ =(
+		                SELECT MAX(UZJ_SEQ) FROM UZJ010 UZJ1 WHERE UZJ1.UZJ_FILIAL = UZJ.UZJ_FILIAL AND UZJ1.UZJ_CODTDO = UZJ.UZJ_CODTDO AND UZJ1.UZJ_MAT = UZJ.UZJ_MAT AND UZJ1.D_E_L_E_T_ = '')";
+
+                var documentos = (await conn.QueryAsync<DocumentoxColaboradorModel>(sql, new { Matricula = matricula })).ToList();
+
+                // Convertendo bytes para Base64
+                documentos.ForEach(doc =>
+                {
+                    if (doc.Bytes != null)
+                    {
+                        doc.Base64 = $"data:image/png;base64,{Convert.ToBase64String(doc.Bytes)}";
+                    }
+                });
+
+                return Ok(documentos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal Server Error: " + ex.Message);
+            }
+        }
+
     }
 }

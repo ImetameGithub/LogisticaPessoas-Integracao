@@ -16,6 +16,13 @@ export const environment = {
     },
     //#endregion
 
+    //#region COLABORADORES
+    Colaboradores: {
+        GetColaboradores: `${baseUrl}/Colaboradores/GetColaboradores`, 
+        GetDocumentosProtheus: `${baseUrl}/Colaboradores/GetDocumentosProtheus`, 
+    },
+    //#endregion
+
     //#region PROTHEUS
     Protheus: {
         GetOs: `${baseUrl}/Protheus/GetOs`,

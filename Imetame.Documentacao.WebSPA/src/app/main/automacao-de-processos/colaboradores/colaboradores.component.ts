@@ -21,12 +21,14 @@ import * as _ from "lodash";
 import { Title } from "@angular/platform-browser";
 import { FuseProgressBarService } from "@fuse/components/progress-bar/progress-bar.service";
 import { ShowErrosDialogComponent } from "app/shared/components/show-erros-dialog/show-erros-dialog.component";
-import { MatDialog } from "@angular/material/dialog";
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { AutomacaoDeProcessosService } from "../automacao-de-processos.service";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { FilesDataSource } from "app/utils/files-data-source";
 import { FusePerfectScrollbarDirective } from "@fuse/directives/fuse-perfect-scrollbar/fuse-perfect-scrollbar.directive";
 import { ShowLogDialogComponent } from "../show-log-dialog/show-log-dialog.component";
+import { DocumentoxColaboradorModel } from "app/models/DTO/DocumentoxColaboradorModel";
+import { DocumentosModalComponent } from "./documentos-modal/documentos-modal.component";
 
 @Component({
     selector: "colaboradores",
@@ -58,12 +60,15 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
     searchInputEl: any;
     @ViewChildren("searchInputEl") searchInputField;
 
+    documentos: DocumentoxColaboradorModel[]
+
     constructor(
         public service: AutomacaoDeProcessosService,
 
         private titleService: Title,
         private _fuseProgressBarService: FuseProgressBarService,
         public dialog: MatDialog,
+        private _snackbar: MatSnackBar,
         public snackBar: MatSnackBar
     ) {
         this._unsubscribeAll = new Subject();
@@ -161,8 +166,31 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
         );
     }
 
-    getDocumentosProtheus(){
-        alert("Buscar itens")
+    getDocumentosProtheus(matricula: string){
+        this._fuseProgressBarService.setMode("indeterminate");
+        this._fuseProgressBarService.show();
+        this.service.GetDocumentosProtheus('0'+matricula).subscribe(
+            {
+                next: (response: DocumentoxColaboradorModel[]) => {
+                    this._fuseProgressBarService.hide();
+                   this.documentos = response;
+                   const dialogConfig = new MatDialogConfig();
+                   dialogConfig.autoFocus = false;
+                   dialogConfig.width = '95%';
+                   dialogConfig.height = 'auto';
+                   const dialogRef = this.dialog.open(DocumentosModalComponent, dialogConfig);
+                },
+                error: (error) => {
+                    this._fuseProgressBarService.hide();
+                    this._snackbar.open('Erro ao consultar documentos', 'X', {
+                        duration: 2500,
+                        panelClass: 'snackbar-error',
+                    })
+                }
+            }
+        )
+
+
     }
 
     showError(error) {

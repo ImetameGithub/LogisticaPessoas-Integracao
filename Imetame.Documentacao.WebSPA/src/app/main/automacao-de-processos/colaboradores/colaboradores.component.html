@@ -99,7 +99,7 @@
                         <ng-container matColumnDef="documento">
                             <mat-header-cell *matHeaderCellDef></mat-header-cell>
                             <mat-cell  *matCellDef="let item; let i = index">
-                                <button mat-raised-button style="background-color: darkgray; color: white;" (click)="getDocumentosProtheus()" [@animate]="{ value: '*', params: { delay: '300ms', scale: '0.2' }}">
+                                <button mat-raised-button style="background-color: darkgray; color: white;" (click)="getDocumentosProtheus(item.numCad)" [@animate]="{ value: '*', params: { delay: '300ms', scale: '0.2' }}">
                                     Visualizar Documento
                                 </button>
                             </mat-cell>

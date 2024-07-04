@@ -1,0 +1,14 @@
+<mat-dialog-content class="mat-typography">
+    <div class="modal">
+        <div class="modal-content">
+            <div class="document-grid">            
+                <div *ngFor="let doc of documentos" class="document-box">
+                    <span>{{ doc.descArquivo }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button (click)="closeModal()" mat-button mat-dialog-close>Fechar</button>
+</mat-dialog-actions>

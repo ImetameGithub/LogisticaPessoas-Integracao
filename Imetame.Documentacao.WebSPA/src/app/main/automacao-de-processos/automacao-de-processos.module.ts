@@ -13,11 +13,12 @@ import { FinalizadosComponent } from './finalizados/finalizados.component';
 import { PedidoService } from '../pedido/pedido.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
+import { DocumentosModalComponent } from './colaboradores/documentos-modal/documentos-modal.component';
 
 
 
 @NgModule({
-    declarations: [CredenciadoraComponent, ColaboradoresComponent, ShowLogDialogComponent, LogComponent, FinalizadosComponent],
+    declarations: [CredenciadoraComponent, ColaboradoresComponent, ShowLogDialogComponent, LogComponent, FinalizadosComponent, DocumentosModalComponent],
   imports: [
       CommonModule,
       AutomacaoDeProcessosRoutingModule,

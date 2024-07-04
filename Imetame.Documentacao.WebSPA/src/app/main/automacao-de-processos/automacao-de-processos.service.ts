@@ -1,16 +1,18 @@
 import { Injectable, Inject } from '@angular/core';
 
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, ReplaySubject, Subject } from 'rxjs';
 import { DataService } from 'app/services/data.service';
 import * as _ from 'lodash';
 import { API_URL, EXTRANET_API_URL } from 'app/config/tokens';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { Finalizado } from './finalizados/finalizados.component';
 import { Log } from './logs/logs.component';
 import { environment } from 'environments/environment';
 import { Pedido } from 'app/models/Pedido';
 import { HttpClient } from '@angular/common/http';
+import { ColaboradorModel } from 'app/models/DTO/ColaboradorModel';
+import { DocumentoxColaboradorModel } from 'app/models/DTO/DocumentoxColaboradorModel';
 
 
 
@@ -19,6 +21,7 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
 
 
     private _finalizadosSource = new BehaviorSubject<any>([]);
+    private _documentoxColaborador: ReplaySubject<DocumentoxColaboradorModel[]> = new ReplaySubject<DocumentoxColaboradorModel[]>(1);
     private _logSource = new BehaviorSubject<Log[]>([]);
 
     finalizados$ = this._finalizadosSource.asObservable();
@@ -46,9 +49,11 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
         @Inject(EXTRANET_API_URL) private extranetApiUrl: string,
         @Inject(API_URL) private apiUrl: string,
         private dataService: DataService,
-        private _httpClient: HttpClient
+        private _httpClient: HttpClient,
+
 
     ) {
+        this._documentoxColaborador.next(null);
         this.onProcessamentoChanged = new BehaviorSubject({});
         this.onItensChanged = new BehaviorSubject([]);
         this.onSearchTextChanged = new Subject();
@@ -58,7 +63,11 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
 
             this.onItensChanged.next(this.itens.filter((col) => col.nome.toUpperCase().includes(this.searchText)));
         });
-        
+
+    }
+
+    get documentoxColaborador$(): Observable<DocumentoxColaboradorModel[]> {
+        return this._documentoxColaborador.asObservable();
     }
 
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> | Promise<any> | any {
@@ -87,19 +96,19 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
         }
     }
 
-    getColaboradores(): Promise<any> {
-        this.onItensChanged.next([]);
-        //let param = { 'pageIndex': this.pageIndex, 'pageSize': this.pageSize, 'query': this.searchText };
+    // getColaboradores(): Promise<any> {
+    //     this.onItensChanged.next([]);
+    //     //let param = { 'pageIndex': this.pageIndex, 'pageSize': this.pageSize, 'query': this.searchText };
 
-        return new Promise((resolve, reject) => {
-            this.dataService.getList(this.apiUrl + `colaboradores/${this.routeParams.processamento}`, {})
-                .subscribe((response: any) => {
-                    this.itens = response;
-                    this.onItensChanged.next(this.itens);
-                    resolve(response);
-                }, reject);
-        });
-    }
+    //     return new Promise((resolve, reject) => {
+    //         this.dataService.getList(this.apiUrl + `colaboradores/${this.routeParams.processamento}`, {})
+    //             .subscribe((response: any) => {
+    //                 this.itens = response;
+    //                 this.onItensChanged.next(this.itens);
+    //                 resolve(response);
+    //             }, reject);
+    //     });
+    // }
 
     getOss(searchText: string): Observable<any[]> {
         let param = { 'pageIndex': 0, 'pageSize': 10 };
@@ -120,6 +129,26 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
 
     cadastrar(item: any): Promise<any> {
         return this.dataService.post(this.apiUrl + 'Cadastros/', item).toPromise();
+    }
+
+
+    GetDocumentosProtheus(matricula: string): Observable<DocumentoxColaboradorModel[]> {
+        return this._httpClient.get<DocumentoxColaboradorModel[]>(`${environment.Colaboradores.GetDocumentosProtheus}/${matricula}`)
+            .pipe(
+                tap((documentoxColaboradorRetorno: DocumentoxColaboradorModel[]) => {
+                    this._documentoxColaborador.next(documentoxColaboradorRetorno);
+                }));
+    }
+
+    getColaboradores(): Promise<ColaboradorModel> {
+        return new Promise((resolve, reject) => {
+            this.dataService.getList(`${environment.Colaboradores.GetColaboradores}/${this.routeParams.processamento}`, {})
+                .subscribe((response: any) => {
+                    this.itens = response;
+                    this.onItensChanged.next(this.itens);
+                    resolve(response);
+                }, reject);
+        });
     }
 
     adicionarFinalizados(novosFinalizados: Finalizado[]) {
