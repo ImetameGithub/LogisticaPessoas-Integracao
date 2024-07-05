@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.34916.146
@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Imetame.Documentacao.Domain
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Imetame.Documentacao.Infra.Data", "Imetame.Documentacao.Infra.Data\Imetame.Documentacao.Infra.Data.csproj", "{DBD1A5B1-1410-487D-A977-161CBBCEC843}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imetame.Documentacao.CrossCutting", "Imetame.Documentacao.CrossCutting\Imetame.Documentacao.CrossCutting.csproj", "{DD0550AF-16B7-4DE1-A0BF-DBAAAEC4B57D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,11 +39,16 @@ Global
 		{DBD1A5B1-1410-487D-A977-161CBBCEC843}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DBD1A5B1-1410-487D-A977-161CBBCEC843}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DBD1A5B1-1410-487D-A977-161CBBCEC843}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD0550AF-16B7-4DE1-A0BF-DBAAAEC4B57D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD0550AF-16B7-4DE1-A0BF-DBAAAEC4B57D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD0550AF-16B7-4DE1-A0BF-DBAAAEC4B57D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD0550AF-16B7-4DE1-A0BF-DBAAAEC4B57D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{DD0550AF-16B7-4DE1-A0BF-DBAAAEC4B57D} = {2816DE68-C6F1-491E-97C3-95D746397939}
 		{3BD472B0-4D6D-4156-B003-DD18DC6DC330} = {70EFE306-D3DF-43BA-A526-9CA2B51D4A0A}
 		{0BFDE061-A890-469E-BB32-1C22A3617DA9} = {948F5F57-13ED-47FE-B8FB-C410875BC5E0}
 		{DBD1A5B1-1410-487D-A977-161CBBCEC843} = {2816DE68-C6F1-491E-97C3-95D746397939}

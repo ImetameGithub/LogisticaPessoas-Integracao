@@ -207,9 +207,11 @@ namespace Imetame.Documentacao.WebApi
             services.AddScoped<Domain.Repositories.IPedidoRepository, Infra.Data.Repositories.PedidoRepository>();
             services.AddScoped<Domain.Repositories.IProcessamentoRepository, Infra.Data.Repositories.ProcessamentoRepository>();
             services.AddScoped<Domain.Repositories.ILogProcessamentoRepository, Infra.Data.Repositories.LogProcessamentoRepository>();
-            services.AddScoped<Domain.Repositories.IResultadoCadastroRepository, Infra.Data.Repositories.ResultadoCadastroRepository>();
+            services.AddScoped<Domain.Repositories.IResultadoCadastroRepository, Infra.Data.Repositories.ResultadoCadastroRepository>();            
             services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 
+            //CrossCutting
+            services.AddTransient<CrossCutting.Services.Destra.IDestraService, CrossCutting.Services.Destra.DestraService>();
 
             //Selenium
             services.AddScoped<IWebDriver, ChromeDriver>();
