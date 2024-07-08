@@ -44,7 +44,7 @@ import { DataService } from './services/data.service';
 import { IDENTITY_API_URL_VALUE } from './config/urlConfig';
 import { PermissaoService } from './services/permissao.service';
 import { ErrorService } from './services/error.service';
-
+import { LuxonDateAdapter } from '@angular/material-luxon-adapter';
 import { QuillModule } from 'ngx-quill';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
@@ -105,6 +105,27 @@ const maskConfig: Partial<IConfig> = {
     ],
     providers: [
         
+
+         // Material Date Adapter
+         {
+            provide : DateAdapter,
+            useClass: LuxonDateAdapter,
+        },
+        {
+            provide : MAT_DATE_FORMATS,
+            useValue: {
+                parse  : {
+                    dateInput: 'D',
+                },
+                display: {
+                    dateInput         : 'dd/MM/yyyy',
+                    monthYearLabel    : 'LLL yyyy',
+                    dateA11yLabel     : 'DD',
+                    monthYearA11yLabel: 'LLLL yyyy',
+                },
+            },
+        },
+
         { provide: IDENTITY_URL, useValue: IDENTITY_URL_VALUE },
         { provide: API_URL, useValue: API_URL_VALUE },
         { provide: EXTRANET_API_URL, useValue: EXTRANET_API_URL_VALUE },
