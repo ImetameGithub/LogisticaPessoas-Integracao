@@ -4,5 +4,7 @@ namespace Imetame.Documentacao.CrossCutting.Services.Destra;
 
 public interface IDestraService
 {
-    Task<AuthResponse> AuthenticateAsync(AuthDestra authDestra);
+    Task<AuthResponse> AuthAsync(AuthDestra authDestra);
+    Task<HttpResponseMessage> GetAsync(string endPoint, string token);    
+    Task<HttpResponseMessage> PostAsync(string endPoint, string json, string token);    
 }

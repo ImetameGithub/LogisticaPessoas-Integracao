@@ -1,5 +1,8 @@
 
 using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Imetame.Documentacao.CrossCutting.Services.Destra.Models;
 
 namespace Imetame.Documentacao.CrossCutting.Services.Destra;
@@ -19,7 +22,7 @@ public class DestraService : IDestraService
 #endif
 
     }
-    public async Task<AuthResponse> AuthenticateAsync(AuthDestra authDestra)
+    public async Task<AuthResponse> AuthAsync(AuthDestra authDestra)
     {
         HttpResponseMessage response;
 
@@ -51,8 +54,40 @@ public class DestraService : IDestraService
             return new AuthResponse
             {
                 Erro = true,
-                MensagemErro = $"Falha ao autenticar. Código de status: {response.StatusCode}"
+                MensagemErro = $"Desafio ao autenticar. Código de status: {response.StatusCode}"
             };
+        }
+    }
+
+    public async Task<HttpResponseMessage> GetAsync(string endPoint, string token)
+    {
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_url}{endPoint}");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            return await _httpClient.SendAsync(request);
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new Exception("Desabio ao chamar a API", ex);
+        }
+    }
+
+    public async Task<HttpResponseMessage> PostAsync(string endPoint, string json, string token)
+    {
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, $"{_url}{endPoint}");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            return await _httpClient.SendAsync(request);
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new Exception("Desafio ao chamar a API", ex);
         }
     }
 }
