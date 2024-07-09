@@ -33,6 +33,13 @@ const routes: Routes = [
             ),
     },
     {
+        path: "credenciadora",
+        loadChildren: () =>
+            import("./main/credenciadora/credenciadora.module").then(
+                (mod) => mod.CredenciadoraModule
+            ),
+    },
+    {
         path: "processamento",
         loadChildren: () =>
             import("./main/processamento/processamento.module").then(

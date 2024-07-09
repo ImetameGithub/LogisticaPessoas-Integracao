@@ -17,6 +17,7 @@ namespace Imetame.Documentacao.Infra.Data.Context
 
         public DbSet<Domain.Entities.CredenciadoraDePara> CredenciadoraDeParas { get; set; }
         public DbSet<Domain.Entities.LogProcessamento> LogProcessamento { get; set; }
+        public DbSet<Domain.Entities.Credenciadora> Credenciadora { get; set; }
         public DbSet<Domain.Entities.Pedido> Pedido { get; set; }
         public DbSet<Domain.Entities.Processamento> Processamento { get; set; }
         public DbSet<Domain.Entities.ResultadoCadastro> ResultadoCadastro { get; set; }
@@ -51,9 +52,10 @@ namespace Imetame.Documentacao.Infra.Data.Context
 
             // MATHEUS FARTEC SISTEMAS - CONFIGURAÇÃO PARA OS MAP SEREM USADOS
             modelBuilder.Entity<Domain.Entities.ResultadoCadastro>(new ResultadoCadastroMap().Configure);
+            modelBuilder.Entity<Domain.Entities.Credenciadora>(new CredenciadoraMap().Configure);
             modelBuilder.Entity<Domain.Entities.CredenciadoraDePara>(new CredenciadoraDeParaMap().Configure);
             modelBuilder.Entity<Domain.Entities.LogProcessamento>(new LogProcessamentoMap().Configure);
-            modelBuilder.Entity<Domain.Entities.Pedido>(new PedidoMap().Configure);
+            modelBuilder.Entity<Domain.Entities.Pedido>(new PedidoMap().Configure);        
             modelBuilder.Entity<Domain.Entities.Processamento>(new ProcessamentoMap().Configure);
 
 

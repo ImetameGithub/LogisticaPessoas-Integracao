@@ -29,6 +29,13 @@ export const navigation: FuseNavigation[] = [
                 icon: "business",
             },
             {
+                id: "credenciadora",
+                title: "Credenciadora",
+                type: "item",
+                url: "/credenciadora",
+                icon: "business",
+            },
+            {
                 id: "processamento",
                 title: "Processamento",
                 type: "item",

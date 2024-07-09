@@ -15,6 +15,16 @@ export const environment = {
         GetAllPaginated: `${baseUrl}/Pedido/GetAllPaginated`,
     },
     //#endregion
+    //#region CREDENCIADORA
+    Credenciadora: {
+        GetItem: `${baseUrl}/Credenciadora/GetItem`,   
+        Add: `${baseUrl}/Credenciadora/Add`,
+        Update: `${baseUrl}/Credenciadora/Update`,
+        Delete: `${baseUrl}/Credenciadora/Delete`,
+        GetAll: `${baseUrl}/Credenciadora/GetAll`,
+        GetAllPaginated: `${baseUrl}/Credenciadora/GetAllPaginated`,
+    },
+    //#endregion
 
     //#region COLABORADORES
     Colaboradores: {

@@ -1,3 +1,5 @@
+import { Credenciadora } from "app/models/Crendenciadora";
+
 const baseUrl = 'https://reuniaodiariaapi.imetame.com.br:443/api';
 export const environment = {
     production: true,
@@ -11,6 +13,16 @@ export const environment = {
         Delete: `${baseUrl}/Pedido/Delete`,
         GetAll: `${baseUrl}/Pedido/GetAll`,
         GetAllPaginated: `${baseUrl}/Pedido/GetAllPaginated`,
+    },
+    //#endregion
+    //#region CREDENCIADORA
+    Credenciadora: {
+        Get: `${baseUrl}/Credenciadora/Get`,   
+        Add: `${baseUrl}/Credenciadora/Add`,
+        Update: `${baseUrl}/Credenciadora/Update`,
+        Delete: `${baseUrl}/Credenciadora/Delete`,
+        GetAll: `${baseUrl}/Credenciadora/GetAll`,
+        GetAllPaginated: `${baseUrl}/Credenciadora/GetAllPaginated`,
     },
     //#endregion
 

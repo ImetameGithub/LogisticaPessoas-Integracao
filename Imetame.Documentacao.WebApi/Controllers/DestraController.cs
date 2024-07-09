@@ -17,7 +17,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
     
     [Route("api/[controller]/[action]")]
     [ApiController]
-    //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
     public class DestraController : Controller
     {
         private readonly IConfiguration _configuration;
