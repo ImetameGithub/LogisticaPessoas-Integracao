@@ -94,19 +94,34 @@ namespace Imetame.Documentacao.WebApi.Controllers
             {
                 conn.Open();
                 var sql = @"SELECT 
-                        Id = UZJ.R_E_C_N_O_,	
-		                UZI_DESC as DescArquivo,
-		                UZJ_VENC as DtVencimento,
-                        SRA.RA_NOME as NomeColaborador,
-                        UZJ_DOC as NomeArquivo,
-                        UZJ_IMG as Bytes
-                FROM	DADOSADV..UZJ010 UZJ
-                        INNER JOIN DADOSADV..UZI010 UZI	ON UZI.D_E_L_E_T_ = '' AND UZI_FILIAL = UZJ_FILIAL AND UZI.UZI_CODIGO = UZJ.UZJ_CODTDO 
-                        INNER JOIN DADOSADV..SRA010 SRA ON SRA.D_E_L_E_T_ = ''AND SRA.RA_MAT = UZJ.UZJ_MAT
-                WHERE   UZJ.D_E_L_E_T_ = ''
-                        AND UZJ.UZJ_CODTDO <> '01'
-                        AND SRA.RA_MAT = @Matricula AND UZJ_SEQ =(
-		                SELECT MAX(UZJ_SEQ) FROM UZJ010 UZJ1 WHERE UZJ1.UZJ_FILIAL = UZJ.UZJ_FILIAL AND UZJ1.UZJ_CODTDO = UZJ.UZJ_CODTDO AND UZJ1.UZJ_MAT = UZJ.UZJ_MAT AND UZJ1.D_E_L_E_T_ = '')";
+                            UZJ.R_E_C_N_O_ AS Id,
+                            UZI.UZI_DESC AS DescArquivo,
+                            UZJ.UZJ_VENC AS DtVencimento,
+                            SRA.RA_NOME AS NomeColaborador,
+                            UZJ.UZJ_DOC AS NomeArquivo,
+                            UZJ.UZJ_IMG AS Bytes
+                        FROM 
+                            DADOSADV..UZJ010 UZJ
+                            INNER JOIN DADOSADV..UZI010 UZI 
+    	                        ON UZI.UZI_FILIAL = UZJ.UZJ_FILIAL 
+    	                        AND UZI.UZI_CODIGO = UZJ.UZJ_CODTDO           
+                                AND UZI.D_E_L_E_T_ = ''
+                            INNER JOIN DADOSADV..SRA010 SRA ON SRA.RA_FILIAL = UZJ.UZJ_FILIAL  
+                                AND SRA.RA_MAT = UZJ.UZJ_MAT 
+                                AND SRA.D_E_L_E_T_ = ''
+                        WHERE 
+                            UZJ.UZJ_FILIAL = ''
+                            AND UZJ.UZJ_MAT = @Matricula 
+                            AND UZJ.UZJ_CODTDO <> '01' 
+                            AND UZJ.UZJ_SEQ = (
+                                SELECT MAX(UZJ_SEQ) 
+                                FROM DADOSADV..UZJ010 
+                                WHERE UZJ_FILIAL = UZJ.UZJ_FILIAL 
+                                    AND UZJ_MAT = UZJ.UZJ_MAT 
+                                    AND UZJ_CODTDO = UZJ.UZJ_CODTDO 
+                                    AND D_E_L_E_T_ = ''
+                            )
+                            AND UZJ.D_E_L_E_T_ = ''";
 
                 var documentos = (await conn.QueryAsync<DocumentoxColaboradorModel>(sql, new { Matricula = matricula })).ToList();
 

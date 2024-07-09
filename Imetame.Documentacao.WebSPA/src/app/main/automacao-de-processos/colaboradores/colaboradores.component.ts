@@ -173,12 +173,25 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
             {
                 next: (response: DocumentoxColaboradorModel[]) => {
                     this._fuseProgressBarService.hide();
-                   this.documentos = response;
-                   const dialogConfig = new MatDialogConfig();
-                   dialogConfig.autoFocus = false;
-                   dialogConfig.width = '95%';
-                   dialogConfig.height = 'auto';
-                   const dialogRef = this.dialog.open(DocumentosModalComponent, dialogConfig);
+                    this.documentos = response;
+                    const dialogConfig = new MatDialogConfig();
+                    dialogConfig.autoFocus = false;
+                    dialogConfig.width = '95%';
+                    dialogConfig.height = 'auto';
+                    const dialogRef = this.dialog.open(DocumentosModalComponent, dialogConfig);
+                    dialogRef.afterClosed().subscribe(() => {
+                     this.titleService.setTitle("Cadastro - Imetame");
+                   });
+                    // if(response.length > 0){
+                    // }
+                    // else{
+                    //     this._fuseProgressBarService.hide();
+                    //     this._snackbar.open('Nenhum documento encontrado', 'X', {
+                    //         duration: 2500,
+                    //         panelClass: 'snackbar-error',
+                    //     })
+                    // }
+                  
                 },
                 error: (error) => {
                     this._fuseProgressBarService.hide();

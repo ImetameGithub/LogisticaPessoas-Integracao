@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Title } from '@angular/platform-browser';
+import { DomSanitizer, Title } from '@angular/platform-browser';
 import { FuseProgressBarService } from '@fuse/components/progress-bar/progress-bar.service';
 import { DocumentoxColaboradorModel } from 'app/models/DTO/DocumentoxColaboradorModel';
 import { FilesDataSource } from 'app/utils/files-data-source';
@@ -15,9 +15,13 @@ import { AutomacaoDeProcessosService } from '../../automacao-de-processos.servic
   styleUrls: ['./documentos-modal.component.scss']
 })
 export class DocumentosModalComponent implements OnInit {
-
+  imageSource;
+  form: UntypedFormGroup;
   documentos: DocumentoxColaboradorModel[]
-
+  visualizarImagem: boolean = false;
+  colspanDocs: number = 6
+  rowspan: number = 4
+  colspanImg: number = 0
   constructor(
     public service: AutomacaoDeProcessosService,
     public dialogRef: MatDialogRef<DocumentosModalComponent>,
@@ -25,9 +29,13 @@ export class DocumentosModalComponent implements OnInit {
     private _fuseProgressBarService: FuseProgressBarService,
     public dialog: MatDialog,
     private _snackbar: MatSnackBar,
+    private sanitizer: DomSanitizer,
     public snackBar: MatSnackBar
   ) {
-
+    this.form = new FormGroup({
+      dtVencimento: new FormControl(new Date, [Validators.required]),
+      arquivo: new FormControl('', [Validators.required]),
+  });
   }
 
   ngOnInit(): void {
@@ -43,8 +51,16 @@ export class DocumentosModalComponent implements OnInit {
 
   }
 
+  docDetalhes(item: DocumentoxColaboradorModel) {
+    this.visualizarImagem = true;
+    this.colspanDocs = 4
+    this.colspanImg = 2
+    this.imageSource = this.sanitizer.bypassSecurityTrustResourceUrl(`${item.base64}`);
+  }
 
   closeModal() {
-    this.dialogRef.close();
+    // this.dialogRef.close();
+    this.colspanDocs = 6
+    this.colspanImg = 0
   }
 }

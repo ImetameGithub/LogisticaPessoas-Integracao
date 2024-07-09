@@ -20,10 +20,10 @@ const moment = _moment;
 // https://momentjs.com/docs/#/displaying/format/
 export const MY_FORMATS = {
     parse: {
-        dateInput: 'MM/YYYY',
+        dateInput: 'DD MMMM YYYY',
     },
     display: {
-        dateInput: 'MM/YYYY',
+        dateInput: 'DD/MM/YYYY',
         monthYearLabel: 'MMM YYYY',
         dateA11yLabel: 'LL',
         monthYearA11yLabel: 'MMMM YYYY',
@@ -31,8 +31,8 @@ export const MY_FORMATS = {
 };
 
 @Component({
-  selector: 'app-mes-ano-picker',
-  templateUrl: './mes-ano-picker.component.html',
+    selector: 'app-mes-ano-picker',
+    templateUrl: './mes-ano-picker.component.html',
     styleUrls: ['./mes-ano-picker.component.scss'],
     providers: [
         // `MomentDateAdapter` can be automatically provided by importing `MomentDateModule` in your
@@ -45,7 +45,7 @@ export const MY_FORMATS = {
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => MesAnoPickerComponent), multi: true },
     ]
 })
-export class MesAnoPickerComponent implements OnInit,ControlValueAccessor {
+export class MesAnoPickerComponent implements OnInit, ControlValueAccessor {
 
     @Input() placeholder = '';
 
@@ -59,24 +59,24 @@ export class MesAnoPickerComponent implements OnInit,ControlValueAccessor {
         this.propagateChange = fn;
     }
     registerOnTouched(fn: any): void {
-        
+
     }
     setDisabledState?(isDisabled: boolean): void {
-        
+
     }
 
 
 
-    
 
-  constructor() { }
+
+    constructor() { }
 
     ngOnInit() {
         this.dateControl.valueChanges
             .subscribe(() => {
                 this.propagateChange(this.dateControl.value);
             });
-  }
+    }
 
 
     chosenYearHandler(normalizedYear: Moment) {

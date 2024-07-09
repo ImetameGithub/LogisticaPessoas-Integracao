@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 
 
 import { AutomacaoDeProcessosService } from './automacao-de-processos.service';
@@ -14,6 +14,10 @@ import { PedidoService } from '../pedido/pedido.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { DocumentosModalComponent } from './colaboradores/documentos-modal/documentos-modal.component';
+import {MatGridListModule} from '@angular/material/grid-list';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 
 
@@ -22,7 +26,12 @@ import { DocumentosModalComponent } from './colaboradores/documentos-modal/docum
   imports: [
       CommonModule,
       AutomacaoDeProcessosRoutingModule,
+      MatFormFieldModule,
+      MatDatepickerModule,
+      MatNativeDateModule,
+      DatePipe,
       SharedModule,
+      MatGridListModule,
       MatButtonModule,
       MatTableModule,
   ],
