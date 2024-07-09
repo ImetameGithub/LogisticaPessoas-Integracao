@@ -5,9 +5,9 @@ export const environment = {
     production: true,
     urlApi: 'https://reuniaodiariaapi.imetame.com.br:443/api',
     hmr: false,
-       //#region PEDIDO
-       Pedido: {
-        Get: `${baseUrl}/Pedido/Get`,   
+    //#region PEDIDO
+    Pedido: {
+        Get: `${baseUrl}/Pedido/Get`,
         Add: `${baseUrl}/Pedido/Add`,
         Update: `${baseUrl}/Pedido/Update`,
         Delete: `${baseUrl}/Pedido/Delete`,
@@ -28,8 +28,19 @@ export const environment = {
 
     //#region COLABORADORES
     Colaboradores: {
-        GetColaboradores: `${baseUrl}/Colaboradores/GetColaboradores`, 
-        GetDocumentosProtheus: `${baseUrl}/Colaboradores/GetDocumentosProtheus`, 
+        GetColaboradores: `${baseUrl}/Colaboradores/GetColaboradores`,
+        GetDocumentosProtheus: `${baseUrl}/Colaboradores/GetDocumentosProtheus`,
+    },
+    //#endregion
+
+    //#region ATIVIDADE-ESPECIFICA
+    AtividadeEspecifica: {
+        GetItem: `${baseUrl}/AtividadeEspecifica/GetItem`,
+        Add: `${baseUrl}/AtividadeEspecifica/Add`,
+        Update: `${baseUrl}/AtividadeEspecifica/Update`,
+        Delete: `${baseUrl}/AtividadeEspecifica/Delete`,
+        GetAll: `${baseUrl}/AtividadeEspecifica/GetAll`,
+        GetAllPaginated: `${baseUrl}/AtividadeEspecifica/GetAllPaginated`,
     },
     //#endregion
 

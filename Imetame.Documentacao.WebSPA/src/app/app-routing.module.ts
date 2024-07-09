@@ -24,7 +24,13 @@ const routes: Routes = [
                 (mod) => mod.DeParaModule
             ),
     },
-
+    {
+        path: "credenciadora",
+        loadChildren: () =>
+            import("./main/credenciadora/credenciadora.module").then(
+                (mod) => mod.CredenciadoraModule
+            ),
+    },
     {
         path: "pedido",
         loadChildren: () =>
@@ -33,10 +39,10 @@ const routes: Routes = [
             ),
     },
     {
-        path: "credenciadora",
+        path: "atividade-especifica",
         loadChildren: () =>
-            import("./main/credenciadora/credenciadora.module").then(
-                (mod) => mod.CredenciadoraModule
+            import("./main/atividade-especifica/atividade-especifica.module").then(
+                (mod) => mod.AtividadeEspecificaModule
             ),
     },
     {

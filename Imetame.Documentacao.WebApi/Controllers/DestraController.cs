@@ -1,15 +1,9 @@
 ﻿using Imetame.Documentacao.CrossCutting.Services.Destra;
 using Imetame.Documentacao.CrossCutting.Services.Destra.Models;
 using Imetame.Documentacao.Domain.Entities;
+using Imetame.Documentacao.Domain.Models;
 using Imetame.Documentacao.Domain.Repositories;
-using Imetame.Documentacao.WebAPI.Helpers;
-using Imetame.Documentacao.WebAPI.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using OpenIddict.Validation.AspNetCore;
-using System.Net;
-using System.Text;
 using System.Text.Json;
 
 namespace Imetame.Documentacao.WebApi.Controllers
@@ -17,15 +11,18 @@ namespace Imetame.Documentacao.WebApi.Controllers
     
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
+    //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
     public class DestraController : Controller
     {
         private readonly IConfiguration _configuration;
         private readonly IDestraService _destraService;
-        public DestraController(IConfiguration configuration, IDestraService destraService)
+        private readonly IBaseRepository<Domain.Entities.AtividadeEspecifica> _repAtividadeEspecifica;
+
+        public DestraController(IConfiguration configuration, IDestraService destraService, IBaseRepository<Domain.Entities.AtividadeEspecifica> repAtividadeEspecifica)
         {
             _configuration = configuration;
             _destraService = destraService;
+            _repAtividadeEspecifica = repAtividadeEspecifica;
         }
 
         private async Task<AuthResponse> Login()
@@ -154,6 +151,27 @@ namespace Imetame.Documentacao.WebApi.Controllers
                     var result = await _destraService.GetAsync(endPoint,response.Token);
                     if (result.IsSuccessStatusCode)
                     {
+                        var jsonResponse = await result.Content.ReadAsStringAsync();
+                        List<AtividadeEspecifica> listAtividades = new List<AtividadeEspecifica>();
+
+                        ListaAtividadesModel listaModel = JsonSerializer.Deserialize<ListaAtividadesModel>(jsonResponse);
+
+                        foreach (var item in listaModel.LISTA)
+                        {
+                            AtividadeEspecifica at = new AtividadeEspecifica
+                            {
+                                Codigo = item.codigo,
+                                Descricao = item.descricao,
+                                IdDestra = item.id,
+                            };
+
+                            listAtividades.Add(at);
+                        }
+
+                        // ESTÁ DESSA MANEIRA POIS A CLASSE ENTITY CRIADA NO PROJETO INSERE UM GUID E O BASE REPOSITORIO NÃO SALVA DESSA MANEIRA - TENTEI PDRONIZAR MAS MUDA MUITA COISA - MATHEUS FARTEC
+                        listAtividades.ForEach(m => m.Id = new Guid());
+                        await _repAtividadeEspecifica.InsertRangeAsync(listAtividades);
+
                         return Ok(await result.Content.ReadAsStringAsync());
                     }
 

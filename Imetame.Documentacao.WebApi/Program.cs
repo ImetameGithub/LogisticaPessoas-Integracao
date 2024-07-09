@@ -88,6 +88,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 
+//FORCAR EXECUTAR MIGRATION AO ABRIR
+await app.MigrateDatabaseAsync();
 
 
 

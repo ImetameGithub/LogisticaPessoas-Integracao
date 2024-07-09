@@ -1,0 +1,91 @@
+<div id="de-paras" class="default-list-page page-layout simple inner-scroll">
+    <!-- CENTER -->
+    <div class="center" fxFlex>
+        <!-- HEADER -->
+        <div class="header accent-500 p-16 p-sm-24" fxLayout="column" fxLayoutAlign="start" fxLayout.gt-xs="row"
+            fxLayoutAlign.gt-xs="space-between center">
+            <!-- APP TITLE -->
+            <div fxLayout="row" fxLayoutAlign="start center">
+                <div class="logo" fxLayout="row" fxLayoutAlign="start center">
+                    <mat-icon class="logo-icon mr-16" [@animate]="{
+                            value: '*',
+                            params: { delay: '50ms', scale: '0.2' }
+                        }">
+                        ballot
+                    </mat-icon>
+                    <span class="logo-text h1" [@animate]="{
+                            value: '*',
+                            params: { delay: '100ms', x: '-25px' }
+                        }">
+                        Atividades Específicas 
+                    </span>
+                </div>
+            </div>
+            <!-- / APP TITLE -->
+            <!-- SEARCH -->
+            <div class="ml-sm-64 mr-sm-128" fxLayout="row" fxLayoutAlign="center center" fxFlex>
+                <div class="search-wrapper mt-16 mt-sm-0">
+                    <div class="search" fxFlex fxLayout="row" fxLayoutAlign="start center">
+                        <mat-icon>search</mat-icon>
+                        <input [formControl]="searchInput" class="input-search" placeholder="Pesquise aqui...">
+                    </div>
+                </div>
+            </div>
+            <!-- / SEARCH -->
+
+            <!-- ADD FILE BUTTON -->
+            <div class="file-uploader">
+                <button
+                    mat-fab
+                    color="accent"
+                    class="add-file-button"
+                    [routerLink]="'./novo'"
+                    aria-label="Novo"
+                    [@animate]="{
+                        value: '*',
+                        params: { delay: '300ms', scale: '0.2' }
+                    }"
+                >
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+            <!-- / ADD FILE BUTTON -->
+        </div>
+        <!-- / HEADER -->
+        <!-- CONTENT -->
+        <div class="content" fusePerfectScrollbar>
+            <mat-table mat-table #table [dataSource]="dataSource" class="mat-elevation-z8 demo-table" [@animateStagger]="{ value: '50' }">
+                <ng-container matColumnDef="codigo">
+                    <mat-header-cell fxFlex="45%" *matHeaderCellDef>Atividades Específicas</mat-header-cell>
+                    <mat-cell fxFlex="45%" *matCellDef="let row">
+                        {{ row.codigo }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="credenciadora">
+                    <mat-header-cell *matHeaderCellDef>Credenciadora</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> DESTRA </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="ultimaAtualizacao">
+                    <mat-header-cell *matHeaderCellDef>Ultima Atualização</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ dataAtual | date: "dd/MM/yyyy" }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="colaboradoresCadastrados">
+                    <mat-header-cell *matHeaderCellDef>Colaboradores Cadastrados </mat-header-cell>
+                    <mat-cell *matCellDef="let row">10</mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+                <mat-row *matRowDef="let item; columns: displayedColumns" (click)="abrir(item)" matRipple
+                    [@animate]="{ value: '*', params: { y: '100%' } }">
+                </mat-row>
+            </mat-table>
+        </div>
+        <mat-paginator [length]="totalCount" [pageIndex]="page - 1" [pageSize]="pageSize"
+            [pageSizeOptions]="[5,10,20,50]" (page)="onPageChange($event)">
+        </mat-paginator>
+        <!-- / CONTENT -->
+    </div>
+    <!-- / CENTER -->
+</div>

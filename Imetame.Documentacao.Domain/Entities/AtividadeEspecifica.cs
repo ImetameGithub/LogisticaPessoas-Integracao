@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace Imetame.Documentacao.Domain.Entities
 {
-    public class CredenciadoraDePara :  Entity
+    public class AtividadeEspecifica : Entity
     {
-        public string Credenciadora { get; set; }
-        public string De { get; set; }
-        public string Para { get; set; }
+        public string Codigo {  get; set; }
+        public string Descricao {  get; set; }
+        public int IdDestra { get; set; }
+           
     }
 }

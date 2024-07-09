@@ -21,6 +21,7 @@ namespace Imetame.Documentacao.Infra.Data.Context
         public DbSet<Domain.Entities.Pedido> Pedido { get; set; }
         public DbSet<Domain.Entities.Processamento> Processamento { get; set; }
         public DbSet<Domain.Entities.ResultadoCadastro> ResultadoCadastro { get; set; }
+        public DbSet<Domain.Entities.AtividadeEspecifica> AtividadeEspecifica { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -57,6 +58,7 @@ namespace Imetame.Documentacao.Infra.Data.Context
             modelBuilder.Entity<Domain.Entities.LogProcessamento>(new LogProcessamentoMap().Configure);
             modelBuilder.Entity<Domain.Entities.Pedido>(new PedidoMap().Configure);        
             modelBuilder.Entity<Domain.Entities.Processamento>(new ProcessamentoMap().Configure);
+            modelBuilder.Entity<Domain.Entities.AtividadeEspecifica>(new AtividadeEspecificaMap().Configure);
 
 
 

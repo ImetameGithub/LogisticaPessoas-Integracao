@@ -1,4 +1,3 @@
-
 const baseUrl = 'https://localhost:7030/api';
 export const environment = {
     production: true,
@@ -7,7 +6,7 @@ export const environment = {
     // URL PARA API - MATHEUS MONFREIDES - FARTEC SISTEMAS
     //#region PEDIDO
     Pedido: {
-        GetItem: `${baseUrl}/Pedido/GetItem`,   
+        GetItem: `${baseUrl}/Pedido/GetItem`,
         Add: `${baseUrl}/Pedido/Add`,
         Update: `${baseUrl}/Pedido/Update`,
         Delete: `${baseUrl}/Pedido/Delete`,
@@ -28,8 +27,19 @@ export const environment = {
 
     //#region COLABORADORES
     Colaboradores: {
-        GetColaboradores: `${baseUrl}/Colaboradores/GetColaboradores`, 
-        GetDocumentosProtheus: `${baseUrl}/Colaboradores/GetDocumentosProtheus`, 
+        GetColaboradores: `${baseUrl}/Colaboradores/GetColaboradores`,
+        GetDocumentosProtheus: `${baseUrl}/Colaboradores/GetDocumentosProtheus`,
+    },
+    //#endregion
+
+    //#region ATIVIDADE-ESPECIFICA
+    AtividadeEspecifica: {
+        GetItem: `${baseUrl}/AtividadeEspecifica/GetItem`,
+        Add: `${baseUrl}/AtividadeEspecifica/Add`,
+        Update: `${baseUrl}/AtividadeEspecifica/Update`,
+        Delete: `${baseUrl}/AtividadeEspecifica/Delete`,
+        GetAll: `${baseUrl}/AtividadeEspecifica/GetAll`,
+        GetAllPaginated: `${baseUrl}/AtividadeEspecifica/GetAllPaginated`,
     },
     //#endregion
 

@@ -4,6 +4,7 @@ using Imetame.Documentacao.Infra.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Imetame.Documentacao.Infra.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240709141310_AddAtividadeEspecifica")]
+    partial class AddAtividadeEspecifica
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,9 +24,13 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.AtividadeEspecifica", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-            modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.Credenciadora", b => {
-                 b.Property<string>("Codigo")
+                    b.Property<string>("Codigo")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -38,23 +44,6 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AtividadeEspecifica", (string)null);
-            });
-
-            modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.AtividadeEspecifica", b =>
-
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Descricao")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Credenciadora", (string)null);
                 });
 
             modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.CredenciadoraDePara", b =>

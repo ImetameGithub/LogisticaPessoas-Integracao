@@ -1,47 +1,30 @@
-import {
-  Component,
-  OnDestroy,
-  OnInit,
-  ViewEncapsulation,
-  ViewChild,
-  ViewChildren,
-  AfterViewInit,
-  ChangeDetectorRef,
-} from "@angular/core";
-import { takeUntil, debounceTime, distinctUntilChanged } from "rxjs/operators";
-import { Subject, merge } from "rxjs";
-import { fuseAnimations } from "@fuse/animations";
-
-import { FilesDataSource } from "app/utils/files-data-source";
-import { MatPaginator, PageEvent } from "@angular/material/paginator";
-import { MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
-import { MatSnackBar } from "@angular/material/snack-bar";
-
-import { ShowErrosDialogComponent } from "app/shared/components/show-erros-dialog/show-erros-dialog.component";
-import { ConfirmDialogComponent } from "app/shared/components/confirm-dialog/confirm-dialog.component";
-
-import { Title } from "@angular/platform-browser";
-import { FormControl, UntypedFormGroup } from "@angular/forms";
-import { Router, ActivatedRoute } from "@angular/router";
-
-import { FusePerfectScrollbarDirective } from "@fuse/directives/fuse-perfect-scrollbar/fuse-perfect-scrollbar.directive";
-import { PedidoService } from "../pedido.service";
-import { FuseProgressBarService } from "@fuse/components/progress-bar/progress-bar.service";
-import { Pedido } from "app/models/Pedido";
-import { MatSort } from "@angular/material/sort";
-import { MatTableDataSource } from "@angular/material/table";
-import { FuseConfirmationService } from "@fuse/services/confirmation";
-import { PaginatedResponse } from "app/models/PaginatedResponse";
-import { PedidoFormComponent } from "../pedido-form/pedido-form.component";
+import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { FormControl, UntypedFormGroup } from '@angular/forms';
+import { MatDialogRef, MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+import { Router, ActivatedRoute } from '@angular/router';
+import { FuseConfirmationService } from '@fuse/services/confirmation';
+import { AtividadeEspecifica } from 'app/models/AtividadeEspecifica';
+import { PaginatedResponse } from 'app/models/PaginatedResponse';
+import { ConfirmDialogComponent } from 'app/shared/components/confirm-dialog/confirm-dialog.component';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { AtividadeEspecificaFormComponent } from '../atividade-especifica-form/atividade-especifica-form.component';
+import { AtividadeEspecificaService } from '../atividade-especifica.service';
+import { Title } from '@angular/platform-browser';
+import { fuseAnimations } from '@fuse/animations';
 
 @Component({
-  selector: "pedido-list",
-  templateUrl: "./pedido-list.component.html",
-  styleUrls: ["./pedido-list.component.scss"],
+  selector: 'atividade-especifica-list',
+  templateUrl: './atividade-especifica-list.component.html',
+  styleUrls: ['./atividade-especifica-list.component.scss'],
   encapsulation: ViewEncapsulation.None,
   animations: fuseAnimations,
 })
-export class PedidoListComponent implements OnInit {
+export class AtividadeEspecificaListComponent implements OnInit {
+
 
   //#region CONTRALADORES BOLEANOS
   blockRequisicao: boolean = false;
@@ -54,15 +37,17 @@ export class PedidoListComponent implements OnInit {
   //#endregion 
 
   //#region PESQUISA E LISTAS
-  PedidoList: Pedido[];
+  AtividadeEspecificaList: AtividadeEspecifica[];
   searchInput: FormControl;
   nenhumDadoEncontrado: boolean;
   //#endregion
 
   //#region DATA SOURCE E FORMULARIO
-  displayedColumns = ["credenciadora", "unidade", "numPedido", "buttons"];
-  dataSource: MatTableDataSource<Pedido>;
+  // displayedColumns = ["codigo", "descricao", "buttons"];
+  displayedColumns = ["codigo","credenciadora","ultimaAtualizacao", "colaboradoresCadastrados"];
+  dataSource: MatTableDataSource<AtividadeEspecifica>;
   form: UntypedFormGroup;
+  dataAtual: Date = new Date()
   //#endregion
 
   //#region PAGINAÇÃO 
@@ -76,10 +61,10 @@ export class PedidoListComponent implements OnInit {
     private _changeDetectorRef: ChangeDetectorRef,
     private _snackbar: MatSnackBar,
     public dialog: MatDialog,
-    private titleService: Title,
     private router: Router,
+    private titleService: Title,
     private route: ActivatedRoute,
-    private _PedidoService: PedidoService,
+    private _AtividadeEspecificaService: AtividadeEspecificaService,
 
   ) {
 
@@ -96,7 +81,7 @@ export class PedidoListComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.titleService.setTitle("Pedido - Imetame");
+    this.titleService.setTitle("Atividade Específica - Imetame");
     this.loadData()
   }
 
@@ -112,9 +97,9 @@ export class PedidoListComponent implements OnInit {
 
     this.confirmDialogRef.afterClosed().subscribe((result) => {
         if (result) {
-          this._PedidoService.Delete(ItemDelete).subscribe(
+          this._AtividadeEspecificaService.Delete(ItemDelete).subscribe(
             {
-              next: (response: Pedido) => {
+              next: (response: AtividadeEspecifica) => {
                 this._snackbar.open("Item excluído com sucesso", 'X', {
                   duration: 2500,
                   panelClass: 'snackbar-success',
@@ -138,8 +123,8 @@ export class PedidoListComponent implements OnInit {
 
   //#region FUNÇÕES DE LOAD E ATUALIZAR PAGINA - 23/03/2024
   loadData() {
-    this._PedidoService.listPedido$.subscribe(
-      (response: PaginatedResponse<Pedido>) => {
+    this._AtividadeEspecificaService.listAtividadeEspecifica$.subscribe(
+      (response: PaginatedResponse<AtividadeEspecifica>) => {
         this.totalCount = response.totalCount;
         this.page = response.page;
         this.pageSize = response.pageSize;
@@ -163,20 +148,20 @@ export class PedidoListComponent implements OnInit {
   abrir(item) {
     this.router.navigate([item.id], { relativeTo: this.route });
   }
-  openModalEdit(itemEdit: Pedido) {
+  openModalEdit(itemEdit: AtividadeEspecifica) {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = false;
     dialogConfig.width = '80%';
     dialogConfig.height = 'auto%';
     dialogConfig.data = { itemEdit };
-    const dialogRef = this._matDialog.open(PedidoFormComponent, dialogConfig);
+    const dialogRef = this._matDialog.open(AtividadeEspecificaFormComponent, dialogConfig);
 
     //#region AFTER CLOSE REALIZADO DESSA MANEIRA PARA EVITAR VARIAS CONSULTAS NA API - MATHEUS MONFREIDES 04/12/2023
-    dialogRef.afterClosed().subscribe((PedidoAtualizado: Pedido | null) => {
-      if (PedidoAtualizado) {
-        const index = this.dataSource.data.findIndex(m => m.Id === PedidoAtualizado.Id);
+    dialogRef.afterClosed().subscribe((AtividadeEspecificaAtualizado: AtividadeEspecifica | null) => {
+      if (AtividadeEspecificaAtualizado) {
+        const index = this.dataSource.data.findIndex(m => m.Id === AtividadeEspecificaAtualizado.Id);
         if (index !== -1) {
-          this.dataSource.data[index] = PedidoAtualizado;
+          this.dataSource.data[index] = AtividadeEspecificaAtualizado;
           this.dataSource.data = [...this.dataSource.data];
         }
       }
@@ -187,19 +172,10 @@ export class PedidoListComponent implements OnInit {
 
   //#region FUNÇÃO FILTRAR REGISTROS - MATHEUS MONFREIDES 04/12/2023
   filtrar(value: string): void {
-    // if (value == '' || value == "") {
-    //   this.loadData();
-    //   return;
-    // }
-
-    // if (this.paginator.pageIndex !== 0) {
-    //   this.paginator.firstPage();
-    // }
-
-    this._PedidoService.GetAllPaginated(this.page, this.pageSize, value)
+    this._AtividadeEspecificaService.GetAllPaginated(this.page, this.pageSize, value)
       .subscribe(
         {
-          next: (response: PaginatedResponse<Pedido>) => {
+          next: (response: PaginatedResponse<AtividadeEspecifica>) => {
             if (response.data.length <= 0) {
               this.nenhumDadoEncontrado = true;
             }
@@ -207,7 +183,7 @@ export class PedidoListComponent implements OnInit {
             this.page = response.page;
             this.pageSize = response.pageSize;
 
-            this.PedidoList = response.data;
+            this.AtividadeEspecificaList = response.data;
             this.dataSource = new MatTableDataSource();
             this.dataSource = new MatTableDataSource(response.data);
             this.reassignPaginatorAndSort();

@@ -15,6 +15,13 @@ export const navigation: FuseNavigation[] = [
                 icon: "business",
             },
             {
+                id: "atividade-especificas",
+                title: "Atividades específicas",
+                type: "item",
+                url: "/atividade-especifica",
+                icon: "business",
+            },
+            {
                 id: "de-para",
                 title: "De Para",
                 type: "item",

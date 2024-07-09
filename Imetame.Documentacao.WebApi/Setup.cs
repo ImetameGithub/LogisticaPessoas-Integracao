@@ -53,7 +53,7 @@ namespace Imetame.Documentacao.WebApi
                 options.Filters.Add(typeof(ValidateModelStateFilter));
 
             })
-              
+
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
@@ -94,7 +94,7 @@ namespace Imetame.Documentacao.WebApi
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("PodeGerenciar", policy => policy.RequireClaim("servidor", "gerenciar"));
-                
+
 
             });
 
@@ -162,7 +162,7 @@ namespace Imetame.Documentacao.WebApi
         {
             //api
 
-            
+
 
             //Options
             services.Configure<EmailSenderOptions>(configuration.GetSection("Email"));
@@ -185,14 +185,14 @@ namespace Imetame.Documentacao.WebApi
 
             // Domain
             services.AddScoped<IUser, AspNetUser>();
-            
+
             services.AddScoped<ICredenciadoraDeParaService, CredenciadoraDeParaService>();
             services.AddScoped<ICadastroService, CadastroService>();
             services.AddScoped<ICadastroDestraService, CadastroDestraService>();
-            services.AddScoped<IPedidoService, PedidoService>();  
-            
+            services.AddScoped<IPedidoService, PedidoService>();
+
             services.AddScoped<IProcessamentoService, ProcessamentoService>();
-            
+
             services.AddScoped<ConsoleHelper>();
 
             // Infra - Data      
@@ -207,7 +207,7 @@ namespace Imetame.Documentacao.WebApi
             services.AddScoped<Domain.Repositories.IPedidoRepository, Infra.Data.Repositories.PedidoRepository>();
             services.AddScoped<Domain.Repositories.IProcessamentoRepository, Infra.Data.Repositories.ProcessamentoRepository>();
             services.AddScoped<Domain.Repositories.ILogProcessamentoRepository, Infra.Data.Repositories.LogProcessamentoRepository>();
-            services.AddScoped<Domain.Repositories.IResultadoCadastroRepository, Infra.Data.Repositories.ResultadoCadastroRepository>();            
+            services.AddScoped<Domain.Repositories.IResultadoCadastroRepository, Infra.Data.Repositories.ResultadoCadastroRepository>();
             services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 
             //CrossCutting
@@ -225,7 +225,7 @@ namespace Imetame.Documentacao.WebApi
             return services;
         }
 
-       
+
         public static IApplicationBuilder UseCustomStaticFiles(this IApplicationBuilder app)
         {
             app.UseStaticFiles();
@@ -242,4 +242,28 @@ namespace Imetame.Documentacao.WebApi
         }
 
     }
+    public static class MigrationManager
+    {
+        public static async Task<IHost> MigrateDatabaseAsync(this IHost host)
+        {
+            using (var scope = host.Services.CreateScope())
+            {
+                using (var appContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>())
+                {
+                    try
+                    {
+                        //appContext.Database.Migrate();
+                        await appContext.Database.MigrateAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        //Log errors or do anything you think it's need                        throw;
+                    }
+                }
+            }
+
+            return host;
+        }
+    }
 }
+

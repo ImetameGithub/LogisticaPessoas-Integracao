@@ -2,29 +2,26 @@
 using Imetame.Documentacao.Domain.Repositories;
 using Imetame.Documentacao.WebAPI.Helpers;
 using Imetame.Documentacao.WebAPI.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using OpenIddict.Validation.AspNetCore;
 using System.Text;
 
 namespace Imetame.Documentacao.WebApi.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
-    public class PedidoController : Controller
+    public class AtividadeEspecificaController : Controller
     {
-        private readonly IBaseRepository<Pedido> _repPedido;
+        private readonly IBaseRepository<AtividadeEspecifica> _repAtividadeEspecifica;
         private readonly IConfiguration _configuration;
-        public PedidoController(IBaseRepository<Pedido> repPedido, IConfiguration configuration)
+        public AtividadeEspecificaController(IBaseRepository<AtividadeEspecifica> repAtividadeEspecifica, IConfiguration configuration)
         {
-            _repPedido = repPedido;
+            _repAtividadeEspecifica = repAtividadeEspecifica;
             _configuration = configuration;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllPaginated(int page = 1, int pageSize = 10, string texto = "")
+        public async Task<IActionResult> GetAllPaginated(int page = 1, int pageSize = 10, string filtro = "")
         {
             try
             {
@@ -33,22 +30,22 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 int offset = (page - 1) * pageSize;
 
-                IQueryable<Pedido> query = _repPedido.SelectContext()
-                                                             .OrderBy(x => x.NumPedido);
-                if (!string.IsNullOrEmpty(texto))
-                    query = query.Where(q => q.Credenciadora.Contains(texto) || q.Unidade.Contains(texto) || q.NumPedido.Contains(texto));
+                IQueryable<AtividadeEspecifica> query = _repAtividadeEspecifica.SelectContext()
+                                                             .OrderBy(x => x.Codigo);
+                if (!string.IsNullOrEmpty(filtro))
+                    query = query.Where(q => q.Codigo.Contains(filtro) || q.Descricao.Contains(filtro));
 
                 int totalCount = await query.CountAsync();
 
-                IList<Pedido> listPedidos = query.Skip(offset)
+                IList<AtividadeEspecifica> listAtividadeEspecificas = query.Skip(offset)
                                                              .Take(pageSize).ToList();
 
-                PaginatedResponse<Pedido> paginatedResponse = new PaginatedResponse<Pedido>
+                PaginatedResponse<AtividadeEspecifica> paginatedResponse = new PaginatedResponse<AtividadeEspecifica>
                 {
                     totalCount = totalCount,
                     page = page,
                     pageSize = pageSize,
-                    data = listPedidos
+                    data = listAtividadeEspecificas
                 };
                 return Ok(paginatedResponse);
             }
@@ -68,9 +65,9 @@ namespace Imetame.Documentacao.WebApi.Controllers
             if (!ModelState.IsValid)
                 throw new Exception("Parametros necessarios nao informados");
 
-            List<Pedido> listaPedido = await _repPedido.SelectContext()
+            List<AtividadeEspecifica> listaAtividadeEspecifica = await _repAtividadeEspecifica.SelectContext()
                                                             .ToListAsync();
-            return Ok(listaPedido);
+            return Ok(listaAtividadeEspecifica);
         }
         #endregion GET ALL
 
@@ -81,10 +78,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
             if (!ModelState.IsValid)
                 throw new Exception("Parametros necessarios nao informados");
 
-            Pedido Pedido = await _repPedido.SelectContext()                                                            
+            AtividadeEspecifica AtividadeEspecifica = await _repAtividadeEspecifica.SelectContext()
                                                             .Where(e => e.Id.Equals(id))
                                                             .FirstAsync();
-            return Ok(Pedido);
+            return Ok(AtividadeEspecifica);
         }
         #endregion GET ALL        
 
@@ -93,7 +90,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
         #region FUNÇÕES CRUD - MATHEUS MONFREIDES FARTEC SISTEMAS
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] Pedido model, CancellationToken cancellationToken)
+        public async Task<IActionResult> Add([FromBody] AtividadeEspecifica model, CancellationToken cancellationToken)
         {
             try
             {
@@ -104,7 +101,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                     throw new Exception("Falha ao Salvar Dados.\n" + erro);
                 }
                 model.Id = new Guid();
-                await _repPedido.SaveAsync(model);
+                await _repAtividadeEspecifica.SaveAsync(model);
 
                 return Ok(model);
             }
@@ -115,7 +112,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] Pedido model, CancellationToken cancellationToken)
+        public async Task<IActionResult> Update([FromBody] AtividadeEspecifica model, CancellationToken cancellationToken)
         {
             try
             {
@@ -126,7 +123,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                     throw new Exception("Falha ao Salvar Dados.\n" + erro);
                 }
 
-                await _repPedido.UpdateAsync(model);
+                await _repAtividadeEspecifica.UpdateAsync(model);
 
 
                 return Ok(model);
@@ -142,14 +139,14 @@ namespace Imetame.Documentacao.WebApi.Controllers
         {
             try
             {
-                Pedido Pedido = await _repPedido.SelectAsync(id) ?? throw new Exception("Erro ao apagar o Pedido com o id fornecido.");
+                AtividadeEspecifica AtividadeEspecifica = await _repAtividadeEspecifica.SelectAsync(id) ?? throw new Exception("Erro ao apagar o AtividadeEspecifica com o id fornecido.");
 
-                await _repPedido.DeleteAsync(Pedido);
+                await _repAtividadeEspecifica.DeleteAsync(AtividadeEspecifica);
 
                 return Ok(new ApiResponse
                 {
                     Success = true,
-                    Message = "Pedido excluido com sucesso"
+                    Message = "Atividade Especifica excluida com sucesso"
                 });
             }
             catch (Exception ex)
@@ -160,3 +157,4 @@ namespace Imetame.Documentacao.WebApi.Controllers
         #endregion
     }
 }
+
