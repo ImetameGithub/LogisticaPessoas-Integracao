@@ -197,10 +197,7 @@ namespace Imetame.Documentacao.WebApi
 
             // Infra - Data      
 
-
             services.AddTransient<ApplicationDbContext>();
-
-
 
             services.AddScoped<Domain.Repositories.IColaboradorRepository, Infra.Data.Repositories.ColaboradorRepository>();
             services.AddScoped<Domain.Repositories.ICredenciadoraDeParaRepository, Infra.Data.Repositories.CredenciadoraDeParaRepository>();
@@ -212,15 +209,11 @@ namespace Imetame.Documentacao.WebApi
 
             //CrossCutting
             services.AddTransient<CrossCutting.Services.Destra.IDestraService, CrossCutting.Services.Destra.DestraService>();
+            services.AddTransient<CrossCutting.Services.Protheus.IProtheusService, CrossCutting.Services.Protheus.ProtheusService>();
 
             //Selenium
             services.AddScoped<IWebDriver, ChromeDriver>();
             services.AddSingleton<ConfigDestra>();
-
-
-
-
-
 
             return services;
         }
