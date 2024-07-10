@@ -22,9 +22,13 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.AtividadeEspecifica", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-            modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.Credenciadora", b => {
-                 b.Property<string>("Codigo")
+                    b.Property<string>("Codigo")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -38,10 +42,59 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AtividadeEspecifica", (string)null);
-            });
+                });
 
-            modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.AtividadeEspecifica", b =>
+            modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.Colaborador", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Cracha")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
+
+                    b.Property<string>("Matricula")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
+
+                    b.Property<string>("MudaFuncao")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Colaborador", (string)null);
+                });
+
+            modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.ColaboradorxAtividade", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CXA_IDATIVIDADE_ESPECIFICA")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CXA_IDCOLABORADOR")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CXA_IDATIVIDADE_ESPECIFICA");
+
+                    b.HasIndex("CXA_IDCOLABORADOR");
+
+                    b.ToTable("ColaboradorxAtividade", (string)null);
+                });
+
+            modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.Credenciadora", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -205,6 +258,23 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
                     b.HasIndex("IdProcessamento");
 
                     b.ToTable("ResultadoCadastro", (string)null);
+                });
+
+            modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.ColaboradorxAtividade", b =>
+                {
+                    b.HasOne("Imetame.Documentacao.Domain.Entities.AtividadeEspecifica", "AtividadeEspecifica")
+                        .WithMany()
+                        .HasForeignKey("CXA_IDATIVIDADE_ESPECIFICA")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Imetame.Documentacao.Domain.Entities.Colaborador", "Colaborador")
+                        .WithMany()
+                        .HasForeignKey("CXA_IDCOLABORADOR")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("AtividadeEspecifica");
+
+                    b.Navigation("Colaborador");
                 });
 
             modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.LogProcessamento", b =>

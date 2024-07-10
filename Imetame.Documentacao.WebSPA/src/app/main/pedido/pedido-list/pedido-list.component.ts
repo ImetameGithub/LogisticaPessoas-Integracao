@@ -174,7 +174,7 @@ export class PedidoListComponent implements OnInit {
     //#region AFTER CLOSE REALIZADO DESSA MANEIRA PARA EVITAR VARIAS CONSULTAS NA API - MATHEUS MONFREIDES 04/12/2023
     dialogRef.afterClosed().subscribe((PedidoAtualizado: Pedido | null) => {
       if (PedidoAtualizado) {
-        const index = this.dataSource.data.findIndex(m => m.Id === PedidoAtualizado.Id);
+        const index = this.dataSource.data.findIndex(m => m.id === PedidoAtualizado.id);
         if (index !== -1) {
           this.dataSource.data[index] = PedidoAtualizado;
           this.dataSource.data = [...this.dataSource.data];

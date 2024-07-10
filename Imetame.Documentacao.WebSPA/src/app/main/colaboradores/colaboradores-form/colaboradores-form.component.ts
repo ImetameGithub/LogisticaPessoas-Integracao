@@ -5,21 +5,26 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FuseProgressBarService } from '@fuse/components/progress-bar/progress-bar.service';
-import { Credenciadora } from 'app/models/Crendenciadora';
+import { Colaborador } from 'app/models/Colaborador';
 import { ConfirmDialogComponent } from 'app/shared/components/confirm-dialog/confirm-dialog.component';
 import { ShowErrosDialogComponent } from 'app/shared/components/show-erros-dialog/show-erros-dialog.component';
 import { GenericValidator } from 'app/utils/generic-form-validator';
 import { Subject } from 'rxjs';
-import { CredenciadoraService } from '../credenciadora.service';
+import { ColaboradorService } from '../colaboradores.service';
+import { AtividadeEspecifica } from 'app/models/AtividadeEspecifica';
+import { CustomOptionsSelect } from 'app/shared/components/components.types';
+import { CustomSearchSelectComponent } from 'app/shared/components/custom-select/custom-select.component';
+import { ColaboradorModel } from 'app/models/DTO/ColaboradorModel';
 
 @Component({
-  selector: 'credenciadora-form',
-  templateUrl: './credenciadora-form.component.html',
-  styleUrls: ['./credenciadora-form.component.scss']
+  selector: 'colaboradores-form',
+  templateUrl: './colaboradores-form.component.html',
+  styleUrls: ['./colaboradores-form.component.scss']
 })
-export class CredenciadoraFormComponent implements OnInit {
+export class ColaboradoresFormComponent implements OnInit {
 
-    blockRequisicao: boolean = false;
+
+  blockRequisicao: boolean = false;
     private _unsubscribeAll: Subject<any>;
     genericValidator: GenericValidator;
     validationMessages: { [key: string]: { [key: string]: any } };
@@ -35,11 +40,15 @@ export class CredenciadoraFormComponent implements OnInit {
     item: any = {};
     isBusy: boolean = false;
 
-    selectCredenciadora: any;
+    selectColaborador: any;
+
+
+    atividadesOptions: CustomOptionsSelect[] = [];
+    colaboradoresOptions: CustomOptionsSelect[] = [];
 
     constructor(
         private titleService: Title,
-        private _Credenciadoraservice: CredenciadoraService,
+        private _Colaboradorservice: ColaboradorService,
         private _snackbar: MatSnackBar,
         private _formBuilder: UntypedFormBuilder,
         private router: Router,
@@ -47,25 +56,27 @@ export class CredenciadoraFormComponent implements OnInit {
         private _fuseProgressBarService: FuseProgressBarService,
     ) {
         this.form = new FormGroup({
-            descricao: new FormControl('', [Validators.required]),            
+            atividades: new FormControl([], [Validators.required]),
         });
-        this.titleService.setTitle("Novo - Credenciadora - Imetame");
+        this.titleService.setTitle("Novo - Colaboradores - Imetame");
     }
 
 
     ngOnInit() {
 
-        this._Credenciadoraservice._selectCredenciadora$.subscribe(
+        this._Colaboradorservice._selectColaborador$.subscribe(
             (data: any) => {
                 if (data != null) {
                     
-                    this.selectCredenciadora = data;
+                    this.selectColaborador = data;
                     
                     this.form = this._formBuilder.group({
-                        descricao: [data?.descricao, [Validators.required]],                        
+                        credenciadora: [data?.credenciadora, [Validators.required]],
+                        numColaborador: [data?.numColaborador, [Validators.required]],
+                        unidade: [data?.unidade, [Validators.required]],
                     });
                     this.titleService.setTitle(
-                        data.credenciadora + " - Credenciadora - Imetame"
+                        data.credenciadora + " - Colaborador - Imetame"
                     );
                 }
             },
@@ -73,18 +84,22 @@ export class CredenciadoraFormComponent implements OnInit {
                 console.error('Erro ao buscar credenciadoras', error);
             }
         );
-        
-
-
-        // this._Credenciadoraservice.getCredenciadoras().subscribe(
-        //     (credenciadoras) => {
-        //         console.log(credenciadoras)
-        //         this.credenciadoras = credenciadoras;
-        //     },
-        //     (error) => {
-        //         console.error('Erro ao buscar credenciadoras', error);
-        //     }
-        // );
+        this._Colaboradorservice.GetAllAtividades().subscribe(
+            (data: AtividadeEspecifica[]) => {
+                this.atividadesOptions = data.map(estrutura => new CustomOptionsSelect(estrutura.id, estrutura.codigo)) ?? [];
+            },
+            (error) => {
+                console.error('Erro ao buscar credenciadoras', error);
+            }
+        );
+        this._Colaboradorservice.GetAll().subscribe(
+            (data: ColaboradorModel[]) => {
+                this.colaboradoresOptions = data.map(estrutura => new CustomOptionsSelect(estrutura.id, estrutura.nome)) ?? [];
+            },
+            (error) => {
+                console.error('Erro ao buscar credenciadoras', error);
+            }
+        );
     }
 
 
@@ -99,22 +114,22 @@ export class CredenciadoraFormComponent implements OnInit {
         if (!this.form.valid) {
             return;
         }
-        const model: Credenciadora = this.form.getRawValue();
+        const model: Colaborador = this.form.getRawValue();
 
-        if (this.selectCredenciadora) {
+        if (this.selectColaborador) {
             this.update(model);
         } else {
             this.add(model);
         }
     }
 
-    add(model: Credenciadora) {
+    add(model: Colaborador) {
         this._fuseProgressBarService.setMode("indeterminate");
         this._fuseProgressBarService.show();
         this.blockRequisicao = true;
-        this._Credenciadoraservice.Add(model).subscribe(
+        this._Colaboradorservice.Add(model).subscribe(
             {
-                next: (response: Credenciadora) => {
+                next: (response: Colaborador) => {
                     this._fuseProgressBarService.hide();
                     this.blockRequisicao = false;
                     this.router.navigate(["../"], { relativeTo: this.route });
@@ -135,14 +150,14 @@ export class CredenciadoraFormComponent implements OnInit {
         )
     }
 
-    update(model: Credenciadora) {
+    update(model: Colaborador) {
         this._fuseProgressBarService.setMode("indeterminate");
         this._fuseProgressBarService.show();
         this.blockRequisicao = true;
-        model.id = this.selectCredenciadora.id;
-        this._Credenciadoraservice.Update(model).subscribe(
+        model.id = this.selectColaborador.id;
+        this._Colaboradorservice.Update(model).subscribe(
             {
-                next: (response: Credenciadora) => {
+                next: (response: Colaborador) => {
                     this.blockRequisicao = false;
                     this._fuseProgressBarService.hide();
                     this.router.navigate(["../"], { relativeTo: this.route });
@@ -175,4 +190,5 @@ export class CredenciadoraFormComponent implements OnInit {
         return;
     };
     //#endregion
+
 }

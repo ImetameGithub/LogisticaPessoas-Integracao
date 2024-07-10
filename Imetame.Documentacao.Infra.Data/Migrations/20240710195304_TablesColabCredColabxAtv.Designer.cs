@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Imetame.Documentacao.Infra.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240709141931_Credenciadora")]
-    partial class Credenciadora
+    [Migration("20240710195304_TablesColabCredColabxAtv")]
+    partial class TablesColabCredColabxAtv
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,6 +23,78 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.AtividadeEspecifica", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("IdDestra")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AtividadeEspecifica", (string)null);
+                });
+
+            modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.Colaborador", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Cracha")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
+
+                    b.Property<string>("Matricula")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
+
+                    b.Property<string>("MudaFuncao")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Colaborador", (string)null);
+                });
+
+            modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.ColaboradorxAtividade", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CXA_IDATIVIDADE_ESPECIFICA")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CXA_IDCOLABORADOR")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CXA_IDATIVIDADE_ESPECIFICA");
+
+                    b.HasIndex("CXA_IDCOLABORADOR");
+
+                    b.ToTable("ColaboradorxAtividade", (string)null);
+                });
 
             modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.Credenciadora", b =>
                 {
@@ -188,6 +260,23 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
                     b.HasIndex("IdProcessamento");
 
                     b.ToTable("ResultadoCadastro", (string)null);
+                });
+
+            modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.ColaboradorxAtividade", b =>
+                {
+                    b.HasOne("Imetame.Documentacao.Domain.Entities.AtividadeEspecifica", "AtividadeEspecifica")
+                        .WithMany()
+                        .HasForeignKey("CXA_IDATIVIDADE_ESPECIFICA")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Imetame.Documentacao.Domain.Entities.Colaborador", "Colaborador")
+                        .WithMany()
+                        .HasForeignKey("CXA_IDCOLABORADOR")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("AtividadeEspecifica");
+
+                    b.Navigation("Colaborador");
                 });
 
             modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.LogProcessamento", b =>

@@ -27,8 +27,15 @@ export const environment = {
 
     //#region COLABORADORES
     Colaboradores: {
+        GetColaboradoresPorOs: `${baseUrl}/Colaboradores/GetColaboradoresPorOs`,
         GetColaboradores: `${baseUrl}/Colaboradores/GetColaboradores`,
         GetDocumentosProtheus: `${baseUrl}/Colaboradores/GetDocumentosProtheus`,
+        GetItem: `${baseUrl}/Colaboradores/GetItem`,   
+        Add: `${baseUrl}/Colaboradores/Add`,
+        Update: `${baseUrl}/Colaboradores/Update`,
+        Delete: `${baseUrl}/Colaboradores/Delete`,
+        GetAll: `${baseUrl}/Colaboradores/GetAll`,
+        GetAllPaginated: `${baseUrl}/Colaboradores/GetAllPaginated`,
     },
     //#endregion
 

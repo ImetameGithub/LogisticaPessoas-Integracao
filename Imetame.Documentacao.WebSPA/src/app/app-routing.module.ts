@@ -39,6 +39,13 @@ const routes: Routes = [
             ),
     },
     {
+        path: "colaboradores",
+        loadChildren: () =>
+            import("./main/colaboradores/colaboradores.module").then(
+                (mod) => mod.ColaboradoresModule
+            ),
+    },
+    {
         path: "atividade-especifica",
         loadChildren: () =>
             import("./main/atividade-especifica/atividade-especifica.module").then(
@@ -94,4 +101,4 @@ const routes: Routes = [
     imports: [RouterModule.forRoot(routes)],
     exports: [RouterModule, SigninOidcComponent],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

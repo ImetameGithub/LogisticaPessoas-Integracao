@@ -6,7 +6,7 @@ export class ColaboradorModel extends BaseEntity{
     NumCad: string;
     NumCracha: string;
     Status: string;
-    Nome: string;
+    nome: string;
     Cpf: string;
     FuncaoAtual: string;
     FuncaoInicial: string;

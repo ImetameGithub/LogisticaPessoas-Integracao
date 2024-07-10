@@ -1,4 +1,5 @@
-﻿using Imetame.Documentacao.Domain.Entities;
+﻿using Imetame.Documentacao.Domain.Core.Models;
+using Imetame.Documentacao.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;

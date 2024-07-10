@@ -159,7 +159,7 @@ export class AtividadeEspecificaListComponent implements OnInit {
     //#region AFTER CLOSE REALIZADO DESSA MANEIRA PARA EVITAR VARIAS CONSULTAS NA API - MATHEUS MONFREIDES 04/12/2023
     dialogRef.afterClosed().subscribe((AtividadeEspecificaAtualizado: AtividadeEspecifica | null) => {
       if (AtividadeEspecificaAtualizado) {
-        const index = this.dataSource.data.findIndex(m => m.Id === AtividadeEspecificaAtualizado.Id);
+        const index = this.dataSource.data.findIndex(m => m.id === AtividadeEspecificaAtualizado.id);
         if (index !== -1) {
           this.dataSource.data[index] = AtividadeEspecificaAtualizado;
           this.dataSource.data = [...this.dataSource.data];

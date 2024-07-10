@@ -1,12 +1,16 @@
 ﻿using Dapper;
+using DocumentFormat.OpenXml.Drawing;
 using Imetame.Documentacao.Domain.Entities;
 using Imetame.Documentacao.Domain.Models;
 using Imetame.Documentacao.Domain.Repositories;
+using Imetame.Documentacao.WebAPI.Helpers;
+using Imetame.Documentacao.WebAPI.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System.Text;
 
 namespace Imetame.Documentacao.WebApi.Controllers
 {
@@ -17,20 +21,22 @@ namespace Imetame.Documentacao.WebApi.Controllers
     {
         private readonly IColaboradorRepository _repository;
         private readonly IBaseRepository<Domain.Entities.Processamento> _repProcessamento;
+        private readonly IBaseRepository<Domain.Entities.Colaborador> _repColaborador;
         protected readonly SqlConnection conn;
         private readonly IConfiguration _configuration;
 
 
-        public ColaboradoresController(IColaboradorRepository repository, IBaseRepository<Domain.Entities.Processamento> repProcessamento, IConfiguration configuration)
+        public ColaboradoresController(IColaboradorRepository repository, IBaseRepository<Domain.Entities.Processamento> repProcessamento, IConfiguration configuration, IBaseRepository<Domain.Entities.Colaborador> repColaborador)
         {
             _repository = repository;
             _configuration = configuration;
             _repProcessamento = repProcessamento;
             conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            _repColaborador = repColaborador;
         }
 
         [HttpGet("{idProcessamento}")]
-        public async Task<IActionResult> GetColaboradores(Guid idProcessamento, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetColaboradoresPorOs(Guid idProcessamento, CancellationToken cancellationToken)
         {
             try
             {
@@ -78,6 +84,122 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 #endregion CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
 
                 var lista = (await this.conn.QueryAsync<ColaboradorModel>(sql, new { Oss = processamento.Oss }));
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+        }
+
+        [HttpGet()]
+        public async Task<IActionResult> GetColaboradores(int page = 1, int pageSize = 10, string texto = "")
+        {
+            try
+            {
+                int offset = (page - 1) * pageSize;
+                #region CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
+                conn.Open();
+                var sql = @"SELECT distinct [empresa] as Empresa
+                      ,[numcad] as NumCad
+                      ,[numcracha] as NumCracha
+                      ,[status] as Status
+                      ,[nomefuncionario] as Nome
+                      ,[cpf] as Cpf
+                      ,[funcaoatual] as FuncaoAtual
+                      ,[funcaoinicial] as FuncaoInicial
+                      ,[dataafastamento] as DataAfastamento
+                      ,[dataadmissao] as DataAdmissao
+                      ,[datanascimento] as DataNascimento
+                      ,[equipe] as Equipe
+                      ,[perfil] as Perfil
+                      ,[endereco] as Endereco
+                      ,[numero] as Numero
+                      ,[bairro] as Bairro
+                      ,[cidade] as Cidade
+                      ,[cep] as Cep
+                      ,[ddd] as Ddd
+                      ,[numtel] as NumTel
+                      ,[ddd2] as Ddd2
+                      ,[numtel2] as NumTel2
+                      ,[estado] as Estado
+                      ,[tempoempresaanos] as TempoEmpresaAnos
+                      ,[tempoempresaanosint] as TempoEmpresaAnosInt
+                      ,[tempoempresamesesint] as TempoEmpresaMesesInt
+                      ,[tempoempresatexto] as TempoEmpresaTeexto
+                  FROM [DW_IMETAME_NOVA_OS].[dbo].VW_FUSION_GP_COLABORADOR (nolock) COLA
+                  WHERE empresa ='01' and status = '1-Ativo'
+               		 order by Nome";
+                #endregion CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
+
+
+                var lista = (await this.conn.QueryAsync<ColaboradorModel>(sql));
+
+                int totalCount = lista.Count();
+
+                lista = lista.Skip(offset).Take(pageSize);
+
+                IList<ColaboradorModel> listColaboradores = lista.Skip(offset).Take(pageSize).ToList();
+
+                PaginatedResponse<ColaboradorModel> paginatedResponse = new PaginatedResponse<ColaboradorModel>
+                {
+                    totalCount = totalCount,
+                    page = page,
+                    pageSize = pageSize,
+                    data = listColaboradores
+                };
+                return Ok(paginatedResponse);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            try
+            {
+                #region CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
+                conn.Open();
+                var sql = @"SELECT distinct [empresa] as Empresa
+                      ,[numcad] as NumCad
+                      ,[numcracha] as NumCracha
+                      ,[status] as Status
+                      ,[nomefuncionario] as Nome
+                      ,[cpf] as Cpf
+                      ,[funcaoatual] as FuncaoAtual
+                      ,[funcaoinicial] as FuncaoInicial
+                      ,[dataafastamento] as DataAfastamento
+                      ,[dataadmissao] as DataAdmissao
+                      ,[datanascimento] as DataNascimento
+                      ,[equipe] as Equipe
+                      ,[perfil] as Perfil
+                      ,[endereco] as Endereco
+                      ,[numero] as Numero
+                      ,[bairro] as Bairro
+                      ,[cidade] as Cidade
+                      ,[cep] as Cep
+                      ,[ddd] as Ddd
+                      ,[numtel] as NumTel
+                      ,[ddd2] as Ddd2
+                      ,[numtel2] as NumTel2
+                      ,[estado] as Estado
+                      ,[tempoempresaanos] as TempoEmpresaAnos
+                      ,[tempoempresaanosint] as TempoEmpresaAnosInt
+                      ,[tempoempresamesesint] as TempoEmpresaMesesInt
+                      ,[tempoempresatexto] as TempoEmpresaTeexto
+                  FROM [DW_IMETAME_NOVA_OS].[dbo].VW_FUSION_GP_COLABORADOR (nolock) COLA
+                  WHERE empresa ='01' and status = '1-Ativo'
+               		 order by Nome";
+                #endregion CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
+
+
+                var lista = (await this.conn.QueryAsync<ColaboradorModel>(sql));
+
                 return Ok(lista);
             }
             catch (Exception ex)
@@ -142,5 +264,73 @@ namespace Imetame.Documentacao.WebApi.Controllers
             }
         }
 
+
+        #region FUNÇÕES CRUD - MATHEUS MONFREIDES FARTEC SISTEMAS
+        [HttpPost]
+        public async Task<IActionResult> Add([FromBody] Colaborador model, CancellationToken cancellationToken)
+        {
+            try
+            {
+                StringBuilder erro = new StringBuilder();
+                if (!ModelState.IsValid)
+                {
+                    erro = ErrorHelper.GetErroModelState(ModelState.Values);
+                    throw new Exception("Falha ao Salvar Dados.\n" + erro);
+                }
+                model.Id = new Guid();
+                await _repColaborador.SaveAsync(model);
+
+                return Ok(model);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ErrorHelper.GetException(ex));
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Update([FromBody] Colaborador model, CancellationToken cancellationToken)
+        {
+            try
+            {
+                StringBuilder erro = new StringBuilder();
+                if (!ModelState.IsValid)
+                {
+                    erro = ErrorHelper.GetErroModelState(ModelState.Values);
+                    throw new Exception("Falha ao Salvar Dados.\n" + erro);
+                }
+
+                await _repColaborador.UpdateAsync(model);
+
+
+                return Ok(model);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ErrorHelper.GetException(ex));
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            try
+            {
+                Colaborador Colaborador = await _repColaborador.SelectAsync(id) ?? throw new Exception("Erro ao apagar o Colaborador com o id fornecido.");
+
+                await _repColaborador.DeleteAsync(Colaborador);
+
+                return Ok(new ApiResponse
+                {
+                    Success = true,
+                    Message = "Colaborador excluido com sucesso"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        #endregion
     }
 }

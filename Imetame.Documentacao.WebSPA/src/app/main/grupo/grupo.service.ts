@@ -87,7 +87,7 @@ export class GrupoService implements Resolve<any>{
 
         if (!_.isNull(this.routeParams.id) && !_.isUndefined(this.routeParams.id)) {
             return new Promise((resolve, reject) => {
-                Promise.all([this.getItem(),this.getPortas(), this.getColaboradores()]).then(() => { resolve(); }, reject);
+                Promise.all([this.getItem(),this.getPortas(), this.GetColaboradoresPorOs()]).then(() => { resolve(); }, reject);
             });
 
         } else {
@@ -140,7 +140,7 @@ export class GrupoService implements Resolve<any>{
         });
     }
 
-    getColaboradores(): Promise<any> {
+    GetColaboradoresPorOs(): Promise<any> {
         return new Promise((resolve, reject) => {
             if (this.routeParams.id === 'novo') {
                 this.onItemChanged.next(null);

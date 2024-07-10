@@ -1,25 +1,31 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormControl, UntypedFormGroup } from '@angular/forms';
 import { MatDialogRef, MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
-import { Credenciadora } from 'app/models/Crendenciadora';
+import { Colaborador } from 'app/models/Colaborador';
 import { PaginatedResponse } from 'app/models/PaginatedResponse';
 import { ConfirmDialogComponent } from 'app/shared/components/confirm-dialog/confirm-dialog.component';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { CredenciadoraFormComponent } from '../credenciadora-form/credenciadora-form.component';
-import { CredenciadoraService } from '../credenciadora.service';
+import { ColaboradorService } from '../colaboradores.service';
+import { ColaboradorModel } from 'app/models/DTO/ColaboradorModel';
+import { ColaboradoresFormComponent } from '../colaboradores-form/colaboradores-form.component';
+import { fuseAnimations } from '@fuse/animations';
 
 @Component({
-  selector: 'credenciadora-list',
-  templateUrl: './credenciadora-list.component.html',
-  styleUrls: ['./credenciadora-list.component.scss']
+  selector: 'colaboradores-list',
+  templateUrl: './colaboradores-list.component.html',
+  styleUrls: ['./colaboradores-list.component.scss'],
+  encapsulation: ViewEncapsulation.None,
+  animations: fuseAnimations,
 })
-export class CredenciadoraListComponent implements OnInit {
+export class ColaboradoresListComponent implements OnInit {
+
 
   //#region CONTRALADORES BOLEANOS
   blockRequisicao: boolean = false;
@@ -32,14 +38,14 @@ export class CredenciadoraListComponent implements OnInit {
   //#endregion 
 
   //#region PESQUISA E LISTAS
-  CredenciadoraList: Credenciadora[];
+  ColaboradorList: ColaboradorModel[];
   searchInput: FormControl;
   nenhumDadoEncontrado: boolean;
   //#endregion
 
   //#region DATA SOURCE E FORMULARIO
-  displayedColumns = ["descricao", "buttons"];
-  dataSource: MatTableDataSource<Credenciadora>;
+  displayedColumns = ["cadastro", "cracha", "nome","empresa","mudaFuncao","atividadeEspecifica", "buttons"];
+  dataSource: MatTableDataSource<ColaboradorModel>;
   form: UntypedFormGroup;
   //#endregion
 
@@ -54,9 +60,10 @@ export class CredenciadoraListComponent implements OnInit {
     private _changeDetectorRef: ChangeDetectorRef,
     private _snackbar: MatSnackBar,
     public dialog: MatDialog,
+    private titleService: Title,
     private router: Router,
     private route: ActivatedRoute,
-    private _CredenciadoraService: CredenciadoraService,
+    private _ColaboradorService: ColaboradorService,
 
   ) {
 
@@ -73,6 +80,7 @@ export class CredenciadoraListComponent implements OnInit {
 
 
   ngOnInit(): void {
+    this.titleService.setTitle("Colaborador - Imetame");
     this.loadData()
   }
 
@@ -88,9 +96,9 @@ export class CredenciadoraListComponent implements OnInit {
 
     this.confirmDialogRef.afterClosed().subscribe((result) => {
         if (result) {
-          this._CredenciadoraService.Delete(ItemDelete).subscribe(
+          this._ColaboradorService.Delete(ItemDelete).subscribe(
             {
-              next: (response: Credenciadora) => {
+              next: (response: Colaborador) => {
                 this._snackbar.open("Item excluído com sucesso", 'X', {
                   duration: 2500,
                   panelClass: 'snackbar-success',
@@ -114,8 +122,8 @@ export class CredenciadoraListComponent implements OnInit {
 
   //#region FUNÇÕES DE LOAD E ATUALIZAR PAGINA - 23/03/2024
   loadData() {
-    this._CredenciadoraService.listCredenciadora$.subscribe(
-      (response: PaginatedResponse<Credenciadora>) => {
+    this._ColaboradorService.listColaborador$.subscribe(
+      (response: PaginatedResponse<ColaboradorModel>) => {
         this.totalCount = response.totalCount;
         this.page = response.page;
         this.pageSize = response.pageSize;
@@ -139,20 +147,20 @@ export class CredenciadoraListComponent implements OnInit {
   abrir(item) {
     this.router.navigate([item.id], { relativeTo: this.route });
   }
-  openModalEdit(itemEdit: Credenciadora) {
+  openModalEdit(itemEdit: ColaboradorModel) {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = false;
     dialogConfig.width = '80%';
     dialogConfig.height = 'auto%';
     dialogConfig.data = { itemEdit };
-    const dialogRef = this._matDialog.open(CredenciadoraFormComponent, dialogConfig);
+    const dialogRef = this._matDialog.open(ColaboradoresFormComponent, dialogConfig);
 
     //#region AFTER CLOSE REALIZADO DESSA MANEIRA PARA EVITAR VARIAS CONSULTAS NA API - MATHEUS MONFREIDES 04/12/2023
-    dialogRef.afterClosed().subscribe((CredenciadoraAtualizado: Credenciadora | null) => {
-      if (CredenciadoraAtualizado) {
-        const index = this.dataSource.data.findIndex(m => m.id === CredenciadoraAtualizado.id);
+    dialogRef.afterClosed().subscribe((ColaboradorAtualizado: ColaboradorModel | null) => {
+      if (ColaboradorAtualizado) {
+        const index = this.dataSource.data.findIndex(m => m.id === ColaboradorAtualizado.id);
         if (index !== -1) {
-          this.dataSource.data[index] = CredenciadoraAtualizado;
+          this.dataSource.data[index] = ColaboradorAtualizado;
           this.dataSource.data = [...this.dataSource.data];
         }
       }
@@ -172,10 +180,10 @@ export class CredenciadoraListComponent implements OnInit {
     //   this.paginator.firstPage();
     // }
 
-    this._CredenciadoraService.GetAllPaginated(this.page, this.pageSize, value)
+    this._ColaboradorService.GetAllPaginated(this.page, this.pageSize, value)
       .subscribe(
         {
-          next: (response: PaginatedResponse<Credenciadora>) => {
+          next: (response: PaginatedResponse<ColaboradorModel>) => {
             if (response.data.length <= 0) {
               this.nenhumDadoEncontrado = true;
             }
@@ -183,7 +191,7 @@ export class CredenciadoraListComponent implements OnInit {
             this.page = response.page;
             this.pageSize = response.pageSize;
 
-            this.CredenciadoraList = response.data;
+            this.ColaboradorList = response.data;
             this.dataSource = new MatTableDataSource();
             this.dataSource = new MatTableDataSource(response.data);
             this.reassignPaginatorAndSort();

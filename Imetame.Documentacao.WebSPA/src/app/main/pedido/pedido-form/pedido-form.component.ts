@@ -169,7 +169,7 @@ export class PedidoFormComponent implements OnInit {
         this._fuseProgressBarService.setMode("indeterminate");
         this._fuseProgressBarService.show();
         this.blockRequisicao = true;
-        model.Id = this.selectPedido.id;
+        model.id = this.selectPedido.id;
         this._Pedidoservice.Update(model).subscribe(
             {
                 next: (response: Pedido) => {

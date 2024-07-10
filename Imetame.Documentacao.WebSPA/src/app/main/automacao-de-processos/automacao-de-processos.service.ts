@@ -76,7 +76,7 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
         this.searchText = null;
 
         return new Promise((resolve, reject) => {
-            Promise.all([this.getColaboradores()]).then(() => { resolve(null); }, reject);
+            Promise.all([this.GetColaboradoresPorOs()]).then(() => { resolve(null); }, reject);
         });
     }
 
@@ -96,7 +96,7 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
         }
     }
 
-    // getColaboradores(): Promise<any> {
+    // GetColaboradoresPorOs(): Promise<any> {
     //     this.onItensChanged.next([]);
     //     //let param = { 'pageIndex': this.pageIndex, 'pageSize': this.pageSize, 'query': this.searchText };
 
@@ -140,9 +140,9 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
                 }));
     }
 
-    getColaboradores(): Promise<ColaboradorModel> {
+    GetColaboradoresPorOs(): Promise<ColaboradorModel> {
         return new Promise((resolve, reject) => {
-            this.dataService.getList(`${environment.Colaboradores.GetColaboradores}/${this.routeParams.processamento}`, {})
+            this.dataService.getList(`${environment.Colaboradores.GetColaboradoresPorOs}/${this.routeParams.processamento}`, {})
                 .subscribe((response: any) => {
                     this.itens = response;
                     this.onItensChanged.next(this.itens);

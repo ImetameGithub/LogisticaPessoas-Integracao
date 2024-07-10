@@ -22,17 +22,24 @@ export const navigation: FuseNavigation[] = [
                 icon: "business",
             },
             {
-                id: "de-para",
-                title: "De Para",
-                type: "item",
-                url: "/de-para",
-                icon: "business",
-            },
-            {
                 id: "pedido",
                 title: "Pedido",
                 type: "item",
                 url: "/pedido",
+                icon: "business",
+            },
+            {
+                id: "colaboradores",
+                title: "Colaboradores",
+                type: "item",
+                url: "/colaboradores",
+                icon: "business",
+            },
+            {
+                id: "de-para",
+                title: "De Para",
+                type: "item",
+                url: "/de-para",
                 icon: "business",
             },
             {

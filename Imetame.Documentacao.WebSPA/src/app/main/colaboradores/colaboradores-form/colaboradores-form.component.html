@@ -1,0 +1,77 @@
+<div id="pedido" class="default-form-page page-layout simple inner-scroll">
+    <!-- CENTER -->
+    <div class="center" fxFlex>
+        <!-- HEADER -->
+        <div class="header accent-500 p-16 p-sm-24" fxLayout="column" fxLayoutAlign="start" fxLayout.gt-xs="row"
+            fxLayoutAlign.gt-xs="space-between center">
+            <!-- APP TITLE -->
+            <div fxLayout="row" fxLayoutAlign="start center">
+                <div class="logo" fxLayout="row" fxLayoutAlign="start center">
+                    <mat-icon class="logo-icon mr-16 navi" [@animate]="{
+                            value: '*',
+                            params: { delay: '50ms', scale: '0.2' }
+                        }" [routerLink]="'../'">
+                        arrow_back
+                    </mat-icon>
+                    <span class="logo-text h1 navi" [@animate]="{
+                            value: '*',
+                            params: { delay: '100ms', x: '-25px' }
+                        }" [routerLink]="'../'">
+                        Colaboradores
+                    </span>
+                    <mat-icon class="separator">chevron_right</mat-icon>
+                    <span class="logo-text h1" [@animate]="{
+                            value: '*',
+                            params: { delay: '200ms', x: '-25px' }
+                        }" *ngIf="pageType === 'new'">
+                        Novo
+                    </span>
+                    <span class="logo-text h1" [@animate]="{
+                            value: '*',
+                            params: { delay: '200ms', x: '-25px' }
+                        }" *ngIf="pageType === 'edit'">
+                        {{ form?.controls.credenciadora.value }}
+                    </span>
+                </div>
+            </div>
+            <!-- / APP TITLE -->
+            <div>
+                <button mat-raised-button class="reference-button mat-white-bg mt-16 mt-sm-0"
+                    [disabled]="form.invalid || blockRequisicao" (click)="addOrUpdate()">
+                    <mat-icon class="mr-8">save</mat-icon>
+                    <span>Salvar</span>
+                </button>
+            </div>
+        </div>
+        <!-- / HEADER -->
+        <!-- CONTENT -->
+        <div class="content">
+            <mat-tab-group dynamicHeight="true">
+                <mat-tab label="Dados">
+                    <div class="tab-content" fusePerfectScrollbar fxLayout="row wrap" fxLayoutAlign="space-between">
+                        <Form class="w-100-p" fxLayout="row wrap" fxLayoutAlign="space-between">
+
+
+                            <custom-search-select [options]="colaboradoresOptions" [multiple]="false"
+                                formControlName="atividades" placeholder="Selecione os Colaboradores"
+                                label="Colaboradores">
+                            </custom-search-select>
+
+                            <custom-search-select [options]="atividadesOptions" [multiple]="true"
+                                formControlName="atividades" placeholder="Selecione as atividades"
+                                label="Atividades Específicas">
+                            </custom-search-select>
+
+
+                            <!-- <mat-form-field fxFlex="100" appearance="outline">
+                            </mat-form-field> -->
+                        </Form>
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+        </div>
+
+        <!-- / CONTENT -->
+    </div>
+    <!-- / CENTER -->
+</div>

@@ -17,7 +17,7 @@ export const environment = {
     //#endregion
     //#region CREDENCIADORA
     Credenciadora: {
-        Get: `${baseUrl}/Credenciadora/Get`,   
+        Get: `${baseUrl}/Credenciadora/Get`,
         Add: `${baseUrl}/Credenciadora/Add`,
         Update: `${baseUrl}/Credenciadora/Update`,
         Delete: `${baseUrl}/Credenciadora/Delete`,
@@ -28,8 +28,15 @@ export const environment = {
 
     //#region COLABORADORES
     Colaboradores: {
+        GetColaboradoresPorOs: `${baseUrl}/Colaboradores/GetColaboradoresPorOs`,
         GetColaboradores: `${baseUrl}/Colaboradores/GetColaboradores`,
         GetDocumentosProtheus: `${baseUrl}/Colaboradores/GetDocumentosProtheus`,
+        GetItem: `${baseUrl}/Colaboradores/GetItem`,
+        Add: `${baseUrl}/Colaboradores/Add`,
+        Update: `${baseUrl}/Colaboradores/Update`,
+        Delete: `${baseUrl}/Colaboradores/Delete`,
+        GetAll: `${baseUrl}/Colaboradores/GetAll`,
+        GetAllPaginated: `${baseUrl}/Colaboradores/GetAllPaginated`,
     },
     //#endregion
 
