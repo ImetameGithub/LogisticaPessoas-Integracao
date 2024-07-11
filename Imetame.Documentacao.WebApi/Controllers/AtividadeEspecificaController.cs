@@ -42,10 +42,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 PaginatedResponse<AtividadeEspecifica> paginatedResponse = new PaginatedResponse<AtividadeEspecifica>
                 {
-                    totalCount = totalCount,
-                    page = page,
-                    pageSize = pageSize,
-                    data = listAtividadeEspecificas
+                    TotalCount = totalCount,
+                    Page = page,
+                    PageSize = pageSize,
+                    Data = listAtividadeEspecificas
                 };
                 return Ok(paginatedResponse);
             }

@@ -3,10 +3,10 @@ import { BaseEntity } from "../BaseEntity";
 
 export class ColaboradorModel extends BaseEntity{
     Empresa: string;
-    NumCad: string;
+    numCad: string;
     NumCracha: string;
     Status: string;
-    nome: string;
+    Nome: string;
     Cpf: string;
     FuncaoAtual: string;
     FuncaoInicial: string;

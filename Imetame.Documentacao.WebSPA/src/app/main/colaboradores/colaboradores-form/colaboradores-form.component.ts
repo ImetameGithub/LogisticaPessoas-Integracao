@@ -12,19 +12,19 @@ import { GenericValidator } from 'app/utils/generic-form-validator';
 import { Subject } from 'rxjs';
 import { ColaboradorService } from '../colaboradores.service';
 import { AtividadeEspecifica } from 'app/models/AtividadeEspecifica';
-import { CustomOptionsSelect } from 'app/shared/components/components.types';
+import { CustomOptionsSelect } from 'app/shared/components/custom-select/components.types';
 import { CustomSearchSelectComponent } from 'app/shared/components/custom-select/custom-select.component';
 import { ColaboradorModel } from 'app/models/DTO/ColaboradorModel';
 
 @Component({
-  selector: 'colaboradores-form',
-  templateUrl: './colaboradores-form.component.html',
-  styleUrls: ['./colaboradores-form.component.scss']
+    selector: 'colaboradores-form',
+    templateUrl: './colaboradores-form.component.html',
+    styleUrls: ['./colaboradores-form.component.scss']
 })
 export class ColaboradoresFormComponent implements OnInit {
 
 
-  blockRequisicao: boolean = false;
+    blockRequisicao: boolean = false;
     private _unsubscribeAll: Subject<any>;
     genericValidator: GenericValidator;
     validationMessages: { [key: string]: { [key: string]: any } };
@@ -63,52 +63,10 @@ export class ColaboradoresFormComponent implements OnInit {
 
 
     ngOnInit() {
-
-        this._Colaboradorservice._selectColaborador$.subscribe(
-            (data: any) => {
-                if (data != null) {
-                    
-                    this.selectColaborador = data;
-                    
-                    this.form = this._formBuilder.group({
-                        credenciadora: [data?.credenciadora, [Validators.required]],
-                        numColaborador: [data?.numColaborador, [Validators.required]],
-                        unidade: [data?.unidade, [Validators.required]],
-                    });
-                    this.titleService.setTitle(
-                        data.credenciadora + " - Colaborador - Imetame"
-                    );
-                }
-            },
-            (error) => {
-                console.error('Erro ao buscar credenciadoras', error);
-            }
-        );
-        this._Colaboradorservice.GetAllAtividades().subscribe(
-            (data: AtividadeEspecifica[]) => {
-                this.atividadesOptions = data.map(estrutura => new CustomOptionsSelect(estrutura.id, estrutura.codigo)) ?? [];
-            },
-            (error) => {
-                console.error('Erro ao buscar credenciadoras', error);
-            }
-        );
-        this._Colaboradorservice.GetAll().subscribe(
-            (data: ColaboradorModel[]) => {
-                this.colaboradoresOptions = data.map(estrutura => new CustomOptionsSelect(estrutura.id, estrutura.nome)) ?? [];
-            },
-            (error) => {
-                console.error('Erro ao buscar credenciadoras', error);
-            }
-        );
+        const Projetos: ColaboradorModel[] = this.route.snapshot.data['data'];
+        this.colaboradoresOptions = Projetos.map(estrutura => new CustomOptionsSelect(estrutura.Id, estrutura.Nome)) ?? [];
     }
-
-
-    // ngOnDestroy(): void {
-    //     // Unsubscribe from all subscriptions
-    //     this._unsubscribeAll.next();
-    //     this._unsubscribeAll.complete();
-    // }
-
+    
     //#region FUNÇÕES CRUD MATHEUS MONFREIDES - FARTEC SISTEMAS
     addOrUpdate() {
         if (!this.form.valid) {
@@ -154,7 +112,7 @@ export class ColaboradoresFormComponent implements OnInit {
         this._fuseProgressBarService.setMode("indeterminate");
         this._fuseProgressBarService.show();
         this.blockRequisicao = true;
-        model.id = this.selectColaborador.id;
+        model.Id = this.selectColaborador.id;
         this._Colaboradorservice.Update(model).subscribe(
             {
                 next: (response: Colaborador) => {

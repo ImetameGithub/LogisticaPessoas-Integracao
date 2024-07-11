@@ -136,11 +136,11 @@ export class CredenciadoraComponent implements OnInit, OnDestroy {
                 if (!processo.id) {
                     this.service.cadastrarProcessamento({IdPedido: values.pedido,Oss: values.oss,OssString: '' }).then(
                         (processo) => {
-                            this.router.navigate([`${processo.id}`], { relativeTo: this.route });
+                            this.router.navigate([`${processo.Id}`], { relativeTo: this.route });
                         }
                     )
                 }else{
-                    this.router.navigate([`${processo.id}/view`], { relativeTo: this.route });
+                    this.router.navigate([`${processo.Id}/view`], { relativeTo: this.route });
                 }
             },
             (error) => this.showError(error)

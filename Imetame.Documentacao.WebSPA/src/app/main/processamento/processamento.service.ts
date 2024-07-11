@@ -167,9 +167,9 @@ export class ProcessamentoService implements Resolve<any> {
             this.dataService
                 .getList(this.apiUrl + "Processamento", param)
                 .subscribe((response: any) => {
-                    this.itens = response.data;
-                    if (this.count != response.count) {
-                        this.count = response.count;
+                    this.itens = response.Data;
+                    if (this.count != response.Count) {
+                        this.count = response.Count;
                         this.onTotalRowsChanged.next(this.count);
                     }
                     this.onItensChanged.next(this.itens);
@@ -217,7 +217,7 @@ export class ProcessamentoService implements Resolve<any> {
 
         getCredenciadoras(): Observable<any> {
         return this.dataService.getList(`${this.apiUrl}CredenciadoraDePara?pageIndex=0&pageSize=100`).pipe(
-            map((response: any) => response.data)
+            map((response: any) => response.Data)
         );
     }
 }

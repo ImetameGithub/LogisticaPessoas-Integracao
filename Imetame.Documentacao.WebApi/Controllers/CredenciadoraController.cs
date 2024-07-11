@@ -45,10 +45,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 PaginatedResponse<Credenciadora> paginatedResponse = new PaginatedResponse<Credenciadora>
                 {
-                    totalCount = totalCount,
-                    page = page,
-                    pageSize = pageSize,
-                    data = listCredenciadoras
+                    TotalCount = totalCount,
+                    Page = page,
+                    PageSize = pageSize,
+                    Data = listCredenciadoras
                 };
                 return Ok(paginatedResponse);
             }

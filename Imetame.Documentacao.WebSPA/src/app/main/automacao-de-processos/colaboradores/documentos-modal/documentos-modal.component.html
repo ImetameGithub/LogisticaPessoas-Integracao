@@ -1,5 +1,5 @@
 <div class="chamada">
-    <span>{{documentos[0].nomeColaborador}}</span>
+    <span>{{documentos[0].NomeColaborador}}</span>
 </div>
 
 <mat-grid-list cols="6" rowHeight="100px">
@@ -36,9 +36,9 @@
                 <div class="modal-content">
                     <div class="document-grid">
                         <div *ngFor="let doc of documentos" class="document-box">
-                            <button matTooltip={{doc.descArquivo}} mat-button mat-raised-button
+                            <button matTooltip={{doc.DescArquivo}} mat-button mat-raised-button
                                 (click)="docDetalhes(doc)">{{
-                                doc.descArquivo }}</button>
+                                doc.DescArquivo }}</button>
                         </div>
                     </div>
                 </div>

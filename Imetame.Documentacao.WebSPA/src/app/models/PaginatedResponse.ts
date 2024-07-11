@@ -1,7 +1,7 @@
 export class PaginatedResponse<T> {
-    totalCount: number;
-    page: number;
-    pageSize: number;
-    data: T[];
+    TotalCount: number;
+    Page: number;
+    PageSize: number;
+    Data: T[];
 }
   

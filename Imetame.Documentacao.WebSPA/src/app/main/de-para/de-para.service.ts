@@ -167,9 +167,9 @@ export class DeParaService implements Resolve<any> {
             this.dataService
                 .getList(this.apiUrl + "CredenciadoraDePara", param)
                 .subscribe((response: any) => {
-                    this.itens = response.data;
-                    if (this.count != response.count) {
-                        this.count = response.count;
+                    this.itens = response.Data;
+                    if (this.count != response.Count) {
+                        this.count = response.Count;
                         this.onTotalRowsChanged.next(this.count);
                     }
                     this.onItensChanged.next(this.itens);
@@ -203,7 +203,7 @@ export class DeParaService implements Resolve<any> {
     delete(item: any): Promise<any> {
         return new Promise((resolve, reject) => {
             this.dataService
-                .delete(this.apiUrl + "CredenciadoraDePara/" + item.id)
+                .delete(this.apiUrl + "CredenciadoraDePara/" + item.Id)
                 .subscribe((response) => {
                     if (this.itens.length == 1 && this.pageIndex > 1) {
                         this.pageIndex = this.pageIndex - 1;

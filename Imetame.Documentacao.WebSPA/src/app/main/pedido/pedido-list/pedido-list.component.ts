@@ -140,10 +140,10 @@ export class PedidoListComponent implements OnInit {
   loadData() {
     this._PedidoService.listPedido$.subscribe(
       (response: PaginatedResponse<Pedido>) => {
-        this.totalCount = response.totalCount;
-        this.page = response.page;
-        this.pageSize = response.pageSize;
-        this.dataSource.data = response.data;
+        this.totalCount = response.TotalCount;
+        this.page = response.Page;
+        this.pageSize = response.PageSize;
+        this.dataSource.data = response.Data;
         this.reassignPaginatorAndSort();
       }
     );
@@ -161,7 +161,7 @@ export class PedidoListComponent implements OnInit {
 
   //#region FUNÇÕES ABRIR MODAL DE CADASTRO/EDITAR DO FERIADO - MATHEUS MONFREIDES 23/03/2024
   abrir(item) {
-    this.router.navigate([item.id], { relativeTo: this.route });
+    this.router.navigate([item.Id], { relativeTo: this.route });
   }
   openModalEdit(itemEdit: Pedido) {
     const dialogConfig = new MatDialogConfig();
@@ -174,7 +174,7 @@ export class PedidoListComponent implements OnInit {
     //#region AFTER CLOSE REALIZADO DESSA MANEIRA PARA EVITAR VARIAS CONSULTAS NA API - MATHEUS MONFREIDES 04/12/2023
     dialogRef.afterClosed().subscribe((PedidoAtualizado: Pedido | null) => {
       if (PedidoAtualizado) {
-        const index = this.dataSource.data.findIndex(m => m.id === PedidoAtualizado.id);
+        const index = this.dataSource.data.findIndex(m => m.Id === PedidoAtualizado.Id);
         if (index !== -1) {
           this.dataSource.data[index] = PedidoAtualizado;
           this.dataSource.data = [...this.dataSource.data];
@@ -200,16 +200,16 @@ export class PedidoListComponent implements OnInit {
       .subscribe(
         {
           next: (response: PaginatedResponse<Pedido>) => {
-            if (response.data.length <= 0) {
+            if (response.Data.length <= 0) {
               this.nenhumDadoEncontrado = true;
             }
-            this.totalCount = response.totalCount;
-            this.page = response.page;
-            this.pageSize = response.pageSize;
+            this.totalCount = response.TotalCount;
+            this.page = response.Page;
+            this.pageSize = response.PageSize;
 
-            this.PedidoList = response.data;
+            this.PedidoList = response.Data;
             this.dataSource = new MatTableDataSource();
-            this.dataSource = new MatTableDataSource(response.data);
+            this.dataSource = new MatTableDataSource(response.Data);
             this.reassignPaginatorAndSort();
 
           },

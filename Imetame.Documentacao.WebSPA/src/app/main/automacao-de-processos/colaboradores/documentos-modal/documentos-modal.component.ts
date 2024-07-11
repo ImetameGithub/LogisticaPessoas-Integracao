@@ -55,7 +55,7 @@ export class DocumentosModalComponent implements OnInit {
     this.visualizarImagem = true;
     this.colspanDocs = 4
     this.colspanImg = 2
-    this.imageSource = this.sanitizer.bypassSecurityTrustResourceUrl(`${item.base64}`);
+    this.imageSource = this.sanitizer.bypassSecurityTrustResourceUrl(`${item.Base64}`);
   }
 
   closeModal() {

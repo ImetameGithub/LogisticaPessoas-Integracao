@@ -158,7 +158,7 @@ export class DeParaListComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     abrir(item) {
-        this.router.navigate([item.id], { relativeTo: this.route });
+        this.router.navigate([item.Id], { relativeTo: this.route });
     }
 
     showError(error) {

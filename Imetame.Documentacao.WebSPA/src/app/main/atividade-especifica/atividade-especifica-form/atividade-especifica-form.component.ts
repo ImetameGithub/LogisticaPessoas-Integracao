@@ -131,7 +131,7 @@ export class AtividadeEspecificaFormComponent implements OnInit {
       this._fuseProgressBarService.setMode("indeterminate");
       this._fuseProgressBarService.show();
       this.blockRequisicao = true;
-      model.id = this.selectAtividadeEspecifica.id;
+      model.Id = this.selectAtividadeEspecifica.id;
       this._AtividadeEspecificaservice.Update(model).subscribe(
           {
               next: (response: AtividadeEspecifica) => {

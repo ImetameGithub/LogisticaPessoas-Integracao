@@ -125,10 +125,10 @@ export class AtividadeEspecificaListComponent implements OnInit {
   loadData() {
     this._AtividadeEspecificaService.listAtividadeEspecifica$.subscribe(
       (response: PaginatedResponse<AtividadeEspecifica>) => {
-        this.totalCount = response.totalCount;
-        this.page = response.page;
-        this.pageSize = response.pageSize;
-        this.dataSource.data = response.data;
+        this.totalCount = response.TotalCount;
+        this.page = response.Page;
+        this.pageSize = response.PageSize;
+        this.dataSource.data = response.Data;
         this.reassignPaginatorAndSort();
       }
     );
@@ -159,7 +159,7 @@ export class AtividadeEspecificaListComponent implements OnInit {
     //#region AFTER CLOSE REALIZADO DESSA MANEIRA PARA EVITAR VARIAS CONSULTAS NA API - MATHEUS MONFREIDES 04/12/2023
     dialogRef.afterClosed().subscribe((AtividadeEspecificaAtualizado: AtividadeEspecifica | null) => {
       if (AtividadeEspecificaAtualizado) {
-        const index = this.dataSource.data.findIndex(m => m.id === AtividadeEspecificaAtualizado.id);
+        const index = this.dataSource.data.findIndex(m => m.Id === AtividadeEspecificaAtualizado.Id);
         if (index !== -1) {
           this.dataSource.data[index] = AtividadeEspecificaAtualizado;
           this.dataSource.data = [...this.dataSource.data];
@@ -176,16 +176,16 @@ export class AtividadeEspecificaListComponent implements OnInit {
       .subscribe(
         {
           next: (response: PaginatedResponse<AtividadeEspecifica>) => {
-            if (response.data.length <= 0) {
+            if (response.Data.length <= 0) {
               this.nenhumDadoEncontrado = true;
             }
-            this.totalCount = response.totalCount;
-            this.page = response.page;
-            this.pageSize = response.pageSize;
+            this.totalCount = response.TotalCount;
+            this.page = response.Page;
+            this.pageSize = response.PageSize;
 
-            this.AtividadeEspecificaList = response.data;
+            this.AtividadeEspecificaList = response.Data;
             this.dataSource = new MatTableDataSource();
-            this.dataSource = new MatTableDataSource(response.data);
+            this.dataSource = new MatTableDataSource(response.Data);
             this.reassignPaginatorAndSort();
 
           },

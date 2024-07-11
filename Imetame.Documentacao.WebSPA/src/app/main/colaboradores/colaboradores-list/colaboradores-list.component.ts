@@ -16,6 +16,9 @@ import { ColaboradorService } from '../colaboradores.service';
 import { ColaboradorModel } from 'app/models/DTO/ColaboradorModel';
 import { ColaboradoresFormComponent } from '../colaboradores-form/colaboradores-form.component';
 import { fuseAnimations } from '@fuse/animations';
+import { ColaboradoresAtividadeModalComponent } from '../colaboradores-atividade-modal/colaboradores-atividade-modal.component';
+import { AtividadeEspecifica } from 'app/models/AtividadeEspecifica';
+import { ColaboradoresFiltroComponent } from '../colaboradores-filtro/colaboradores-filtro.component';
 
 @Component({
   selector: 'colaboradores-list',
@@ -44,10 +47,13 @@ export class ColaboradoresListComponent implements OnInit {
   //#endregion
 
   //#region DATA SOURCE E FORMULARIO
-  displayedColumns = ["cadastro", "cracha", "nome","empresa","mudaFuncao","atividadeEspecifica", "buttons"];
+  displayedColumns = ["cadastro", "cracha", "nome", "empresa", "mudaFuncao", "atividadeEspecifica", "buttons"];
   dataSource: MatTableDataSource<ColaboradorModel>;
   form: UntypedFormGroup;
   //#endregion
+
+  _listAllColaboradores: ColaboradorModel[];
+  _listAtividades: AtividadeEspecifica[];
 
   //#region PAGINAÇÃO 
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -80,58 +86,52 @@ export class ColaboradoresListComponent implements OnInit {
 
 
   ngOnInit(): void {
+    const Colaborador: PaginatedResponse<ColaboradorModel> = this.route.snapshot.data['data'].colaboradorPaginated;
+    this.totalCount = Colaborador.TotalCount;
+    this.page = Colaborador.Page;
+    this.pageSize = Colaborador.PageSize;
+    this.dataSource.data = Colaborador.Data;
+    this.reassignPaginatorAndSort();
     this.titleService.setTitle("Colaborador - Imetame");
-    this.loadData()
+    // this.loadData()
   }
 
   //#region FUNÇÃO DELETE - MATHEUS MONFREIDES - FARTEC SISTEMAS 
 
-  deleteItem(ItemDelete: string,index: number) {
+  deleteItem(ItemDelete: string, index: number) {
     this.confirmDialogRef = this.dialog.open(ConfirmDialogComponent, {
-        disableClose: false,
+      disableClose: false,
     });
 
     this.confirmDialogRef.componentInstance.confirmMessage =
-        "Deseja mesmo deletar o item?";
+      "Deseja mesmo deletar o item?";
 
     this.confirmDialogRef.afterClosed().subscribe((result) => {
-        if (result) {
-          this._ColaboradorService.Delete(ItemDelete).subscribe(
-            {
-              next: (response: Colaborador) => {
-                this._snackbar.open("Item excluído com sucesso", 'X', {
-                  duration: 2500,
-                  panelClass: 'snackbar-success',
-                })
-                const data = this.dataSource.data;
-                data.splice(index, 1); // Remover o item na posição 'index'
-                this.dataSource.data = data; // Atualizar a fonte de dados
-              },
-              error: (error) => {
-                this._snackbar.open(error.error.erros, 'X', {
-                  duration: 2500,
-                  panelClass: ['mat-toolbar', 'mat-warn'],
-                })
-              }
-            })
-        }
-        this.confirmDialogRef = null;
+      if (result) {
+        this._ColaboradorService.Delete(ItemDelete).subscribe(
+          {
+            next: (response: Colaborador) => {
+              this._snackbar.open("Item excluído com sucesso", 'X', {
+                duration: 2500,
+                panelClass: 'snackbar-success',
+              })
+              const data = this.dataSource.data;
+              data.splice(index, 1); // Remover o item na posição 'index'
+              this.dataSource.data = data; // Atualizar a fonte de dados
+            },
+            error: (error) => {
+              this._snackbar.open(error.error.erros, 'X', {
+                duration: 2500,
+                panelClass: ['mat-toolbar', 'mat-warn'],
+              })
+            }
+          })
+      }
+      this.confirmDialogRef = null;
     });
-}
+  }
   //#endregion
 
-  //#region FUNÇÕES DE LOAD E ATUALIZAR PAGINA - 23/03/2024
-  loadData() {
-    this._ColaboradorService.listColaborador$.subscribe(
-      (response: PaginatedResponse<ColaboradorModel>) => {
-        this.totalCount = response.totalCount;
-        this.page = response.page;
-        this.pageSize = response.pageSize;
-        this.dataSource.data = response.data;
-        this.reassignPaginatorAndSort();
-      }
-    );
-  }
 
   private reassignPaginatorAndSort() {
     if (this.paginator && this.sort) {
@@ -147,18 +147,22 @@ export class ColaboradoresListComponent implements OnInit {
   abrir(item) {
     this.router.navigate([item.id], { relativeTo: this.route });
   }
-  openModalEdit(itemEdit: ColaboradorModel) {
+
+  abrirModal() {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = false;
     dialogConfig.width = '80%';
     dialogConfig.height = 'auto%';
-    dialogConfig.data = { itemEdit };
-    const dialogRef = this._matDialog.open(ColaboradoresFormComponent, dialogConfig);
+    dialogConfig.data = {
+      _listColaboradores: this.route.snapshot.data['data'].listAllColaborador,
+      _listAtividades: this.route.snapshot.data['data'].listAllAtividades
+    };
+    const dialogRef = this._matDialog.open(ColaboradoresAtividadeModalComponent, dialogConfig);
 
     //#region AFTER CLOSE REALIZADO DESSA MANEIRA PARA EVITAR VARIAS CONSULTAS NA API - MATHEUS MONFREIDES 04/12/2023
     dialogRef.afterClosed().subscribe((ColaboradorAtualizado: ColaboradorModel | null) => {
       if (ColaboradorAtualizado) {
-        const index = this.dataSource.data.findIndex(m => m.id === ColaboradorAtualizado.id);
+        const index = this.dataSource.data.findIndex(m => m.Id === ColaboradorAtualizado.Id);
         if (index !== -1) {
           this.dataSource.data[index] = ColaboradorAtualizado;
           this.dataSource.data = [...this.dataSource.data];
@@ -167,33 +171,45 @@ export class ColaboradoresListComponent implements OnInit {
     });
     //#endregion
   }
+  abrirModalFiltro() {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.autoFocus = false;
+    dialogConfig.width = '80%';
+    dialogConfig.height = 'auto%';
+    dialogConfig.data = {     
+    };
+    const dialogRef = this._matDialog.open(ColaboradoresFiltroComponent, dialogConfig);
+
+    //#region AFTER CLOSE REALIZADO DESSA MANEIRA PARA EVITAR VARIAS CONSULTAS NA API - MATHEUS MONFREIDES 04/12/2023
+    // dialogRef.afterClosed().subscribe((ColaboradorAtualizado: ColaboradorModel | null) => {
+    //   if (ColaboradorAtualizado) {
+    //     const index = this.dataSource.data.findIndex(m => m.Id === ColaboradorAtualizado.Id);
+    //     if (index !== -1) {
+    //       this.dataSource.data[index] = ColaboradorAtualizado;
+    //       this.dataSource.data = [...this.dataSource.data];
+    //     }
+    //   }
+    // });
+    //#endregion
+  }
   //#endregion
 
   //#region FUNÇÃO FILTRAR REGISTROS - MATHEUS MONFREIDES 04/12/2023
   filtrar(value: string): void {
-    // if (value == '' || value == "") {
-    //   this.loadData();
-    //   return;
-    // }
-
-    // if (this.paginator.pageIndex !== 0) {
-    //   this.paginator.firstPage();
-    // }
-
     this._ColaboradorService.GetAllPaginated(this.page, this.pageSize, value)
       .subscribe(
         {
           next: (response: PaginatedResponse<ColaboradorModel>) => {
-            if (response.data.length <= 0) {
+            if (response.Data.length <= 0) {
               this.nenhumDadoEncontrado = true;
             }
-            this.totalCount = response.totalCount;
-            this.page = response.page;
-            this.pageSize = response.pageSize;
+            this.totalCount = response.TotalCount;
+            this.page = response.Page;
+            this.pageSize = response.PageSize;
 
-            this.ColaboradorList = response.data;
+            this.ColaboradorList = response.Data;
             this.dataSource = new MatTableDataSource();
-            this.dataSource = new MatTableDataSource(response.data);
+            this.dataSource = new MatTableDataSource(response.Data);
             this.reassignPaginatorAndSort();
 
           },

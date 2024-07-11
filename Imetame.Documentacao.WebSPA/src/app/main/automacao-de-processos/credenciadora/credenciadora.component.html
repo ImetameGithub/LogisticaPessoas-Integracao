@@ -29,8 +29,8 @@
                             <mat-form-field fxFlex="51" appearance="outline">
                                 <mat-label>Pedido</mat-label>
                                 <mat-select formControlName="pedido" required>
-                                    <mat-option *ngFor="let pedido of pedidos" [value]="pedido.id">
-                                        {{pedido.numPedido}} - {{pedido.unidade}}
+                                    <mat-option *ngFor="let pedido of pedidos" [value]="pedido.Id">
+                                        {{pedido.NumPedido}} - {{pedido.Unidade}}
                                     </mat-option>
                                 </mat-select>
                             </mat-form-field>

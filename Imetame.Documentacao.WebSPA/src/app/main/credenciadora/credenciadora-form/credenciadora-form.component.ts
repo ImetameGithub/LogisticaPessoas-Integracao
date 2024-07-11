@@ -62,10 +62,10 @@ export class CredenciadoraFormComponent implements OnInit {
                     this.selectCredenciadora = data;
                     
                     this.form = this._formBuilder.group({
-                        descricao: [data?.descricao, [Validators.required]],                        
+                        descricao: [data?.Descricao, [Validators.required]],                        
                     });
                     this.titleService.setTitle(
-                        data.credenciadora + " - Credenciadora - Imetame"
+                        data.Descricao + " - Credenciadora - Imetame"
                     );
                 }
             },
@@ -139,7 +139,7 @@ export class CredenciadoraFormComponent implements OnInit {
         this._fuseProgressBarService.setMode("indeterminate");
         this._fuseProgressBarService.show();
         this.blockRequisicao = true;
-        model.id = this.selectCredenciadora.id;
+        model.Id = this.selectCredenciadora.Id;
         this._Credenciadoraservice.Update(model).subscribe(
             {
                 next: (response: Credenciadora) => {

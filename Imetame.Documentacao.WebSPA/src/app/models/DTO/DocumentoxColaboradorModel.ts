@@ -1,10 +1,10 @@
 export class DocumentoxColaboradorModel{
-    id: string;
-    descArquivo: string;
-    dtVencimento: string;
-    nomeColaborador: string;
-    nomeArquivo: string;
-    bytes: string;
-    base64: string;
-    imageSource;
+    Id: string;
+    DescArquivo: string;
+    DtVencimento: string;
+    NomeColaborador: string;
+    NomeArquivo: string;
+    Bytes: string;
+    Base64: string;
+    ImageSource;
 }

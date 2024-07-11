@@ -90,12 +90,12 @@ export class PedidoFormComponent implements OnInit {
                     this.selectPedido = data;
                     
                     this.form = this._formBuilder.group({
-                        credenciadora: [data?.credenciadora, [Validators.required]],
-                        numPedido: [data?.numPedido, [Validators.required]],
-                        unidade: [data?.unidade, [Validators.required]],
+                        credenciadora: [data?.Credenciadora, [Validators.required]],
+                        numPedido: [data?.NumPedido, [Validators.required]],
+                        unidade: [data?.Unidade, [Validators.required]],
                     });
                     this.titleService.setTitle(
-                        data.credenciadora + " - Pedido - Imetame"
+                        data.Credenciadora + " - Pedido - Imetame"
                     );
                 }
             },
@@ -169,7 +169,7 @@ export class PedidoFormComponent implements OnInit {
         this._fuseProgressBarService.setMode("indeterminate");
         this._fuseProgressBarService.show();
         this.blockRequisicao = true;
-        model.id = this.selectPedido.id;
+        model.Id = this.selectPedido.Id;
         this._Pedidoservice.Update(model).subscribe(
             {
                 next: (response: Pedido) => {

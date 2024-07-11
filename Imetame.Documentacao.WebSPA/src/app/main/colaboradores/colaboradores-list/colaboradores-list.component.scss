@@ -1,0 +1,15 @@
+mat-dialog-container {
+    padding: 0px !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+}
+
+
+.gap-15 {
+    gap: 15px;
+}
+
+.grid-cols-12 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}

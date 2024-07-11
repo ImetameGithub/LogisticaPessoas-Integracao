@@ -6,20 +6,22 @@ import { MatSelectModule } from '@angular/material/select';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
-import { CustomOptionsSelect } from '../components.types';
+import { CustomOptionsSelect } from './components.types';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'custom-search-select',
+  styles: [`
+   .w-full{
+      width: 100% !important;
+    }
+    `],
   template: `
     <mat-form-field class="w-full" appearance="outline" [ngClass]="{'fuse-mat-rounded' :rounded}">
       <mat-label *ngIf="label != null">{{label}}</mat-label>
       <mat-select [formControl]="formControl" [multiple]="multiple" [placeholder]="placeholder" (selectionChange)="onSelectionChange()">
         <mat-option>
           <ngx-mat-select-search [formControl]="filterControl" [placeholderLabel]="placeholder"></ngx-mat-select-search>
-        </mat-option>
-        <mat-option [value]="null">
-            Selecione
         </mat-option>
         <mat-option *ngFor="let option of filteredOptions | async" [value]="option.value">
           {{option.display}}
@@ -60,8 +62,8 @@ export class CustomSearchSelectComponent implements OnInit, OnChanges, ControlVa
   filterControl: FormControl = new FormControl();
   filteredOptions: Observable<CustomOptionsSelect[]>;
 
-  private onChange = (_: any) => {};
-  private onTouched = () => {};
+  private onChange = (_: any) => { };
+  private onTouched = () => { };
 
   ngOnInit() {
     this.filteredOptions = this.filterControl.valueChanges.pipe(
@@ -69,8 +71,8 @@ export class CustomSearchSelectComponent implements OnInit, OnChanges, ControlVa
       map(search => this.filterOptions(search))
     );
     if (this.required) {
-        this.formControl.setValidators(Validators.required);
-      }
+      this.formControl.setValidators(Validators.required);
+    }
     this.formControl.valueChanges.subscribe(value => {
       this.onChange(value);
       this.selectionChange.emit(value);

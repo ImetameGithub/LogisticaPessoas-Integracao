@@ -58,17 +58,17 @@
                 <ng-container matColumnDef="credenciadora">
                     <mat-header-cell *matHeaderCellDef>Credenciadora</mat-header-cell>
                     <mat-cell *matCellDef="let row">
-                        {{ row.credenciadora }}</mat-cell>
+                        {{ row.Credenciadora }}</mat-cell>
                 </ng-container>
 
                 <ng-container matColumnDef="unidade">
                     <mat-header-cell *matHeaderCellDef>Unidade</mat-header-cell>
-                    <mat-cell *matCellDef="let row"> {{ row.unidade }}</mat-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.Unidade }}</mat-cell>
                 </ng-container>
 
                 <ng-container matColumnDef="numPedido">
                     <mat-header-cell *matHeaderCellDef>Número do Pedido</mat-header-cell>
-                    <mat-cell *matCellDef="let row"> {{ row.numPedido }}</mat-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.NumPedido }}</mat-cell>
                 </ng-container>
 
                 <ng-container matColumnDef="buttons" stickyEnd>
@@ -79,7 +79,7 @@
                             <mat-icon class="secondary-text">more_vert</mat-icon>
                         </button>
                         <mat-menu #moreMenu="matMenu">
-                            <button mat-menu-item aria-label="remove" (click)="deleteItem(item.id,i)">
+                            <button mat-menu-item aria-label="remove" (click)="deleteItem(item.Id,i)">
                                 <mat-icon>delete</mat-icon>
                                 <span>Deletar</span>
                             </button>

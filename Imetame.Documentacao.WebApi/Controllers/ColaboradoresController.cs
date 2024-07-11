@@ -93,6 +93,41 @@ namespace Imetame.Documentacao.WebApi.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAllPaginated(int page = 1, int pageSize = 10, string texto = "")
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    throw new Exception("Parametros necessarios nao informados");
+
+                int offset = (page - 1) * pageSize;
+
+                IQueryable<Colaborador> query = _repColaborador.SelectContext()
+                                                             .OrderBy(x => x.Nome);
+                if (!string.IsNullOrEmpty(texto))
+                    query = query.Where(q => q.Nome.Contains(texto) || q.Matricula.Contains(texto));
+
+                int totalCount = await query.CountAsync();
+
+                IList<Colaborador> listColaboradors = query.Skip(offset)
+                                                             .Take(pageSize).ToList();
+
+                PaginatedResponse<Colaborador> paginatedResponse = new PaginatedResponse<Colaborador>
+                {
+                    TotalCount = totalCount,
+                    Page = page,
+                    PageSize = pageSize,
+                    Data = listColaboradors
+                };
+                return Ok(paginatedResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ErrorHelper.GetException(ex));
+            }
+        }
+
         [HttpGet()]
         public async Task<IActionResult> GetColaboradores(int page = 1, int pageSize = 10, string texto = "")
         {
@@ -144,10 +179,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 PaginatedResponse<ColaboradorModel> paginatedResponse = new PaginatedResponse<ColaboradorModel>
                 {
-                    totalCount = totalCount,
-                    page = page,
-                    pageSize = pageSize,
-                    data = listColaboradores
+                    TotalCount = totalCount,
+                    Page = page,
+                    PageSize = pageSize,
+                    Data = listColaboradores
                 };
                 return Ok(paginatedResponse);
             }

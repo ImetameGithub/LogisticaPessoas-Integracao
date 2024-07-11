@@ -45,10 +45,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 PaginatedResponse<Pedido> paginatedResponse = new PaginatedResponse<Pedido>
                 {
-                    totalCount = totalCount,
-                    page = page,
-                    pageSize = pageSize,
-                    data = listPedidos
+                    TotalCount = totalCount,
+                    Page = page,
+                    PageSize = pageSize,
+                    Data = listPedidos
                 };
                 return Ok(paginatedResponse);
             }

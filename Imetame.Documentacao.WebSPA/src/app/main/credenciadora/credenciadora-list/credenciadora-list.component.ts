@@ -13,6 +13,7 @@ import { ConfirmDialogComponent } from 'app/shared/components/confirm-dialog/con
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { CredenciadoraFormComponent } from '../credenciadora-form/credenciadora-form.component';
 import { CredenciadoraService } from '../credenciadora.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'credenciadora-list',
@@ -49,6 +50,7 @@ export class CredenciadoraListComponent implements OnInit {
   //#endregion
   confirmDialogRef: MatDialogRef<ConfirmDialogComponent>;
   constructor(
+    private titleService: Title,
     public _matDialog: MatDialog,
     private _fuseConfirmationService: FuseConfirmationService,
     private _changeDetectorRef: ChangeDetectorRef,
@@ -73,6 +75,7 @@ export class CredenciadoraListComponent implements OnInit {
 
 
   ngOnInit(): void {
+    this.titleService.setTitle("Credenciadora - Imetame");
     this.loadData()
   }
 
@@ -116,10 +119,10 @@ export class CredenciadoraListComponent implements OnInit {
   loadData() {
     this._CredenciadoraService.listCredenciadora$.subscribe(
       (response: PaginatedResponse<Credenciadora>) => {
-        this.totalCount = response.totalCount;
-        this.page = response.page;
-        this.pageSize = response.pageSize;
-        this.dataSource.data = response.data;
+        this.totalCount = response.TotalCount;
+        this.page = response.Page;
+        this.pageSize = response.PageSize;
+        this.dataSource.data = response.Data;
         this.reassignPaginatorAndSort();
       }
     );
@@ -137,7 +140,7 @@ export class CredenciadoraListComponent implements OnInit {
 
   //#region FUNÇÕES ABRIR MODAL DE CADASTRO/EDITAR DO FERIADO - MATHEUS MONFREIDES 23/03/2024
   abrir(item) {
-    this.router.navigate([item.id], { relativeTo: this.route });
+    this.router.navigate([item.Id], { relativeTo: this.route });
   }
   openModalEdit(itemEdit: Credenciadora) {
     const dialogConfig = new MatDialogConfig();
@@ -150,7 +153,7 @@ export class CredenciadoraListComponent implements OnInit {
     //#region AFTER CLOSE REALIZADO DESSA MANEIRA PARA EVITAR VARIAS CONSULTAS NA API - MATHEUS MONFREIDES 04/12/2023
     dialogRef.afterClosed().subscribe((CredenciadoraAtualizado: Credenciadora | null) => {
       if (CredenciadoraAtualizado) {
-        const index = this.dataSource.data.findIndex(m => m.id === CredenciadoraAtualizado.id);
+        const index = this.dataSource.data.findIndex(m => m.Id === CredenciadoraAtualizado.Id);
         if (index !== -1) {
           this.dataSource.data[index] = CredenciadoraAtualizado;
           this.dataSource.data = [...this.dataSource.data];
@@ -176,16 +179,16 @@ export class CredenciadoraListComponent implements OnInit {
       .subscribe(
         {
           next: (response: PaginatedResponse<Credenciadora>) => {
-            if (response.data.length <= 0) {
+            if (response.Data.length <= 0) {
               this.nenhumDadoEncontrado = true;
             }
-            this.totalCount = response.totalCount;
-            this.page = response.page;
-            this.pageSize = response.pageSize;
+            this.totalCount = response.TotalCount;
+            this.page = response.Page;
+            this.pageSize = response.PageSize;
 
-            this.CredenciadoraList = response.data;
+            this.CredenciadoraList = response.Data;
             this.dataSource = new MatTableDataSource();
-            this.dataSource = new MatTableDataSource(response.data);
+            this.dataSource = new MatTableDataSource(response.Data);
             this.reassignPaginatorAndSort();
 
           },

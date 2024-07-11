@@ -89,7 +89,7 @@ export class PedidoService implements Resolve<Pedido> {
 
     getCredenciadoras(): Observable<any> {
         return this.dataService.getList(`${this.apiUrl}CredenciadoraDePara?pageIndex=0&pageSize=100`).pipe(
-            map((response: any) => response.data)
+            map((response: any) => response.Data)
         );
     }
 

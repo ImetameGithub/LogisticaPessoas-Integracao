@@ -66,29 +66,29 @@
                         <ng-container matColumnDef="numCad">
                             <mat-header-cell *matHeaderCellDef class="w-100">NumCad</mat-header-cell>
                             <mat-cell *matCellDef="let row" class="w-100">
-                                {{ row.numCad }}</mat-cell>
+                                {{ row.NumCad }}</mat-cell>
                         </ng-container>
 
                         <ng-container matColumnDef="nome">
                             <mat-header-cell *matHeaderCellDef>Nome</mat-header-cell>
-                            <mat-cell *matCellDef="let row"> {{ row.nome }}</mat-cell>
+                            <mat-cell *matCellDef="let row"> {{ row.Nome }}</mat-cell>
                         </ng-container>
 
                         <ng-container matColumnDef="funcao">
                             <mat-header-cell *matHeaderCellDef>Função</mat-header-cell>
                             <mat-cell *matCellDef="let row">
-                                {{ row.funcaoAtual }}</mat-cell>
+                                {{ row.FuncaoAtual }}</mat-cell>
                         </ng-container>
 
                         <ng-container matColumnDef="cracha">
                             <mat-header-cell *matHeaderCellDef>Crachá</mat-header-cell>
                             <mat-cell *matCellDef="let row">
-                                {{ row.numCracha }}</mat-cell>
+                                {{ row.NumCracha }}</mat-cell>
                         </ng-container>
 
                         <ng-container matColumnDef="equipe">
                             <mat-header-cell *matHeaderCellDef>Equipe</mat-header-cell>
-                            <mat-cell *matCellDef="let row"> {{ row.equipe }}</mat-cell>
+                            <mat-cell *matCellDef="let row"> {{ row.Equipe }}</mat-cell>
                         </ng-container>
 
                         <ng-container matColumnDef="status">
@@ -99,7 +99,7 @@
                         <ng-container matColumnDef="documento">
                             <mat-header-cell *matHeaderCellDef></mat-header-cell>
                             <mat-cell  *matCellDef="let item; let i = index">
-                                <button mat-raised-button style="background-color: darkgray; color: white;" (click)="getDocumentosProtheus(item.numCad)" [@animate]="{ value: '*', params: { delay: '300ms', scale: '0.2' }}">
+                                <button mat-raised-button style="background-color: darkgray; color: white;" (click)="getDocumentosProtheus(item.NumCad)" [@animate]="{ value: '*', params: { delay: '300ms', scale: '0.2' }}">
                                     Visualizar Documento
                                 </button>
                             </mat-cell>

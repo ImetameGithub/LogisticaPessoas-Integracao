@@ -63,8 +63,8 @@
                                 <mat-label>Credenciadora</mat-label>
                                 <mat-select formControlName="credenciadora">
                                     <mat-option>--</mat-option>
-                                    <mat-option *ngFor="let c of credenciadoras" [value]="c.credenciadora">
-                                        {{c.credenciadora}}
+                                    <mat-option *ngFor="let c of credenciadoras" [value]="c.Credenciadora">
+                                        {{c.Credenciadora}}
                                     </mat-option>
                                 </mat-select>
                                 <mat-hint class="text-red-500" *ngIf="myError('credenciadora', 'required', form)">

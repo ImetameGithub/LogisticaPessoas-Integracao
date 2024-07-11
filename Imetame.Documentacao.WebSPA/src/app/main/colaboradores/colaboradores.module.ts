@@ -7,6 +7,7 @@ import { ColaboradorRoutingModule } from './colaboradores-routing.module';
 import { ColaboradoresFormComponent } from './colaboradores-form/colaboradores-form.component';
 import { ColaboradoresAtividadeModalComponent } from './colaboradores-atividade-modal/colaboradores-atividade-modal.component';
 import { CustomSearchSelectComponent } from 'app/shared/components/custom-select/custom-select.component';
+import { ColaboradoresFiltroComponent } from './colaboradores-filtro/colaboradores-filtro.component';
 
 
 
@@ -14,7 +15,8 @@ import { CustomSearchSelectComponent } from 'app/shared/components/custom-select
   declarations: [
     ColaboradoresListComponent,
     ColaboradoresFormComponent,
-    ColaboradoresAtividadeModalComponent
+    ColaboradoresAtividadeModalComponent,
+    ColaboradoresFiltroComponent
   ],
   imports: [CommonModule, ColaboradorRoutingModule, SharedModule, MatDialogModule, CustomSearchSelectComponent,],
 })

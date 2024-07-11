@@ -34,19 +34,21 @@
             <!-- / SEARCH -->
 
             <!-- ADD FILE BUTTON -->
-            <div class="file-uploader">
-                <button
-                    mat-fab
-                    color="accent"
-                    class="add-file-button"
-                    [routerLink]="'./novo'"
-                    aria-label="Novo"
+            <!-- <div class="file-uploader">
+                <button mat-fab color="accent" class="add-file-button" (click)="abrirModal()" aria-label="Novo"
                     [@animate]="{
                         value: '*',
                         params: { delay: '300ms', scale: '0.2' }
-                    }"
-                >
+                    }">
                     <mat-icon>add</mat-icon>
+                </button>
+            </div>    -->
+            <div class="grid-cols-12 gap-15">
+                <button mat-fab aria-label="Adicionar" (click)="abrirModal()" type="submit">
+                    <mat-icon>add</mat-icon>
+                </button>
+                <button mat-fab aria-label="Adicionar" (click)="abrirModalFiltro()" type="submit">
+                    <mat-icon>filter_list</mat-icon>
                 </button>
             </div>
             <!-- / ADD FILE BUTTON -->
@@ -107,6 +109,13 @@
                     [@animate]="{ value: '*', params: { y: '100%' } }">
                 </mat-row>
             </mat-table>
+            <div class="text-center mt-4" *ngIf="totalCount === 0">
+                <p *ngIf="totalCount === 0 && !nenhumDadoEncontrado" class="text-accent font-medium ">Nenhum dado
+                    cadastrado ainda.</p>
+                <p *ngIf="totalCount === 0 && nenhumDadoEncontrado" class="text-warn font-medium ">Nenhuma
+                    informação encontrada com os filtros fornecidos</p>
+
+            </div>
         </div>
         <mat-paginator [length]="totalCount" [pageIndex]="page - 1" [pageSize]="pageSize"
             [pageSizeOptions]="[5,10,20,50]" (page)="onPageChange($event)">

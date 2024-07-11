@@ -58,7 +58,7 @@
                 <ng-container matColumnDef="descricao">
                     <mat-header-cell *matHeaderCellDef>Credenciadora</mat-header-cell>
                     <mat-cell *matCellDef="let row">
-                        {{ row.descricao }}</mat-cell>
+                        {{ row.Descricao }}</mat-cell>
                 </ng-container>            
 
                 <ng-container matColumnDef="buttons" stickyEnd>
@@ -69,7 +69,7 @@
                             <mat-icon class="secondary-text">more_vert</mat-icon>
                         </button>
                         <mat-menu #moreMenu="matMenu">
-                            <button mat-menu-item aria-label="remove" (click)="deleteItem(item.id,i)">
+                            <button mat-menu-item aria-label="remove" (click)="deleteItem(item.Id,i)">
                                 <mat-icon>delete</mat-icon>
                                 <span>Deletar</span>
                             </button>
@@ -82,6 +82,13 @@
                     [@animate]="{ value: '*', params: { y: '100%' } }">
                 </mat-row>
             </mat-table>
+            <div class="text-center mt-4" *ngIf="totalCount === 0">
+                <p *ngIf="totalCount === 0 && !nenhumDadoEncontrado" class="text-accent font-medium ">Nenhum dado
+                    cadastrado ainda.</p>
+                <p *ngIf="totalCount === 0 && nenhumDadoEncontrado" class="text-warn font-medium ">Nenhuma
+                    informação encontrada com os filtros fornecidos</p>
+
+            </div>
         </div>
         <mat-paginator [length]="totalCount" [pageIndex]="page - 1" [pageSize]="pageSize"
             [pageSizeOptions]="[5,10,20,50]" (page)="onPageChange($event)">

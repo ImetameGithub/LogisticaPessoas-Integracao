@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -11,6 +11,9 @@ import { ShowErrosDialogComponent } from 'app/shared/components/show-erros-dialo
 import { GenericValidator } from 'app/utils/generic-form-validator';
 import { Subject } from 'rxjs';
 import { ColaboradorService } from '../colaboradores.service';
+import { ColaboradorModel } from 'app/models/DTO/ColaboradorModel';
+import { AtividadeEspecifica } from 'app/models/AtividadeEspecifica';
+import { CustomOptionsSelect } from 'app/shared/components/custom-select/components.types';
 
 @Component({
   selector: 'colaboradores-atividade-modal',
@@ -37,18 +40,26 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
 
     selectColaborador: any;
 
+    atividadesOptions: CustomOptionsSelect[] = [];
+    colaboradoresOptions: CustomOptionsSelect[] = [];
+
     constructor(
         private titleService: Title,
+        @Inject(MAT_DIALOG_DATA) public _data: {_listColaboradores: ColaboradorModel[] ,_listAtividades: AtividadeEspecifica[]},
         private _Colaboradorservice: ColaboradorService,
+        private _matDialogRef: MatDialogRef<ColaboradoresAtividadeModalComponent>,
         private _snackbar: MatSnackBar,
         private _formBuilder: UntypedFormBuilder,
         private router: Router,
         private route: ActivatedRoute,
         private _fuseProgressBarService: FuseProgressBarService,
     ) {
+        this.colaboradoresOptions = _data._listColaboradores.map(estrutura => new CustomOptionsSelect(estrutura, estrutura.Nome)) ?? [];
+        this.atividadesOptions = _data._listAtividades.map(estrutura => new CustomOptionsSelect(estrutura.Id, estrutura.Codigo)) ?? [];
+
         this.form = new FormGroup({
-            credenciadora: new FormControl('', [Validators.required]),
-            numColaborador: new FormControl('', [Validators.required]),
+            IDS_COLABORARES: new FormControl([], [Validators.required]),
+            IDS_ATIVIDADES: new FormControl('', [Validators.required]),
             unidade: new FormControl('', [Validators.required]),
         });
         this.titleService.setTitle("Novo - Colaborador - Imetame");
@@ -57,34 +68,7 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
 
     ngOnInit() {
 
-        this._Colaboradorservice._selectColaborador$.subscribe(
-            (data: any) => {
-                if (data != null) {
-                    
-                    this.selectColaborador = data;
-                    
-                    this.form = this._formBuilder.group({
-                        credenciadora: [data?.credenciadora, [Validators.required]],
-                        numColaborador: [data?.numColaborador, [Validators.required]],
-                        unidade: [data?.unidade, [Validators.required]],
-                    });
-                    this.titleService.setTitle(
-                        data.credenciadora + " - Colaborador - Imetame"
-                    );
-                }
-            },
-            (error) => {
-                console.error('Erro ao buscar credenciadoras', error);
-            }
-        );
     }
-
-
-    // ngOnDestroy(): void {
-    //     // Unsubscribe from all subscriptions
-    //     this._unsubscribeAll.next();
-    //     this._unsubscribeAll.complete();
-    // }
 
     //#region FUNÇÕES CRUD MATHEUS MONFREIDES - FARTEC SISTEMAS
     addOrUpdate() {
@@ -131,7 +115,7 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
         this._fuseProgressBarService.setMode("indeterminate");
         this._fuseProgressBarService.show();
         this.blockRequisicao = true;
-        model.id = this.selectColaborador.id;
+        model.Id = this.selectColaborador.id;
         this._Colaboradorservice.Update(model).subscribe(
             {
                 next: (response: Colaborador) => {

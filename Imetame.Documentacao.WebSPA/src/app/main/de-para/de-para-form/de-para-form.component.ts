@@ -116,7 +116,7 @@ export class DeParaFormComponent implements OnInit, OnDestroy {
             .subscribe((item: any) => {
                 if (item) {
                     this.titleService.setTitle(
-                        item.credenciadora + " - De Para - Imetame"
+                        item.Credenciadora + " - De Para - Imetame"
                     );
 
                     this.item = item;
@@ -141,18 +141,18 @@ export class DeParaFormComponent implements OnInit, OnDestroy {
 
     createForm() {
         return this.formBuilder.group({
-            id: [this.item?.id],
+            id: [this.item?.Id],
 
             credenciadora: [
-                this.item?.credenciadora,
+                this.item?.Credenciadora,
                 [Validators.required, Validators.maxLength(255)],
             ],
             de: [
-                this.item?.de,
+                this.item?.De,
                 [Validators.required, Validators.maxLength(255)],
             ],
             para: [
-                this.item?.para,
+                this.item?.Para,
                 [Validators.required, Validators.maxLength(255)],
             ],
         });
