@@ -31,4 +31,19 @@ namespace Imetame.Documentacao.Domain.Models
         public string TempoEmpresaAnos { get; set; }
         public string TempoEmpresaAnosInt { get; set; }
     }
+    public class ColaboradorProtheusModel
+    {
+        public string MATRICULA { get; set; }
+        public string CRACHA { get; set; }
+        public string NOME { get; set; }
+        public string CODIGO_FUNCAO { get; set; }
+        public string NOME_FUNCAO { get; set; }
+        public string CODIGO_EQUIPE { get; set; }
+        public string NOME_EQUIPE { get; set; }   
+        public string CODIGO_DISCIPLINA { get; set; }
+        public string NOME_DISCIPLINA { get; set; }
+        public string PERFIL { get; set; }
+        public string CODIGO_OS { get; set; }
+        public string NOME_OS { get; set; }
+    }
 }

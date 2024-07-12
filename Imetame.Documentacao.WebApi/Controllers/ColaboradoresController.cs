@@ -136,48 +136,47 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 int offset = (page - 1) * pageSize;
                 #region CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
                 conn.Open();
-                var sql = @"SELECT distinct [empresa] as Empresa
-                      ,[numcad] as NumCad
-                      ,[numcracha] as NumCracha
-                      ,[status] as Status
-                      ,[nomefuncionario] as Nome
-                      ,[cpf] as Cpf
-                      ,[funcaoatual] as FuncaoAtual
-                      ,[funcaoinicial] as FuncaoInicial
-                      ,[dataafastamento] as DataAfastamento
-                      ,[dataadmissao] as DataAdmissao
-                      ,[datanascimento] as DataNascimento
-                      ,[equipe] as Equipe
-                      ,[perfil] as Perfil
-                      ,[endereco] as Endereco
-                      ,[numero] as Numero
-                      ,[bairro] as Bairro
-                      ,[cidade] as Cidade
-                      ,[cep] as Cep
-                      ,[ddd] as Ddd
-                      ,[numtel] as NumTel
-                      ,[ddd2] as Ddd2
-                      ,[numtel2] as NumTel2
-                      ,[estado] as Estado
-                      ,[tempoempresaanos] as TempoEmpresaAnos
-                      ,[tempoempresaanosint] as TempoEmpresaAnosInt
-                      ,[tempoempresamesesint] as TempoEmpresaMesesInt
-                      ,[tempoempresatexto] as TempoEmpresaTeexto
-                  FROM [DW_IMETAME_NOVA_OS].[dbo].VW_FUSION_GP_COLABORADOR (nolock) COLA
-                  WHERE empresa ='01' and status = '1-Ativo'
-               		 order by Nome";
+                var sql = @"SELECT SRA.RA_MAT AS MATRICULA,
+	                               SRA.RA_CRACHA AS CRACHA,
+	                               SRA.RA_NOME AS NOME,
+	                               SRJ.RJ_FUNCAO AS CODIGO_FUNCAO,
+	                               SRJ.RJ_DESC AS NOME_FUNCAO, 
+	                               UZD.UZD_CODIGO AS CODIGO_EQUIPE,
+	                               UZD.UZD_SIGLA AS NOME_EQUIPE,
+	                               ZA3.ZA3_DESC AS PERFIL,
+	                               ZNB.ZNB_OS AS CODIGO_OS,
+	                               ZNB.ZNB_NOMEOS AS NOME_OS
+                            FROM SRA010 SRA (NOLOCK)
+                            LEFT JOIN SRJ010 SRJ (NOLOCK) --FUNÇOES
+	                            ON SRJ.RJ_FILIAL = SRA.RA_FILIAL 
+	                            AND SRJ.RJ_FUNCAO = SRA.RA_CODFUNC 
+	                            AND SRJ.D_E_L_E_T_ = '' 
+                            LEFT JOIN UZD010 UZD (NOLOCK) --EQUIPE
+	                            ON UZD.UZD_FILIAL = SRA.RA_FILIAL 	
+	                            AND UZD.UZD_CODIGO = SRA.RA_YEQATUA	
+	                            AND UZD.D_E_L_E_T_ = ''
+                            LEFT JOIN ZA3010 AS ZA3 (NOLOCK) --PERFIL 
+	                            ON ZA3.ZA3_FILIAL = UZD.UZD_FILIAL  
+	                            AND ZA3.ZA3_CODIGO = UZD_CODPER 
+	                            AND ZA3.D_E_L_E_T_ = ''
+                            LEFT JOIN ZNB010 ZNB (NOLOCK) --OS
+	                            ON ZNB.ZNB_MATRIC = SRA.RA_MAT 
+	                            AND ZNB.D_E_L_E_T_='' 	
+                            WHERE SRA.RA_SITFOLH = ''
+	                            AND GETDATE() BETWEEN ZNB.ZNB_DTINI AND ZNB.ZNB_DTFIM
+	                            AND SRA.D_E_L_E_T_ = ''";                          
                 #endregion CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
 
 
-                var lista = (await this.conn.QueryAsync<ColaboradorModel>(sql));
+                var lista = (await this.conn.QueryAsync<ColaboradorProtheusModel>(sql));
 
                 int totalCount = lista.Count();
 
                 lista = lista.Skip(offset).Take(pageSize);
 
-                IList<ColaboradorModel> listColaboradores = lista.Skip(offset).Take(pageSize).ToList();
+                IList<ColaboradorProtheusModel> listColaboradores = lista.Skip(offset).Take(pageSize).ToList();
 
-                PaginatedResponse<ColaboradorModel> paginatedResponse = new PaginatedResponse<ColaboradorModel>
+                PaginatedResponse<ColaboradorProtheusModel> paginatedResponse = new PaginatedResponse<ColaboradorProtheusModel>
                 {
                     TotalCount = totalCount,
                     Page = page,
@@ -200,40 +199,44 @@ namespace Imetame.Documentacao.WebApi.Controllers
             {
                 #region CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
                 conn.Open();
-                var sql = @"SELECT distinct [empresa] as Empresa
-                      ,[numcad] as NumCad
-                      ,[numcracha] as NumCracha
-                      ,[status] as Status
-                      ,[nomefuncionario] as Nome
-                      ,[cpf] as Cpf
-                      ,[funcaoatual] as FuncaoAtual
-                      ,[funcaoinicial] as FuncaoInicial
-                      ,[dataafastamento] as DataAfastamento
-                      ,[dataadmissao] as DataAdmissao
-                      ,[datanascimento] as DataNascimento
-                      ,[equipe] as Equipe
-                      ,[perfil] as Perfil
-                      ,[endereco] as Endereco
-                      ,[numero] as Numero
-                      ,[bairro] as Bairro
-                      ,[cidade] as Cidade
-                      ,[cep] as Cep
-                      ,[ddd] as Ddd
-                      ,[numtel] as NumTel
-                      ,[ddd2] as Ddd2
-                      ,[numtel2] as NumTel2
-                      ,[estado] as Estado
-                      ,[tempoempresaanos] as TempoEmpresaAnos
-                      ,[tempoempresaanosint] as TempoEmpresaAnosInt
-                      ,[tempoempresamesesint] as TempoEmpresaMesesInt
-                      ,[tempoempresatexto] as TempoEmpresaTeexto
-                  FROM [DW_IMETAME_NOVA_OS].[dbo].VW_FUSION_GP_COLABORADOR (nolock) COLA
-                  WHERE empresa ='01' and status = '1-Ativo'
-               		 order by Nome";
+                var sql = @"SELECT SRA.RA_MAT AS MATRICULA,
+	                               SRA.RA_NOME AS NOME,
+	                               SRJ.RJ_FUNCAO AS CODIGO_FUNCAO,
+	                               SRJ.RJ_DESC AS NOME_FUNCAO, 
+	                               UZD.UZD_CODIGO AS CODIGO_EQUIPE,
+	                               UZD.UZD_SIGLA AS NOME_EQUIPE,
+	                               ZA3.ZA3_DESC AS PERFIL,
+	                               ZNB.ZNB_OS AS CODIGO_OS,
+	                               ZNB.ZNB_NOMEOS AS NOME_OS,
+	                               ZG0.ZG0_IDDECI AS CODIGO_DISCIPLINA,
+	                               ZG0.ZG0_DEDECI AS NOME_DISCIPLINA
+                            FROM SRA010 SRA (NOLOCK)
+                            LEFT JOIN SRJ010 SRJ (NOLOCK) --FUNÇOES
+	                            ON SRJ.RJ_FILIAL = SRA.RA_FILIAL 
+	                            AND SRJ.RJ_FUNCAO = SRA.RA_CODFUNC 
+	                            AND SRJ.D_E_L_E_T_ = '' 
+                            LEFT JOIN UZD010 UZD (NOLOCK) --EQUIPE
+	                            ON UZD.UZD_FILIAL = SRA.RA_FILIAL 	
+	                            AND UZD.UZD_CODIGO = SRA.RA_YEQATUA	
+	                            AND UZD.D_E_L_E_T_ = ''
+                            LEFT JOIN ZA3010 AS ZA3 (NOLOCK) --PERFIL 
+	                            ON ZA3.ZA3_FILIAL = UZD.UZD_FILIAL  
+	                            AND ZA3.ZA3_CODIGO = UZD_CODPER 
+	                            AND ZA3.D_E_L_E_T_ = ''
+                            LEFT JOIN ZNB010 ZNB (NOLOCK) --OS
+	                            ON ZNB.ZNB_MATRIC = SRA.RA_MAT 
+	                            AND ZNB.D_E_L_E_T_=''
+                            LEFT JOIN ZG0010 ZG0 (NOLOCK) 
+	                            ON (TRY_CAST(ZG0.ZG0_NUMCAD AS INTEGER) = TRY_CAST(RA_YNUMCAD AS INTEGER) 
+	                            AND ZG0.ZG0_NUMEMP = SRA.RA_YNUMEMP 
+	                            AND ZG0.ZG0_TIPCOL = SRA.RA_YTIPCOL AND ZG0.D_E_L_E_T_ <> '*')
+                            WHERE SRA.RA_SITFOLH = ''
+	                            AND GETDATE() BETWEEN ZNB.ZNB_DTINI AND ZNB.ZNB_DTFIM
+	                            AND SRA.D_E_L_E_T_ = ''";
                 #endregion CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
 
 
-                var lista = (await this.conn.QueryAsync<ColaboradorModel>(sql));
+                var lista = (await this.conn.QueryAsync<ColaboradorProtheusModel>(sql));
 
                 return Ok(lista);
             }

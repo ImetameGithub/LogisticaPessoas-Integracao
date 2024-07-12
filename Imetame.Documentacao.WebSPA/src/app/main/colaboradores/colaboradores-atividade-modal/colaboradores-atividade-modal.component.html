@@ -4,20 +4,45 @@
 
 <mat-dialog-content class="mat-typography">
     <div class="padding-border">
-        <Form class="grid-cols-12 gap-15">
 
-            <custom-search-select [options]="colaboradoresOptions" [multiple]="true" [required]="true"
-                formControlName="atividades" placeholder="Selecione os Colaboradores" label="Colaboradores" class="col-span-6">
+        <Form [formGroup]="formFiltro" class="grid-cols-12 gap-15">
+
+            <custom-search-select [multiple]="true" [options]="perfilOptions" [required]="false" formControlName="Perfil"
+                placeholder="Selecione os perfis" label="Perfil" class="col-span-4">
             </custom-search-select>
 
+            <custom-search-select [multiple]="true" [options]="equipeOptions" formControlName="Equipe" [required]="false"
+                placeholder="Selecione as equipe" label="Equipes" class="col-span-4">
+            </custom-search-select>
 
-            <custom-search-select [options]="atividadesOptions" [multiple]="true" formControlName="atividades" [required]="true"
+            <custom-search-select [multiple]="true" [options]="OsOptions" formControlName="Os" [required]="false"
+                placeholder="Selecione as OS" label="OS" class="col-span-4">
+            </custom-search-select>
+            
+            <custom-search-select [multiple]="true" [options]="disciplinaOptions" formControlName="Disciplina" [required]="false"
+                placeholder="Selecione a disciplina" label="Disciplina" class="col-span-4">
+            </custom-search-select>
+
+            <custom-search-select [multiple]="true" [options]="funcaoOptions" formControlName="Funcao" [required]="false"
+                placeholder="Selecione a função" label="Função" class="col-span-7">
+            </custom-search-select>
+
+            <div class="col-span-1">
+                <button type="submit" mat-raised-button (click)="filtrarColaboradores()"
+                    style="background-color: rgb(22, 163, 75); color: white; margin-top: 15px;">Filtrar
+                    Colaboradores</button>
+            </div>
+        </Form>
+        <Form [formGroup]="form" class="grid-cols-12 gap-15">
+            <custom-search-select [multiple]="true" [options]="colaboradoresOptions" [required]="true" formControlName="COLABORADORES"
+                placeholder="Selecione os Colaboradores" label="Colaboradores" class="col-span-6">
+            </custom-search-select>
+
+            <custom-search-select [multiple]="true" [options]="atividadesOptions" [required]="true" formControlName="IDS_ATIVIDADES" 
                 placeholder="Selecione as atividades" label="Atividades Específicas" class="col-span-6">
             </custom-search-select>
-            <!-- <div fxLayout="row wrap" fxLayout.xs="column" fxLayoutGap="30px">
-        
-            </div> -->
         </Form>
+       
     </div>
 </mat-dialog-content>
 
@@ -26,7 +51,7 @@
 <div class="padding-border">
     <mat-dialog-actions align="end">
         <button mat-button mat-dialog-close style="background-color: rgb(157, 27, 27); color: white">Cancelar</button>
-        <button [disabled]="form.invalid || blockRequisicao" type="submit" (click)="addOrUpdate()" mat-raised-button
-            style="background-color: rgb(22, 163, 75); color: white">Salvar</button>
+        <button [disabled]="form.invalid || blockRequisicao" type="submit" (click)="relacionarColaboradores()" mat-raised-button
+            style="background-color: rgb(22, 163, 75); color: white">Relacionar Colaboradores</button>
     </mat-dialog-actions>
 </div>

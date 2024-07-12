@@ -1,7 +1,7 @@
 import { BaseEntity } from "../BaseEntity";
 
 
-export class ColaboradorModel extends BaseEntity{
+export class ColaboradorModel extends BaseEntity {
     Empresa: string;
     numCad: string;
     NumCracha: string;
@@ -24,4 +24,19 @@ export class ColaboradorModel extends BaseEntity{
     Estado: string;
     TempoEmpresaAnos: string;
     TempoEmpresaAnosInt: string;
+}
+
+export class ColaboradorProtheusModel extends BaseEntity {
+    MATRICULA: string;
+    CRACHA: string;
+    NOME: string;
+    CODIGO_FUNCAO: string;
+    NOME_FUNCAO: string;
+    CODIGO_EQUIPE: string;
+    NOME_EQUIPE: string;
+    CODIGO_DISCIPLINA: string;
+    NOME_DISCIPLINA: string;
+    PERFIL: string;
+    CODIGO_OS: string;
+    NOME_OS: string
 }

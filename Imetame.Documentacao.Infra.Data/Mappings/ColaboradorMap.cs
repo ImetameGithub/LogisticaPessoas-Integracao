@@ -26,6 +26,27 @@ namespace Imetame.Documentacao.Infra.Data.Mappings
             builder.Property(c => c.Nome)
              .IsRequired();
 
+            builder.Property(c => c.Codigo_Funcao)
+             .IsRequired();
+
+            builder.Property(c => c.Nome_Funcao)
+             .IsRequired();
+
+            builder.Property(c => c.Codigo_Equipe)
+             .IsRequired();
+
+            builder.Property(c => c.Nome_Equipe)
+             .IsRequired();
+
+            builder.Property(c => c.Perfil)
+             .IsRequired();
+
+            builder.Property(c => c.Codigo_OS)
+             .IsRequired();
+
+            builder.Property(c => c.Nome_OS)
+             .IsRequired();
+
         }
     }
 }

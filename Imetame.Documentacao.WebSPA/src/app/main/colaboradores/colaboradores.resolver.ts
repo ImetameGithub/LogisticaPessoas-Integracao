@@ -6,11 +6,11 @@ import { PaginatedResponse } from 'app/models/PaginatedResponse';
 import { ColaboradorService } from './colaboradores.service';
 import { AtividadeEspecificaService } from '../atividade-especifica/atividade-especifica.service';
 import { Colaborador } from 'app/models/Colaborador';
-import { ColaboradorModel } from 'app/models/DTO/ColaboradorModel';
+import { ColaboradorModel, ColaboradorProtheusModel } from 'app/models/DTO/ColaboradorModel';
 import { forkJoin } from 'rxjs';
 import { AtividadeEspecifica } from 'app/models/AtividadeEspecifica';
 
-export const colaboradorResolver: ResolveFn<PaginatedResponse<ColaboradorModel>> = (route, state) => {
+export const colaboradorResolver: ResolveFn<PaginatedResponse<Colaborador>> = (route, state) => {
   const router = inject(Router);
   const service = inject(ColaboradorService); // Injetando serviço 
   return service.GetAllPaginated().pipe(
@@ -22,7 +22,7 @@ export const colaboradorResolver: ResolveFn<PaginatedResponse<ColaboradorModel>>
 
 };
 
-export const listAllcolaboradorResolver: ResolveFn<{colaboradorPaginated: PaginatedResponse<ColaboradorModel>,listAllColaborador:ColaboradorModel[], listAllAtividades: AtividadeEspecifica[]}> = (route, state) => {
+export const listAllcolaboradorResolver: ResolveFn<{colaboradorPaginated: PaginatedResponse<Colaborador>,listAllColaborador:ColaboradorProtheusModel[], listAllAtividades: AtividadeEspecifica[]}> = (route, state) => {
   const router = inject(Router);
   const service = inject(ColaboradorService);
   const serviceAtividade = inject(AtividadeEspecificaService);

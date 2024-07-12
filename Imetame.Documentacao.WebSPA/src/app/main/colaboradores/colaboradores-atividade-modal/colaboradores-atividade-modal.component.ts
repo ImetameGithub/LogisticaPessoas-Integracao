@@ -11,7 +11,7 @@ import { ShowErrosDialogComponent } from 'app/shared/components/show-erros-dialo
 import { GenericValidator } from 'app/utils/generic-form-validator';
 import { Subject } from 'rxjs';
 import { ColaboradorService } from '../colaboradores.service';
-import { ColaboradorModel } from 'app/models/DTO/ColaboradorModel';
+import { ColaboradorModel, ColaboradorProtheusModel } from 'app/models/DTO/ColaboradorModel';
 import { AtividadeEspecifica } from 'app/models/AtividadeEspecifica';
 import { CustomOptionsSelect } from 'app/shared/components/custom-select/components.types';
 
@@ -33,7 +33,14 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
     confirmDialogRef: MatDialogRef<ConfirmDialogComponent>;
     credenciadoras: any[] = []
 
+    listPerfil: string[]
+    listEquipe: string[]
+    listOs: string[]
+    listFuncao: string[]
+    listDisciplina: string[]
+
     form: UntypedFormGroup;
+    formFiltro: UntypedFormGroup;
 
     item: any = {};
     isBusy: boolean = false;
@@ -42,10 +49,15 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
 
     atividadesOptions: CustomOptionsSelect[] = [];
     colaboradoresOptions: CustomOptionsSelect[] = [];
+    perfilOptions: CustomOptionsSelect[] = [];
+    equipeOptions: CustomOptionsSelect[] = [];
+    OsOptions: CustomOptionsSelect[] = [];
+    funcaoOptions: CustomOptionsSelect[] = [];
+    disciplinaOptions: CustomOptionsSelect[] = [];
 
     constructor(
         private titleService: Title,
-        @Inject(MAT_DIALOG_DATA) public _data: {_listColaboradores: ColaboradorModel[] ,_listAtividades: AtividadeEspecifica[]},
+        @Inject(MAT_DIALOG_DATA) public _data: {_listColaboradores: ColaboradorProtheusModel[] ,_listAtividades: AtividadeEspecifica[]},
         private _Colaboradorservice: ColaboradorService,
         private _matDialogRef: MatDialogRef<ColaboradoresAtividadeModalComponent>,
         private _snackbar: MatSnackBar,
@@ -54,23 +66,48 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
         private route: ActivatedRoute,
         private _fuseProgressBarService: FuseProgressBarService,
     ) {
-        this.colaboradoresOptions = _data._listColaboradores.map(estrutura => new CustomOptionsSelect(estrutura, estrutura.Nome)) ?? [];
-        this.atividadesOptions = _data._listAtividades.map(estrutura => new CustomOptionsSelect(estrutura.Id, estrutura.Codigo)) ?? [];
+        this.listPerfil = Array.from(new Set(_data._listColaboradores.map(m => m.PERFIL)));
+        this.listEquipe = Array.from(new Set(_data._listColaboradores.map(m => m.CODIGO_EQUIPE +' - '+m.NOME_EQUIPE)));
+        this.listOs = Array.from(new Set(_data._listColaboradores.map(m => m.CODIGO_OS +' - '+ m.NOME_OS)));
+        this.listFuncao = Array.from(new Set(_data._listColaboradores.map(m => m.CODIGO_FUNCAO +' - '+ m.NOME_FUNCAO)));
+        this.listDisciplina = Array.from(new Set(_data._listColaboradores.map(m => m.CODIGO_DISCIPLINA +' - '+ m.NOME_DISCIPLINA)));
+                
+        this.atividadesOptions = _data._listAtividades.map(item => new CustomOptionsSelect(item.Id, item.Codigo)) ?? [];
+        this.perfilOptions = this.listPerfil.map(item => new CustomOptionsSelect(item, item)) ?? [];
+        this.equipeOptions = this.listEquipe.map(item => new CustomOptionsSelect(item, item)) ?? [];
+        this.OsOptions = this.listOs.map(item => new CustomOptionsSelect(item, item)) ?? [];
+        this.funcaoOptions = this.listFuncao.map(item => new CustomOptionsSelect(item, item)) ?? [];
+        this.disciplinaOptions = this.listDisciplina.map(item => new CustomOptionsSelect(item, item)) ?? [];
 
+        this.formFiltro = new FormGroup({
+            Perfil: new FormControl([]),
+            Equipe: new FormControl([]),
+            Os: new FormControl([]),
+            Funcao: new FormControl([]),
+            Disciplina: new FormControl([]),
+        });
         this.form = new FormGroup({
-            IDS_COLABORARES: new FormControl([], [Validators.required]),
-            IDS_ATIVIDADES: new FormControl('', [Validators.required]),
-            unidade: new FormControl('', [Validators.required]),
+            IDS_ATIVIDADES: new FormControl([], [Validators.required]),
+            COLABORADORES: new FormControl([], [Validators.required]),
         });
         this.titleService.setTitle("Novo - Colaborador - Imetame");
     }
 
 
     ngOnInit() {
-
+        this.form = new FormGroup({
+            IDS_ATIVIDADES: new FormControl([], [Validators.required]),
+            COLABORADORES: new FormControl([], [Validators.required]),
+        });
     }
 
     //#region FUNÇÕES CRUD MATHEUS MONFREIDES - FARTEC SISTEMAS
+
+    relacionarColaboradores(){
+        var filtroValues = this.form.getRawValue();
+        alert("teste")
+    }
+
     addOrUpdate() {
         if (!this.form.valid) {
             return;
@@ -109,6 +146,30 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
                 }
             }
         )
+    }
+
+    filtrarColaboradores() {
+        // Obtém os valores do formulário
+        var filtroValues = this.formFiltro.getRawValue();
+    
+        // Filtra a lista de colaboradores de acordo com os valores do formulário
+        let colaboradoresFiltrados = this._data._listColaboradores.filter(colaborador => {
+            let matchPerfil = filtroValues.Perfil.length > 0 ? filtroValues.Perfil.includes(colaborador.PERFIL) : true;
+            let matchEquipe = filtroValues.Equipe.length > 0 ? filtroValues.Equipe.includes(colaborador.CODIGO_EQUIPE +' - '+ colaborador.NOME_EQUIPE) : true;
+            let matchOs = filtroValues.Os.length > 0 ? filtroValues.Os.includes(colaborador.CODIGO_OS +' - ' + colaborador.NOME_OS) : true;
+            let matchFuncao = filtroValues.Funcao.length > 0 ? filtroValues.Funcao.includes(colaborador.CODIGO_FUNCAO +' - '+ colaborador.NOME_FUNCAO) : true;
+            let matchDisciplina = filtroValues.Funcao.length > 0 ? filtroValues.Funcao.includes(colaborador.CODIGO_DISCIPLINA +' - '+ colaborador.NOME_DISCIPLINA) : true;
+    
+            return matchPerfil && matchEquipe && matchOs && matchFuncao && matchDisciplina;
+        });
+    
+        // Mapeia os colaboradores filtrados para as opções do select
+        this.colaboradoresOptions = colaboradoresFiltrados.map(item => new CustomOptionsSelect(item, item.NOME)) ?? [];
+
+        this._snackbar.open("Filtro aplicado com sucesso", 'X', {
+            duration: 2500,
+            panelClass: 'snackbar-success',
+        })
     }
 
     update(model: Colaborador) {

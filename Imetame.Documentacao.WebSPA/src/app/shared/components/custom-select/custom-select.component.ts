@@ -23,6 +23,9 @@ import { MatIconModule } from '@angular/material/icon';
         <mat-option>
           <ngx-mat-select-search [formControl]="filterControl" [placeholderLabel]="placeholder"></ngx-mat-select-search>
         </mat-option>
+        <mat-option *ngIf="multiple == false" [value]="null">
+          Nenhum
+        </mat-option>
         <mat-option *ngFor="let option of filteredOptions | async" [value]="option.value">
           {{option.display}}
         </mat-option>
@@ -104,12 +107,31 @@ export class CustomSearchSelectComponent implements OnInit, OnChanges, ControlVa
     isDisabled ? this.formControl.disable() : this.formControl.enable();
   }
 
+  // onSelectionChange() {
+  //   this.onChange(this.formControl.value);
+  //   this.onTouched();
+  //   this.selectionChange.emit(this.formControl.value);
+  // }
+
   onSelectionChange() {
+    // Verifica se "Nenhum" está selecionado
+    const currentSelection = this.formControl.value;
+    // Essa validação existe para se caso o select não for multiplo não apareça nenhum erro no console log 
+    if(currentSelection != null){
+      if (currentSelection.includes(null)) {
+        // Se "Nenhum" está selecionado, remove todas as outras seleções e mantém apenas "Nenhum"
+        this.formControl.setValue([null]);
+      } else if (currentSelection.length > 1 && currentSelection.includes(null)) {
+        // Se há múltiplas seleções incluindo "Nenhum", remove "Nenhum"
+        this.formControl.setValue(currentSelection.filter(value => value !== null));
+      }    
+    }
+  
     this.onChange(this.formControl.value);
     this.onTouched();
     this.selectionChange.emit(this.formControl.value);
   }
-
+  
   private filterOptions(search: string): CustomOptionsSelect[] {
     if (!search) {
       return this.options.slice();

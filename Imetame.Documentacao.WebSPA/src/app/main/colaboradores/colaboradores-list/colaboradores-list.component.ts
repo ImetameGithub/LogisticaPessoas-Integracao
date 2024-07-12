@@ -13,7 +13,7 @@ import { PaginatedResponse } from 'app/models/PaginatedResponse';
 import { ConfirmDialogComponent } from 'app/shared/components/confirm-dialog/confirm-dialog.component';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ColaboradorService } from '../colaboradores.service';
-import { ColaboradorModel } from 'app/models/DTO/ColaboradorModel';
+import { ColaboradorModel, ColaboradorProtheusModel } from 'app/models/DTO/ColaboradorModel';
 import { ColaboradoresFormComponent } from '../colaboradores-form/colaboradores-form.component';
 import { fuseAnimations } from '@fuse/animations';
 import { ColaboradoresAtividadeModalComponent } from '../colaboradores-atividade-modal/colaboradores-atividade-modal.component';
@@ -41,18 +41,18 @@ export class ColaboradoresListComponent implements OnInit {
   //#endregion 
 
   //#region PESQUISA E LISTAS
-  ColaboradorList: ColaboradorModel[];
+  ColaboradorList: Colaborador[];
   searchInput: FormControl;
   nenhumDadoEncontrado: boolean;
   //#endregion
 
   //#region DATA SOURCE E FORMULARIO
   displayedColumns = ["cadastro", "cracha", "nome", "empresa", "mudaFuncao", "atividadeEspecifica", "buttons"];
-  dataSource: MatTableDataSource<ColaboradorModel>;
+  dataSource: MatTableDataSource<Colaborador>;
   form: UntypedFormGroup;
   //#endregion
 
-  _listAllColaboradores: ColaboradorModel[];
+  _listAllColaboradores: ColaboradorProtheusModel[];
   _listAtividades: AtividadeEspecifica[];
 
   //#region PAGINAÇÃO 
@@ -86,7 +86,7 @@ export class ColaboradoresListComponent implements OnInit {
 
 
   ngOnInit(): void {
-    const Colaborador: PaginatedResponse<ColaboradorModel> = this.route.snapshot.data['data'].colaboradorPaginated;
+    const Colaborador: PaginatedResponse<Colaborador> = this.route.snapshot.data['data'].colaboradorPaginated;
     this.totalCount = Colaborador.TotalCount;
     this.page = Colaborador.Page;
     this.pageSize = Colaborador.PageSize;
@@ -160,15 +160,15 @@ export class ColaboradoresListComponent implements OnInit {
     const dialogRef = this._matDialog.open(ColaboradoresAtividadeModalComponent, dialogConfig);
 
     //#region AFTER CLOSE REALIZADO DESSA MANEIRA PARA EVITAR VARIAS CONSULTAS NA API - MATHEUS MONFREIDES 04/12/2023
-    dialogRef.afterClosed().subscribe((ColaboradorAtualizado: ColaboradorModel | null) => {
-      if (ColaboradorAtualizado) {
-        const index = this.dataSource.data.findIndex(m => m.Id === ColaboradorAtualizado.Id);
-        if (index !== -1) {
-          this.dataSource.data[index] = ColaboradorAtualizado;
-          this.dataSource.data = [...this.dataSource.data];
-        }
-      }
-    });
+    // dialogRef.afterClosed().subscribe((ColaboradorAtualizado: ColaboradorModel | null) => {
+    //   if (ColaboradorAtualizado) {
+    //     const index = this.dataSource.data.findIndex(m => m.Id === ColaboradorAtualizado.Id);
+    //     if (index !== -1) {
+    //       this.dataSource.data[index] = ColaboradorAtualizado;
+    //       this.dataSource.data = [...this.dataSource.data];
+    //     }
+    //   }
+    // });
     //#endregion
   }
   abrirModalFiltro() {
@@ -199,7 +199,7 @@ export class ColaboradoresListComponent implements OnInit {
     this._ColaboradorService.GetAllPaginated(this.page, this.pageSize, value)
       .subscribe(
         {
-          next: (response: PaginatedResponse<ColaboradorModel>) => {
+          next: (response: PaginatedResponse<Colaborador>) => {
             if (response.Data.length <= 0) {
               this.nenhumDadoEncontrado = true;
             }

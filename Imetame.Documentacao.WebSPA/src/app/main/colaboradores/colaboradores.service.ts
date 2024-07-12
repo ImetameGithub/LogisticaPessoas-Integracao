@@ -3,7 +3,7 @@ import { Inject, Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { API_URL } from 'app/config/tokens';
 import { Colaborador } from 'app/models/Colaborador';
-import { ColaboradorModel } from 'app/models/DTO/ColaboradorModel';
+import { ColaboradorModel, ColaboradorProtheusModel } from 'app/models/DTO/ColaboradorModel';
 import { PaginatedResponse } from 'app/models/PaginatedResponse';
 import { DataService } from 'app/services/data.service';
 import { environment } from 'environments/environment';
@@ -20,22 +20,22 @@ export class ColaboradorService {
 
   }
   //#region CRUD
-  GetAll(): Observable<ColaboradorModel[]> {
-    return this._httpClient.get<ColaboradorModel[]>(environment.Colaboradores.GetAll);
+  GetAll(): Observable<ColaboradorProtheusModel[]> {
+    return this._httpClient.get<ColaboradorProtheusModel[]>(environment.Colaboradores.GetAll);
   }
-  GetAllPaginated(page: number = 1, pageSize: number = 10, filtro: string = ''): Observable<PaginatedResponse<ColaboradorModel>> {
+  GetAllPaginated(page: number = 1, pageSize: number = 10, filtro: string = ''): Observable<PaginatedResponse<Colaborador>> {
     const params = new HttpParams()     
       .set('page', page.toString())
       .set('pageSize', pageSize.toString())
       .set('filtro', filtro);
-    return this._httpClient.get<PaginatedResponse<ColaboradorModel>>(environment.Colaboradores.GetAllPaginated, { params });
+    return this._httpClient.get<PaginatedResponse<Colaborador>>(environment.Colaboradores.GetAllPaginated, { params });
   }
-  GetColaboradores(page: number = 1, pageSize: number = 10, filtro: string = ''): Observable<PaginatedResponse<ColaboradorModel>> {
+  GetColaboradores(page: number = 1, pageSize: number = 10, filtro: string = ''): Observable<PaginatedResponse<ColaboradorProtheusModel>> {
     const params = new HttpParams()     
       .set('page', page.toString())
       .set('pageSize', pageSize.toString())
       .set('filtro', filtro);
-    return this._httpClient.get<PaginatedResponse<ColaboradorModel>>(environment.Colaboradores.GetColaboradores, { params });
+    return this._httpClient.get<PaginatedResponse<ColaboradorProtheusModel>>(environment.Colaboradores.GetColaboradores, { params });
   }
 
   Add(Colaborador: Colaborador): Observable<Colaborador> {
@@ -49,6 +49,7 @@ export class ColaboradorService {
   Delete(id: string): Observable<Colaborador> {
     return this._httpClient.delete<Colaborador>(`${environment.Colaboradores.Delete}/${id}`)
 }
+
   //#endregion
 
 }

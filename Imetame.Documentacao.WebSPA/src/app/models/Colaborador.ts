@@ -5,5 +5,14 @@ export class Colaborador extends BaseEntity{
     Matricula: string;
     Nome: string;
     MudaFuncao: string;
+    Codigo_Funcao: string;
+    Nome_Funcao: string;
+    Codigo_Equipe: string;
+    Nome_Equipe: string;
+    Codigo_Disciplina: string;
+    Nome_Disciplina: string;
+    Perfil: string;
+    Codigo_OS: string;
+    Nome_OS: string;
 }
   
