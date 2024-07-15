@@ -20,7 +20,6 @@ namespace Imetame.Documentacao.Infra.Data.Mappings
              .IsRequired();
 
             builder.Property(c => c.Cracha)
-             .HasMaxLength(8)
              .IsRequired();
 
             builder.Property(c => c.Nome)

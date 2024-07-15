@@ -21,7 +21,7 @@ namespace Imetame.Documentacao.Infra.Data.Mappings
                  .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(x => x.Colaborador)
-                 .WithMany()
+                 .WithMany(m => m.ColaboradorxAtividade)
                  .HasForeignKey(x => x.CXA_IDCOLABORADOR)
                  .OnDelete(DeleteBehavior.Cascade);
         }

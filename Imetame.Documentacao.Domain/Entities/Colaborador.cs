@@ -1,7 +1,9 @@
 ﻿using Imetame.Documentacao.Domain.Core.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Imetame.Documentacao.Domain.Entities
 {
@@ -20,6 +22,10 @@ namespace Imetame.Documentacao.Domain.Entities
         public string Perfil { get; set; }
         public string Codigo_OS { get; set; }
         public string Nome_OS { get; set; }
+
+        //[JsonIgnore]
+        [NotMapped]
+        public List<ColaboradorxAtividade> ColaboradorxAtividade { get; set; }
 
     }
 }

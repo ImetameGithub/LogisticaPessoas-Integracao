@@ -42,7 +42,7 @@
                     }">
                     <mat-icon>add</mat-icon>
                 </button>
-            </div>   
+            </div>
             <!-- <div class="grid-cols-12 gap-15">
                 <button mat-fab aria-label="Adicionar" (click)="abrirModal()" type="submit">
                     <mat-icon>add</mat-icon>
@@ -60,17 +60,17 @@
                 <ng-container matColumnDef="cadastro">
                     <mat-header-cell *matHeaderCellDef>Cadastro</mat-header-cell>
                     <mat-cell *matCellDef="let row">
-                        {{ row.numCad }}</mat-cell>
+                        {{ row.Matricula }}</mat-cell>
                 </ng-container>
 
                 <ng-container matColumnDef="cracha">
                     <mat-header-cell *matHeaderCellDef>Cracha</mat-header-cell>
-                    <mat-cell *matCellDef="let row"> {{ row.numCracha }}</mat-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.Cracha }}</mat-cell>
                 </ng-container>
 
                 <ng-container matColumnDef="nome">
                     <mat-header-cell *matHeaderCellDef>Nome</mat-header-cell>
-                    <mat-cell *matCellDef="let row"> {{ row.nome }}</mat-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.Nome }}</mat-cell>
                 </ng-container>
 
                 <ng-container matColumnDef="empresa">
@@ -80,12 +80,14 @@
 
                 <ng-container matColumnDef="mudaFuncao">
                     <mat-header-cell *matHeaderCellDef>Mudança Função</mat-header-cell>
-                    <mat-cell *matCellDef="let row"> Sim</mat-cell>
+                    <mat-cell *matCellDef="let row">{{row.MudaFuncao == 'N' ? "Não" : "Sim"}}</mat-cell>
                 </ng-container>
 
                 <ng-container matColumnDef="atividadeEspecifica">
                     <mat-header-cell *matHeaderCellDef>Atividades Específicas</mat-header-cell>
-                    <mat-cell *matCellDef="let row"> Implementar</mat-cell>
+                    <mat-cell *matCellDef="let row">
+                        {{ getAtividadesEspecificas(row) }}
+                    </mat-cell>
                 </ng-container>
 
                 <ng-container matColumnDef="buttons" stickyEnd>
@@ -96,7 +98,7 @@
                             <mat-icon class="secondary-text">more_vert</mat-icon>
                         </button>
                         <mat-menu #moreMenu="matMenu">
-                            <button mat-menu-item aria-label="remove" (click)="deleteItem(item.id,i)">
+                            <button mat-menu-item aria-label="remove" (click)="deleteItem(item.Id,i)">
                                 <mat-icon>delete</mat-icon>
                                 <span>Deletar</span>
                             </button>

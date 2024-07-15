@@ -36,17 +36,18 @@
             <!-- ADD FILE BUTTON -->
             <div class="file-uploader">
                 <button
+                    matTooltip="Atualizar Atividades"
                     mat-fab
                     color="accent"
                     class="add-file-button"
-                    [routerLink]="'./novo'"
+                    (click)="getAtividadesDestra()"
                     aria-label="Novo"
                     [@animate]="{
                         value: '*',
                         params: { delay: '300ms', scale: '0.2' }
                     }"
                 >
-                    <mat-icon>add</mat-icon>
+                <mat-icon>cloud_download</mat-icon>
                 </button>
             </div>
             <!-- / ADD FILE BUTTON -->

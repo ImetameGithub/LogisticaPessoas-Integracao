@@ -10,6 +10,7 @@ import { environment } from 'environments/environment';
 import { tap } from 'rxjs/operators';
 import { ReplaySubject, Observable } from 'rxjs';
 import { AtividadeEspecifica } from 'app/models/AtividadeEspecifica';
+import { ColaboradorxAtividadeModel } from 'app/models/DTO/ColaboradorxAtividadeModel';
 
 @Injectable({
   providedIn: 'root'
@@ -41,6 +42,10 @@ export class ColaboradorService {
   Add(Colaborador: Colaborador): Observable<Colaborador> {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
     return this._httpClient.post<Colaborador>(environment.Colaboradores.Add, Colaborador, { headers });
+  }
+  RelacionarColaboradorxAtividade(model: ColaboradorxAtividadeModel): Observable<ColaboradorxAtividadeModel> {
+    const headers = new HttpHeaders().set('Content-Type', 'application/json');
+    return this._httpClient.post<ColaboradorxAtividadeModel>(environment.Colaboradores.RelacionarColaboradorxAtividade, model, { headers });
   }
   Update(Colaborador: Colaborador): Observable<Colaborador> {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');

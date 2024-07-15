@@ -96,6 +96,12 @@ export class ColaboradoresListComponent implements OnInit {
     // this.loadData()
   }
 
+  getAtividadesEspecificas(colaborador: Colaborador): string {
+    return colaborador.ColaboradorxAtividade
+      .map(cxa => cxa.AtividadeEspecifica.Codigo)
+      .join(', ');
+  }
+
   //#region FUNÇÃO DELETE - MATHEUS MONFREIDES - FARTEC SISTEMAS 
 
   deleteItem(ItemDelete: string, index: number) {
@@ -153,6 +159,7 @@ export class ColaboradoresListComponent implements OnInit {
     dialogConfig.autoFocus = false;
     dialogConfig.width = '80%';
     dialogConfig.height = 'auto%';
+    dialogConfig.panelClass = 'colaborador-modal-class';
     dialogConfig.data = {
       _listColaboradores: this.route.snapshot.data['data'].listAllColaborador,
       _listAtividades: this.route.snapshot.data['data'].listAllAtividades
@@ -160,15 +167,13 @@ export class ColaboradoresListComponent implements OnInit {
     const dialogRef = this._matDialog.open(ColaboradoresAtividadeModalComponent, dialogConfig);
 
     //#region AFTER CLOSE REALIZADO DESSA MANEIRA PARA EVITAR VARIAS CONSULTAS NA API - MATHEUS MONFREIDES 04/12/2023
-    // dialogRef.afterClosed().subscribe((ColaboradorAtualizado: ColaboradorModel | null) => {
-    //   if (ColaboradorAtualizado) {
-    //     const index = this.dataSource.data.findIndex(m => m.Id === ColaboradorAtualizado.Id);
-    //     if (index !== -1) {
-    //       this.dataSource.data[index] = ColaboradorAtualizado;
-    //       this.dataSource.data = [...this.dataSource.data];
-    //     }
-    //   }
-    // });
+    dialogRef.afterClosed().subscribe((newItem: Colaborador | null) => {
+
+      if (newItem) {
+        this.filtrar(this.searchInput.value);
+      }
+
+    });
     //#endregion
   }
   abrirModalFiltro() {
@@ -176,7 +181,7 @@ export class ColaboradoresListComponent implements OnInit {
     dialogConfig.autoFocus = false;
     dialogConfig.width = '80%';
     dialogConfig.height = 'auto%';
-    dialogConfig.data = {     
+    dialogConfig.data = {
     };
     const dialogRef = this._matDialog.open(ColaboradoresFiltroComponent, dialogConfig);
 

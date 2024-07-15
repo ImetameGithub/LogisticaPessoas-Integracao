@@ -138,7 +138,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
         }
         
         [HttpGet]
-        public async Task<IActionResult> GetAtividades()
+        public async Task<string> GetAtividades()
         {
             try
             {
@@ -148,43 +148,22 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 if (!response.Erro)
                 {
-                    var result = await _destraService.GetAsync(endPoint,response.Token);
+                    var result = await _destraService.GetAsync(endPoint, response.Token);
                     if (result.IsSuccessStatusCode)
                     {
-                        var jsonResponse = await result.Content.ReadAsStringAsync();
-                        List<AtividadeEspecifica> listAtividades = new List<AtividadeEspecifica>();
-
-                        ListaAtividadesModel listaModel = JsonSerializer.Deserialize<ListaAtividadesModel>(jsonResponse);
-
-                        foreach (var item in listaModel.LISTA)
-                        {
-                            AtividadeEspecifica at = new AtividadeEspecifica
-                            {
-                                Codigo = item.codigo,
-                                Descricao = item.descricao,
-                                IdDestra = item.id,
-                            };
-
-                            listAtividades.Add(at);
-                        }
-
-                        // ESTÁ DESSA MANEIRA POIS A CLASSE ENTITY CRIADA NO PROJETO INSERE UM GUID E O BASE REPOSITORIO NÃO SALVA DESSA MANEIRA - TENTEI PDRONIZAR MAS MUDA MUITA COISA - MATHEUS FARTEC
-                        listAtividades.ForEach(m => m.Id = new Guid());
-                        await _repAtividadeEspecifica.InsertRangeAsync(listAtividades);
-
-                        return Ok(await result.Content.ReadAsStringAsync());
+                        return await result.Content.ReadAsStringAsync();
                     }
 
-                    return StatusCode((int)result.StatusCode, await result.Content.ReadAsStringAsync());                    
+                    throw new Exception(await result.Content.ReadAsStringAsync());
                 }
                 else
                 {
-                    return BadRequest(response.MensagemErro);
+                    throw new Exception(response.MensagemErro);
                 }
             }
             catch (Exception ex)
             {
-                return NotFound(ex);
+                throw new Exception("Erro ao obter atividades", ex);
             }
         }
     }

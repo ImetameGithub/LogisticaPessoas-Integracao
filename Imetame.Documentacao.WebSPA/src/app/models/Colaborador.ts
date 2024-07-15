@@ -1,4 +1,5 @@
 import { BaseEntity } from "./BaseEntity";
+import { ColaboradorxAtividade } from "./ColaboradorxAtividade";
 
 export class Colaborador extends BaseEntity{
     Cracha: string;
@@ -14,5 +15,7 @@ export class Colaborador extends BaseEntity{
     Perfil: string;
     Codigo_OS: string;
     Nome_OS: string;
+
+    ColaboradorxAtividade: ColaboradorxAtividade[];
 }
   

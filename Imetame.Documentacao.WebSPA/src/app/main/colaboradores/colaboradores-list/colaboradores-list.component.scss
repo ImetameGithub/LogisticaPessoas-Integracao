@@ -1,8 +1,4 @@
-mat-dialog-container {
-    padding: 0px !important;
-    max-width: 100% !important;
-    overflow: hidden !important;
-}
+
 
 
 .gap-15 {
@@ -12,4 +8,11 @@ mat-dialog-container {
 .grid-cols-12 {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+}
+
+//ANGULAR 14 NÃO FICA COM O HEADER CORRETO, POR ESSE MOTIVO USO O ATRIBUTO APENAS PARA O MODAL
+.colaborador-modal-class .mat-dialog-container {
+    padding: 0px !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
 }

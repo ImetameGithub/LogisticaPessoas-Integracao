@@ -14,15 +14,16 @@ import { ColaboradorService } from '../colaboradores.service';
 import { ColaboradorModel, ColaboradorProtheusModel } from 'app/models/DTO/ColaboradorModel';
 import { AtividadeEspecifica } from 'app/models/AtividadeEspecifica';
 import { CustomOptionsSelect } from 'app/shared/components/custom-select/components.types';
+import { ColaboradorxAtividadeModel } from 'app/models/DTO/ColaboradorxAtividadeModel';
 
 @Component({
-  selector: 'colaboradores-atividade-modal',
-  templateUrl: './colaboradores-atividade-modal.component.html',
-  styleUrls: ['./colaboradores-atividade-modal.component.scss']
+    selector: 'colaboradores-atividade-modal',
+    templateUrl: './colaboradores-atividade-modal.component.html',
+    styleUrls: ['./colaboradores-atividade-modal.component.scss']
 })
 export class ColaboradoresAtividadeModalComponent implements OnInit {
 
-  blockRequisicao: boolean = false;
+    blockRequisicao: boolean = false;
     private _unsubscribeAll: Subject<any>;
     genericValidator: GenericValidator;
     validationMessages: { [key: string]: { [key: string]: any } };
@@ -38,6 +39,8 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
     listOs: string[]
     listFuncao: string[]
     listDisciplina: string[]
+
+    listColaboradorAdd: Colaborador[];
 
     form: UntypedFormGroup;
     formFiltro: UntypedFormGroup;
@@ -57,7 +60,7 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
 
     constructor(
         private titleService: Title,
-        @Inject(MAT_DIALOG_DATA) public _data: {_listColaboradores: ColaboradorProtheusModel[] ,_listAtividades: AtividadeEspecifica[]},
+        @Inject(MAT_DIALOG_DATA) public _data: { _listColaboradores: ColaboradorProtheusModel[], _listAtividades: AtividadeEspecifica[] },
         private _Colaboradorservice: ColaboradorService,
         private _matDialogRef: MatDialogRef<ColaboradoresAtividadeModalComponent>,
         private _snackbar: MatSnackBar,
@@ -67,11 +70,11 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
         private _fuseProgressBarService: FuseProgressBarService,
     ) {
         this.listPerfil = Array.from(new Set(_data._listColaboradores.map(m => m.PERFIL)));
-        this.listEquipe = Array.from(new Set(_data._listColaboradores.map(m => m.CODIGO_EQUIPE +' - '+m.NOME_EQUIPE)));
-        this.listOs = Array.from(new Set(_data._listColaboradores.map(m => m.CODIGO_OS +' - '+ m.NOME_OS)));
-        this.listFuncao = Array.from(new Set(_data._listColaboradores.map(m => m.CODIGO_FUNCAO +' - '+ m.NOME_FUNCAO)));
-        this.listDisciplina = Array.from(new Set(_data._listColaboradores.map(m => m.CODIGO_DISCIPLINA +' - '+ m.NOME_DISCIPLINA)));
-                
+        this.listEquipe = Array.from(new Set(_data._listColaboradores.map(m => m.CODIGO_EQUIPE + ' - ' + m.NOME_EQUIPE)));
+        this.listOs = Array.from(new Set(_data._listColaboradores.map(m => m.CODIGO_OS + ' - ' + m.NOME_OS)));
+        this.listFuncao = Array.from(new Set(_data._listColaboradores.map(m => m.CODIGO_FUNCAO + ' - ' + m.NOME_FUNCAO)));
+        this.listDisciplina = Array.from(new Set(_data._listColaboradores.map(m => m.CODIGO_DISCIPLINA + ' - ' + m.NOME_DISCIPLINA)));
+
         this.atividadesOptions = _data._listAtividades.map(item => new CustomOptionsSelect(item.Id, item.Codigo)) ?? [];
         this.perfilOptions = this.listPerfil.map(item => new CustomOptionsSelect(item, item)) ?? [];
         this.equipeOptions = this.listEquipe.map(item => new CustomOptionsSelect(item, item)) ?? [];
@@ -87,8 +90,8 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
             Disciplina: new FormControl([]),
         });
         this.form = new FormGroup({
-            IDS_ATIVIDADES: new FormControl([], [Validators.required]),
-            COLABORADORES: new FormControl([], [Validators.required]),
+            ListAtividade: new FormControl([], [Validators.required]),
+            ListColaborador: new FormControl([], [Validators.required]),
         });
         this.titleService.setTitle("Novo - Colaborador - Imetame");
     }
@@ -96,16 +99,37 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
 
     ngOnInit() {
         this.form = new FormGroup({
-            IDS_ATIVIDADES: new FormControl([], [Validators.required]),
-            COLABORADORES: new FormControl([], [Validators.required]),
+            ListAtividade: new FormControl([], [Validators.required]),
+            ListColaborador: new FormControl([], [Validators.required]),
         });
     }
 
     //#region FUNÇÕES CRUD MATHEUS MONFREIDES - FARTEC SISTEMAS
 
-    relacionarColaboradores(){
-        var filtroValues = this.form.getRawValue();
-        alert("teste")
+    relacionarColaboradores() {
+        const modelRelacao: ColaboradorxAtividadeModel = this.form.getRawValue();
+
+        this._Colaboradorservice.RelacionarColaboradorxAtividade(modelRelacao).subscribe(
+            {
+                next: (response: ColaboradorxAtividadeModel) => {
+                    this._fuseProgressBarService.hide();
+                    this.blockRequisicao = false;
+                    this.closeDiag(response);
+                    this._snackbar.open("Relação realizada com sucesso", 'X', {
+                        duration: 2500,
+                        panelClass: 'snackbar-success',
+                    })
+                },
+                error: (error) => {
+                    this._fuseProgressBarService.hide();
+                    this.blockRequisicao = false;
+                    this._snackbar.open(error.error, 'X', {
+                        duration: 2500,
+                        panelClass: 'snackbar-error',
+                    })
+                }
+            }
+        )
     }
 
     addOrUpdate() {
@@ -130,7 +154,6 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
                 next: (response: Colaborador) => {
                     this._fuseProgressBarService.hide();
                     this.blockRequisicao = false;
-                    this.router.navigate(["../"], { relativeTo: this.route });
                     this._snackbar.open("Item adicionado com sucesso", 'X', {
                         duration: 2500,
                         panelClass: 'snackbar-success',
@@ -151,18 +174,18 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
     filtrarColaboradores() {
         // Obtém os valores do formulário
         var filtroValues = this.formFiltro.getRawValue();
-    
+
         // Filtra a lista de colaboradores de acordo com os valores do formulário
         let colaboradoresFiltrados = this._data._listColaboradores.filter(colaborador => {
             let matchPerfil = filtroValues.Perfil.length > 0 ? filtroValues.Perfil.includes(colaborador.PERFIL) : true;
-            let matchEquipe = filtroValues.Equipe.length > 0 ? filtroValues.Equipe.includes(colaborador.CODIGO_EQUIPE +' - '+ colaborador.NOME_EQUIPE) : true;
-            let matchOs = filtroValues.Os.length > 0 ? filtroValues.Os.includes(colaborador.CODIGO_OS +' - ' + colaborador.NOME_OS) : true;
-            let matchFuncao = filtroValues.Funcao.length > 0 ? filtroValues.Funcao.includes(colaborador.CODIGO_FUNCAO +' - '+ colaborador.NOME_FUNCAO) : true;
-            let matchDisciplina = filtroValues.Funcao.length > 0 ? filtroValues.Funcao.includes(colaborador.CODIGO_DISCIPLINA +' - '+ colaborador.NOME_DISCIPLINA) : true;
-    
+            let matchEquipe = filtroValues.Equipe.length > 0 ? filtroValues.Equipe.includes(colaborador.CODIGO_EQUIPE + ' - ' + colaborador.NOME_EQUIPE) : true;
+            let matchOs = filtroValues.Os.length > 0 ? filtroValues.Os.includes(colaborador.CODIGO_OS + ' - ' + colaborador.NOME_OS) : true;
+            let matchFuncao = filtroValues.Funcao.length > 0 ? filtroValues.Funcao.includes(colaborador.CODIGO_FUNCAO + ' - ' + colaborador.NOME_FUNCAO) : true;
+            let matchDisciplina = filtroValues.Funcao.length > 0 ? filtroValues.Funcao.includes(colaborador.CODIGO_DISCIPLINA + ' - ' + colaborador.NOME_DISCIPLINA) : true;
+
             return matchPerfil && matchEquipe && matchOs && matchFuncao && matchDisciplina;
         });
-    
+
         // Mapeia os colaboradores filtrados para as opções do select
         this.colaboradoresOptions = colaboradoresFiltrados.map(item => new CustomOptionsSelect(item, item.NOME)) ?? [];
 
@@ -182,7 +205,6 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
                 next: (response: Colaborador) => {
                     this.blockRequisicao = false;
                     this._fuseProgressBarService.hide();
-                    this.router.navigate(["../"], { relativeTo: this.route });
                     this._snackbar.open("Item atualizado com sucesso", 'X', {
                         duration: 2500,
                         panelClass: 'snackbar-success',
@@ -199,6 +221,11 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
                 }
             }
         )
+    }
+
+
+    closeDiag(newItem?: ColaboradorxAtividadeModel): void {
+        this._matDialogRef.close(newItem);        
     }
 
     public myError = (

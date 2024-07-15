@@ -22,17 +22,20 @@ namespace Imetame.Documentacao.WebApi.Controllers
         private readonly IColaboradorRepository _repository;
         private readonly IBaseRepository<Domain.Entities.Processamento> _repProcessamento;
         private readonly IBaseRepository<Domain.Entities.Colaborador> _repColaborador;
+        private readonly IBaseRepository<ColaboradorxAtividade> _repColaboradorxAtividade;
         protected readonly SqlConnection conn;
         private readonly IConfiguration _configuration;
 
 
-        public ColaboradoresController(IColaboradorRepository repository, IBaseRepository<Domain.Entities.Processamento> repProcessamento, IConfiguration configuration, IBaseRepository<Domain.Entities.Colaborador> repColaborador)
+        public ColaboradoresController(IColaboradorRepository repository, IBaseRepository<Domain.Entities.Processamento> repProcessamento,
+            IConfiguration configuration, IBaseRepository<Domain.Entities.Colaborador> repColaborador, IBaseRepository<ColaboradorxAtividade> repColaboradorxAtividade)
         {
             _repository = repository;
             _configuration = configuration;
             _repProcessamento = repProcessamento;
             conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
             _repColaborador = repColaborador;
+            _repColaboradorxAtividade = repColaboradorxAtividade;
         }
 
         [HttpGet("{idProcessamento}")]
@@ -104,6 +107,8 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 int offset = (page - 1) * pageSize;
 
                 IQueryable<Colaborador> query = _repColaborador.SelectContext()
+                                                             .Include(m => m.ColaboradorxAtividade)
+                                                                .ThenInclude(m => m.AtividadeEspecifica)
                                                              .OrderBy(x => x.Nome);
                 if (!string.IsNullOrEmpty(texto))
                     query = query.Where(q => q.Nome.Contains(texto) || q.Matricula.Contains(texto));
@@ -200,6 +205,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 #region CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
                 conn.Open();
                 var sql = @"SELECT SRA.RA_MAT AS MATRICULA,
+                                   SRA.RA_CRACHA AS CRACHA,
 	                               SRA.RA_NOME AS NOME,
 	                               SRJ.RJ_FUNCAO AS CODIGO_FUNCAO,
 	                               SRJ.RJ_DESC AS NOME_FUNCAO, 
@@ -244,6 +250,76 @@ namespace Imetame.Documentacao.WebApi.Controllers
             {
 
                 throw;
+            }
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> RelacionarColaboradorxAtividade([FromBody] ColaboradorxAtividadeModel model, CancellationToken cancellationToken)
+        {
+            try
+            {
+                StringBuilder erro = new StringBuilder();
+                if (!ModelState.IsValid)
+                {
+                    erro = ErrorHelper.GetErroModelState(ModelState.Values);
+                    throw new Exception("Falha ao Salvar Dados.\n" + erro);
+                }
+
+                List<Colaborador> colaboradores = new List<Colaborador>();
+
+                foreach (ColaboradorProtheusModel item in model.ListColaborador)
+                {
+                    Colaborador colaborador = new Colaborador()
+                    {
+                        Id = new Guid(),
+                        Matricula = item.MATRICULA,
+                        Cracha = item.CRACHA,
+                        Nome = item.NOME,
+                        Codigo_Funcao = item.CODIGO_FUNCAO,
+                        Nome_Funcao = item.NOME_FUNCAO,
+                        Codigo_Equipe = item.CODIGO_EQUIPE,
+                        Nome_Equipe = item.NOME_EQUIPE,
+                        Codigo_Disciplina = item.CODIGO_DISCIPLINA,
+                        Nome_Disciplina = item.NOME_DISCIPLINA,
+                        Perfil = item.PERFIL,
+                        Codigo_OS = item.CODIGO_OS,
+                        MudaFuncao = "N",// DEFINIR COMO A CONSULTA VAI TRAZER
+                        Nome_OS = item.NOME_OS
+                    };
+
+                    colaboradores.Add(colaborador);
+                }
+
+                await _repColaborador.InsertRangeAsync(colaboradores);
+
+                List<ColaboradorxAtividade> colaboradorxAtividades = new List<ColaboradorxAtividade>();
+
+                // Cria as relações entre colaboradores e atividades
+                foreach (var colaborador in colaboradores)
+                {
+                    foreach (var atividadeId in model.ListAtividade)
+                    {
+                        ColaboradorxAtividade relacao = new ColaboradorxAtividade()
+                        {
+                            Id = new Guid(),
+                            CXA_IDCOLABORADOR = colaborador.Id, // Assumindo que o Id do colaborador seja do tipo Guid e esteja gerado
+                            CXA_IDATIVIDADE_ESPECIFICA = atividadeId
+                        };
+
+                        colaboradorxAtividades.Add(relacao);
+                    }
+                }
+
+                await _repColaboradorxAtividade.InsertRangeAsync(colaboradorxAtividades);
+                //model.Id = new Guid();
+                //await _repAtividadeEspecifica.SaveAsync(model);
+
+                return Ok(model);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ErrorHelper.GetException(ex));
             }
         }
 

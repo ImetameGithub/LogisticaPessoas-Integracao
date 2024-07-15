@@ -39,6 +39,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Imetame.Documentacao.Domain.Repositories;
 using Imetame.Documentacao.Infra.Data.Repositories;
+using Imetame.Documentacao.WebApi.Controllers;
 
 namespace Imetame.Documentacao.WebApi
 {
@@ -58,6 +59,7 @@ namespace Imetame.Documentacao.WebApi
                 {
                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
                     options.JsonSerializerOptions.PropertyNamingPolicy = null;
 
                 });
@@ -191,6 +193,8 @@ namespace Imetame.Documentacao.WebApi
             services.AddScoped<ICadastroService, CadastroService>();
             services.AddScoped<ICadastroDestraService, CadastroDestraService>();
             services.AddScoped<IPedidoService, PedidoService>();
+
+            services.AddTransient<DestraController>();// PARA QUE EU CONSIGA USAR A CONTROLLER DESTRA DENTRO DE OUTRA
 
             services.AddScoped<IProcessamentoService, ProcessamentoService>();
 

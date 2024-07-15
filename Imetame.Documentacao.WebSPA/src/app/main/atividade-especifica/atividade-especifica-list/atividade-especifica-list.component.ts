@@ -15,6 +15,7 @@ import { AtividadeEspecificaFormComponent } from '../atividade-especifica-form/a
 import { AtividadeEspecificaService } from '../atividade-especifica.service';
 import { Title } from '@angular/platform-browser';
 import { fuseAnimations } from '@fuse/animations';
+import { FuseProgressBarService } from '@fuse/components/progress-bar/progress-bar.service';
 
 @Component({
   selector: 'atividade-especifica-list',
@@ -44,7 +45,7 @@ export class AtividadeEspecificaListComponent implements OnInit {
 
   //#region DATA SOURCE E FORMULARIO
   // displayedColumns = ["codigo", "descricao", "buttons"];
-  displayedColumns = ["codigo","credenciadora","ultimaAtualizacao", "colaboradoresCadastrados"];
+  displayedColumns = ["codigo", "credenciadora", "ultimaAtualizacao", "colaboradoresCadastrados"];
   dataSource: MatTableDataSource<AtividadeEspecifica>;
   form: UntypedFormGroup;
   dataAtual: Date = new Date()
@@ -62,6 +63,7 @@ export class AtividadeEspecificaListComponent implements OnInit {
     private _snackbar: MatSnackBar,
     public dialog: MatDialog,
     private router: Router,
+    private _fuseProgressBarService: FuseProgressBarService,
     private titleService: Title,
     private route: ActivatedRoute,
     private _AtividadeEspecificaService: AtividadeEspecificaService,
@@ -87,38 +89,38 @@ export class AtividadeEspecificaListComponent implements OnInit {
 
   //#region FUNÇÃO DELETE - MATHEUS MONFREIDES - FARTEC SISTEMAS 
 
-  deleteItem(ItemDelete: string,index: number) {
+  deleteItem(ItemDelete: string, index: number) {
     this.confirmDialogRef = this.dialog.open(ConfirmDialogComponent, {
-        disableClose: false,
+      disableClose: false,
     });
 
     this.confirmDialogRef.componentInstance.confirmMessage =
-        "Deseja mesmo deletar o item?";
+      "Deseja mesmo deletar o item?";
 
     this.confirmDialogRef.afterClosed().subscribe((result) => {
-        if (result) {
-          this._AtividadeEspecificaService.Delete(ItemDelete).subscribe(
-            {
-              next: (response: AtividadeEspecifica) => {
-                this._snackbar.open("Item excluído com sucesso", 'X', {
-                  duration: 2500,
-                  panelClass: 'snackbar-success',
-                })
-                const data = this.dataSource.data;
-                data.splice(index, 1); // Remover o item na posição 'index'
-                this.dataSource.data = data; // Atualizar a fonte de dados
-              },
-              error: (error) => {
-                this._snackbar.open(error.error.erros, 'X', {
-                  duration: 2500,
-                  panelClass: ['mat-toolbar', 'mat-warn'],
-                })
-              }
-            })
-        }
-        this.confirmDialogRef = null;
+      if (result) {
+        this._AtividadeEspecificaService.Delete(ItemDelete).subscribe(
+          {
+            next: (response: AtividadeEspecifica) => {
+              this._snackbar.open("Item excluído com sucesso", 'X', {
+                duration: 2500,
+                panelClass: 'snackbar-success',
+              })
+              const data = this.dataSource.data;
+              data.splice(index, 1); // Remover o item na posição 'index'
+              this.dataSource.data = data; // Atualizar a fonte de dados
+            },
+            error: (error) => {
+              this._snackbar.open(error.error.erros, 'X', {
+                duration: 2500,
+                panelClass: ['mat-toolbar', 'mat-warn'],
+              })
+            }
+          })
+      }
+      this.confirmDialogRef = null;
     });
-}
+  }
   //#endregion
 
   //#region FUNÇÕES DE LOAD E ATUALIZAR PAGINA - 23/03/2024
@@ -148,6 +150,24 @@ export class AtividadeEspecificaListComponent implements OnInit {
   abrir(item) {
     this.router.navigate([item.id], { relativeTo: this.route });
   }
+
+  getAtividadesDestra() {
+    this._fuseProgressBarService.setMode('indeterminate');
+    this._fuseProgressBarService.show()
+    this._AtividadeEspecificaService.GetAtividadesDestra()
+      .subscribe(
+        {
+          next: (response: PaginatedResponse<AtividadeEspecifica>) => {
+            this.filtrar(this.searchInput.value);
+            this._fuseProgressBarService.hide()
+          },
+          error: (error) => { 
+            console.log(error.error)
+            this._fuseProgressBarService.hide()
+           }
+        });
+  }
+
   openModalEdit(itemEdit: AtividadeEspecifica) {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = false;

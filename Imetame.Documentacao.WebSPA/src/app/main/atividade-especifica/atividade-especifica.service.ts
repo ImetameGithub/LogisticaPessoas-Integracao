@@ -10,82 +10,90 @@ import { tap } from 'rxjs/operators';
 import { ReplaySubject, Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
-export class AtividadeEspecificaService implements Resolve<AtividadeEspecifica>{
+export class AtividadeEspecificaService implements Resolve<AtividadeEspecifica> {
 
-  routeParams: any;
+    routeParams: any;
 
-  private _listAtividadeEspecifica: ReplaySubject<PaginatedResponse<AtividadeEspecifica>> = new ReplaySubject<PaginatedResponse<AtividadeEspecifica>>(1);
-  private _selectAtividadeEspecifica: ReplaySubject<AtividadeEspecifica> = new ReplaySubject<AtividadeEspecifica>(1);
+    private _listAtividadeEspecifica: ReplaySubject<PaginatedResponse<AtividadeEspecifica>> = new ReplaySubject<PaginatedResponse<AtividadeEspecifica>>(1);
+    private _selectAtividadeEspecifica: ReplaySubject<AtividadeEspecifica> = new ReplaySubject<AtividadeEspecifica>(1);
 
-  constructor(private _httpClient: HttpClient, private dataService: DataService, @Inject(API_URL) private apiUrl: string) {
-      this._listAtividadeEspecifica.next(null)
-      this._selectAtividadeEspecifica.next(null)
-  }
+    constructor(private _httpClient: HttpClient, private dataService: DataService, @Inject(API_URL) private apiUrl: string) {
+        this._listAtividadeEspecifica.next(null)
+        this._selectAtividadeEspecifica.next(null)
+    }
 
-  //#region FUNÇÕES DE ECAPSULAMENTOS
-  get listAtividadeEspecifica$(): Observable<PaginatedResponse<AtividadeEspecifica>> {
-      return this._listAtividadeEspecifica.asObservable();
-  }
-  get _selectAtividadeEspecifica$(): Observable<AtividadeEspecifica> {
-      return this._selectAtividadeEspecifica.asObservable();
-  }
-  //#endregion
+    //#region FUNÇÕES DE ECAPSULAMENTOS
+    get listAtividadeEspecifica$(): Observable<PaginatedResponse<AtividadeEspecifica>> {
+        return this._listAtividadeEspecifica.asObservable();
+    }
+    get _selectAtividadeEspecifica$(): Observable<AtividadeEspecifica> {
+        return this._selectAtividadeEspecifica.asObservable();
+    }
+    //#endregion
 
-  resolve(
-      route: ActivatedRouteSnapshot,
-      state: RouterStateSnapshot
-  ): Observable<any> | Promise<any> | any {
-      this.routeParams = route.params;
+    resolve(
+        route: ActivatedRouteSnapshot,
+        state: RouterStateSnapshot
+    ): Observable<any> | Promise<any> | any {
+        this.routeParams = route.params;
 
-      if(this.routeParams.id == 'novo'){
-          this._selectAtividadeEspecifica.next(null)
-      }
-      else{
-          // this.Get(this.routeParams)
-          return this._httpClient.get<AtividadeEspecifica>(`${environment.AtividadeEspecifica.GetItem}/${this.routeParams.id}`).pipe(
-              tap((selectAtividadeEspecifica: AtividadeEspecifica) => {
-                  this._selectAtividadeEspecifica.next(selectAtividadeEspecifica);
-              })
-          );
-      }
-    
-  
-  }
+        if (this.routeParams.id == 'novo') {
+            this._selectAtividadeEspecifica.next(null)
+        }
+        else {
+            // this.Get(this.routeParams)
+            return this._httpClient.get<AtividadeEspecifica>(`${environment.AtividadeEspecifica.GetItem}/${this.routeParams.id}`).pipe(
+                tap((selectAtividadeEspecifica: AtividadeEspecifica) => {
+                    this._selectAtividadeEspecifica.next(selectAtividadeEspecifica);
+                })
+            );
+        }
 
-  //#region FUNÇÕES CRUD MATHEUS MONFREIDES - FARTEC SISTEMAS
-  GetAllPaginated(page: number = 1, pageSize: number = 10, filtro: string = ''): Observable<PaginatedResponse<AtividadeEspecifica>> {
-      const params = new HttpParams()
-          .set('page', page.toString())
-          .set('pageSize', pageSize.toString())
-          .set('filtro', filtro);
-      return this._httpClient.get<PaginatedResponse<AtividadeEspecifica>>(environment.AtividadeEspecifica.GetAllPaginated, { params }).pipe(
-          tap((listFeriados: PaginatedResponse<AtividadeEspecifica>) => {
-              this._listAtividadeEspecifica.next(listFeriados);
-          })
-      );
-  }
-  Get(id: string): Observable<AtividadeEspecifica> {
-      return this._httpClient.get<any>(`${environment.AtividadeEspecifica.GetItem}/${id}`).pipe(
-          tap((selectAtividadeEspecifica: any) => {
-              this._selectAtividadeEspecifica.next(selectAtividadeEspecifica);
-          })
-      );
-  }
-  GetAll(): Observable<AtividadeEspecifica[]> {
-      return this._httpClient.get<AtividadeEspecifica[]>(environment.AtividadeEspecifica.GetAll);
-  }
-  Add(model: AtividadeEspecifica): Observable<AtividadeEspecifica> {
-      const headers = new HttpHeaders().set('Content-Type', 'application/json');
-      return this._httpClient.post<AtividadeEspecifica>(environment.AtividadeEspecifica.Add, model, { headers });
-  }
-  Update(model: AtividadeEspecifica): Observable<AtividadeEspecifica> {
-      const headers = new HttpHeaders().set('Content-Type', 'application/json');
-      return this._httpClient.put<AtividadeEspecifica>(environment.AtividadeEspecifica.Update, model, { headers });
-  }
-  Delete(id: string): Observable<AtividadeEspecifica> {
-      return this._httpClient.delete<AtividadeEspecifica>(`${environment.AtividadeEspecifica.Delete}/${id}`)
-  }
-  //#endregion
+
+    }
+
+    //#region FUNÇÕES CRUD MATHEUS MONFREIDES - FARTEC SISTEMAS
+    GetAllPaginated(page: number = 1, pageSize: number = 10, filtro: string = ''): Observable<PaginatedResponse<AtividadeEspecifica>> {
+        const params = new HttpParams()
+            .set('page', page.toString())
+            .set('pageSize', pageSize.toString())
+            .set('filtro', filtro);
+        return this._httpClient.get<PaginatedResponse<AtividadeEspecifica>>(environment.AtividadeEspecifica.GetAllPaginated, { params }).pipe(
+            tap((listFeriados: PaginatedResponse<AtividadeEspecifica>) => {
+                this._listAtividadeEspecifica.next(listFeriados);
+            })
+        );
+    }
+
+    GetAtividadesDestra(): Observable<PaginatedResponse<AtividadeEspecifica>> {
+        return this._httpClient.get<PaginatedResponse<AtividadeEspecifica>>(environment.AtividadeEspecifica.GetAtividadesDestra).pipe(
+            tap((listFeriados: PaginatedResponse<AtividadeEspecifica>) => {
+                this._listAtividadeEspecifica.next(listFeriados);
+            })
+        );
+    }
+    Get(id: string): Observable<AtividadeEspecifica> {
+        return this._httpClient.get<any>(`${environment.AtividadeEspecifica.GetItem}/${id}`).pipe(
+            tap((selectAtividadeEspecifica: any) => {
+                this._selectAtividadeEspecifica.next(selectAtividadeEspecifica);
+            })
+        );
+    }
+    GetAll(): Observable<AtividadeEspecifica[]> {
+        return this._httpClient.get<AtividadeEspecifica[]>(environment.AtividadeEspecifica.GetAll);
+    }
+    Add(model: AtividadeEspecifica): Observable<AtividadeEspecifica> {
+        const headers = new HttpHeaders().set('Content-Type', 'application/json');
+        return this._httpClient.post<AtividadeEspecifica>(environment.AtividadeEspecifica.Add, model, { headers });
+    }
+    Update(model: AtividadeEspecifica): Observable<AtividadeEspecifica> {
+        const headers = new HttpHeaders().set('Content-Type', 'application/json');
+        return this._httpClient.put<AtividadeEspecifica>(environment.AtividadeEspecifica.Update, model, { headers });
+    }
+    Delete(id: string): Observable<AtividadeEspecifica> {
+        return this._httpClient.delete<AtividadeEspecifica>(`${environment.AtividadeEspecifica.Delete}/${id}`)
+    }
+    //#endregion
 }

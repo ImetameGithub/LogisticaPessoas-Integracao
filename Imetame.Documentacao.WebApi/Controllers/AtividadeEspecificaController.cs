@@ -1,9 +1,11 @@
 ﻿using Imetame.Documentacao.Domain.Entities;
+using Imetame.Documentacao.Domain.Models;
 using Imetame.Documentacao.Domain.Repositories;
 using Imetame.Documentacao.WebAPI.Helpers;
 using Imetame.Documentacao.WebAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using System.Text;
 
 namespace Imetame.Documentacao.WebApi.Controllers
@@ -13,11 +15,19 @@ namespace Imetame.Documentacao.WebApi.Controllers
     public class AtividadeEspecificaController : Controller
     {
         private readonly IBaseRepository<AtividadeEspecifica> _repAtividadeEspecifica;
+        private readonly IBaseRepository<ColaboradorxAtividade> _repColaboradorxAtividade;
+        private readonly IBaseRepository<Colaborador> _repColaborador;
+        private readonly DestraController _destraController;
         private readonly IConfiguration _configuration;
-        public AtividadeEspecificaController(IBaseRepository<AtividadeEspecifica> repAtividadeEspecifica, IConfiguration configuration)
+        public AtividadeEspecificaController(IBaseRepository<AtividadeEspecifica> repAtividadeEspecifica, IConfiguration configuration, IBaseRepository<Colaborador> repColaborador, 
+            IBaseRepository<ColaboradorxAtividade> repColaboradorxAtividade, DestraController destraController)
         {
             _repAtividadeEspecifica = repAtividadeEspecifica;
             _configuration = configuration;
+            _repColaborador = repColaborador;
+            _repColaboradorxAtividade = repColaboradorxAtividade;
+            _destraController = destraController;
+
         }
 
         [HttpGet]
@@ -85,6 +95,44 @@ namespace Imetame.Documentacao.WebApi.Controllers
         }
         #endregion GET ALL        
 
+        #region GET_ATIVIDADES_DESTRA
+        [HttpGet()]
+        public async Task<IActionResult> GetAtividadesDestra()
+        {
+            var jsonResponse = await _destraController.GetAtividades();
+
+            List<AtividadeEspecifica> listAtividades = new List<AtividadeEspecifica>();
+
+            ListaAtividadesModel listaModel = JsonSerializer.Deserialize<ListaAtividadesModel>(jsonResponse);
+
+            // Obtém os códigos ou Ids das atividades da lista
+            var codigosAtividades = listaModel.LISTA.Select(a => a.codigo).ToList();
+
+            // Recupera as atividades existentes no banco de dados com base nos códigos
+            var atividadesExistentes = _repAtividadeEspecifica
+                .SelectContext().Where(a => codigosAtividades.Contains(a.Codigo));
+
+            // Filtra as novas atividades para excluir as que já existem no banco de dados
+            var novasAtividades = listaModel.LISTA
+                .Where(item => !atividadesExistentes.Any(a => a.Codigo == item.codigo))
+                .Select(item => new AtividadeEspecifica
+                {
+                    Codigo = item.codigo,
+                    Descricao = item.descricao,
+                    IdDestra = item.id,
+                    Id = Guid.NewGuid() // Gera um novo Guid para cada nova atividade
+                })
+                .ToList();
+
+            // Insere as novas atividades no banco de dados
+            if (novasAtividades.Any())
+            {
+                await _repAtividadeEspecifica.InsertRangeAsync(novasAtividades);
+            }
+
+            return Ok(novasAtividades);
+        }
+        #endregion
 
         #endregion
 

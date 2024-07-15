@@ -34,11 +34,11 @@
             </div>
         </Form>
         <Form [formGroup]="form" class="grid-cols-12 gap-15">
-            <custom-search-select [multiple]="true" [options]="colaboradoresOptions" [required]="true" formControlName="COLABORADORES"
+            <custom-search-select [multiple]="true" [options]="colaboradoresOptions" [required]="true" formControlName="ListColaborador"
                 placeholder="Selecione os Colaboradores" label="Colaboradores" class="col-span-6">
             </custom-search-select>
 
-            <custom-search-select [multiple]="true" [options]="atividadesOptions" [required]="true" formControlName="IDS_ATIVIDADES" 
+            <custom-search-select [multiple]="true" [options]="atividadesOptions" [required]="true" formControlName="ListAtividade" 
                 placeholder="Selecione as atividades" label="Atividades Específicas" class="col-span-6">
             </custom-search-select>
         </Form>
