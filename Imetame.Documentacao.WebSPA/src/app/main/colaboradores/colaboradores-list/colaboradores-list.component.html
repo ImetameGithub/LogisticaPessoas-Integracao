@@ -78,6 +78,11 @@
                     <mat-cell *matCellDef="let row">IMETAME METALMECANICA LTDA</mat-cell>
                 </ng-container>
 
+                <ng-container matColumnDef="sincronizadoDestra">
+                    <mat-header-cell *matHeaderCellDef>Sincronizado Destra</mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{row.SincronizadoDestra == true ? "Sim" : "Não"}}</mat-cell>
+                </ng-container>
+
                 <ng-container matColumnDef="mudaFuncao">
                     <mat-header-cell *matHeaderCellDef>Mudança Função</mat-header-cell>
                     <mat-cell *matCellDef="let row">{{row.MudaFuncao == 'N' ? "Não" : "Sim"}}</mat-cell>

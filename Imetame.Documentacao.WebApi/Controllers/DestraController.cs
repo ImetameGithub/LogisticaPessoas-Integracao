@@ -91,7 +91,9 @@ namespace Imetame.Documentacao.WebApi.Controllers
                     var result = await _destraService.PostAsync(endPoint, json, response.Token);
                     if (result.IsSuccessStatusCode)
                     {
-                        return Ok(await result.Content.ReadAsStringAsync());
+                        var content = await result.Content.ReadAsStringAsync();
+                        return Ok(content);
+                        //return Ok(await result.Content.ReadAsStringAsync());
                     }
 
                     return StatusCode((int)result.StatusCode, await result.Content.ReadAsStringAsync());

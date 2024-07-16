@@ -36,6 +36,10 @@ namespace Imetame.Documentacao.Domain.Models
         public string MATRICULA { get; set; }
         public string CRACHA { get; set; }
         public string NOME { get; set; }
+        public string NASCIMENTO { get; set; }
+        public string CPF { get; set; }
+        public string RG { get; set; }
+        public string DATA_ADIMISSAO { get; set; }
         public string CODIGO_FUNCAO { get; set; }
         public string NOME_FUNCAO { get; set; }
         public string CODIGO_EQUIPE { get; set; }

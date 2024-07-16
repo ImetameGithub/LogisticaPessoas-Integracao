@@ -37,6 +37,10 @@ namespace Imetame.Documentacao.Infra.Data.Mappings
             builder.Property(c => c.Nome_Equipe)
              .IsRequired();
 
+            builder.Property(c => c.SincronizadoDestra)
+             .HasDefaultValue(false)
+             .IsRequired();
+
             builder.Property(c => c.Perfil)
              .IsRequired();
 

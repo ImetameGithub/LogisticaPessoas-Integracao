@@ -14,6 +14,7 @@ namespace Imetame.Documentacao.Domain.Entities
         public string Nome { get; set; }
         public string MudaFuncao { get; set; }
         public string Codigo_Funcao { get; set; }
+        public bool SincronizadoDestra { get; set; }
         public string Nome_Funcao { get; set; }
         public string Codigo_Equipe { get; set; }    
         public string Nome_Disciplina { get; set; }

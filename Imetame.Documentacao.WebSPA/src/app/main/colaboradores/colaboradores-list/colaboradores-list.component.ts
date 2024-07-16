@@ -47,7 +47,7 @@ export class ColaboradoresListComponent implements OnInit {
   //#endregion
 
   //#region DATA SOURCE E FORMULARIO
-  displayedColumns = ["cadastro", "cracha", "nome", "empresa", "mudaFuncao", "atividadeEspecifica", "buttons"];
+  displayedColumns = ["cadastro", "cracha", "nome", "empresa","sincronizadoDestra", "mudaFuncao", "atividadeEspecifica", "buttons"];
   dataSource: MatTableDataSource<Colaborador>;
   form: UntypedFormGroup;
   //#endregion

@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using DocumentFormat.OpenXml.Drawing;
+using Imetame.Documentacao.CrossCutting.Services.Destra.Models;
 using Imetame.Documentacao.Domain.Entities;
 using Imetame.Documentacao.Domain.Models;
 using Imetame.Documentacao.Domain.Repositories;
@@ -11,6 +12,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Text;
+using System.Text.Json;
 
 namespace Imetame.Documentacao.WebApi.Controllers
 {
@@ -23,12 +25,14 @@ namespace Imetame.Documentacao.WebApi.Controllers
         private readonly IBaseRepository<Domain.Entities.Processamento> _repProcessamento;
         private readonly IBaseRepository<Domain.Entities.Colaborador> _repColaborador;
         private readonly IBaseRepository<ColaboradorxAtividade> _repColaboradorxAtividade;
+        private readonly DestraController _destraController;
         protected readonly SqlConnection conn;
         private readonly IConfiguration _configuration;
 
 
         public ColaboradoresController(IColaboradorRepository repository, IBaseRepository<Domain.Entities.Processamento> repProcessamento,
-            IConfiguration configuration, IBaseRepository<Domain.Entities.Colaborador> repColaborador, IBaseRepository<ColaboradorxAtividade> repColaboradorxAtividade)
+            IConfiguration configuration, IBaseRepository<Domain.Entities.Colaborador> repColaborador,
+            IBaseRepository<ColaboradorxAtividade> repColaboradorxAtividade, DestraController destraController)
         {
             _repository = repository;
             _configuration = configuration;
@@ -36,6 +40,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
             conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
             _repColaborador = repColaborador;
             _repColaboradorxAtividade = repColaboradorxAtividade;
+            _destraController = destraController;
         }
 
         [HttpGet("{idProcessamento}")]
@@ -205,40 +210,44 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 #region CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
                 conn.Open();
                 var sql = @"SELECT SRA.RA_MAT AS MATRICULA,
-                                   SRA.RA_CRACHA AS CRACHA,
-	                               SRA.RA_NOME AS NOME,
-	                               SRJ.RJ_FUNCAO AS CODIGO_FUNCAO,
-	                               SRJ.RJ_DESC AS NOME_FUNCAO, 
-	                               UZD.UZD_CODIGO AS CODIGO_EQUIPE,
-	                               UZD.UZD_SIGLA AS NOME_EQUIPE,
-	                               ZA3.ZA3_DESC AS PERFIL,
-	                               ZNB.ZNB_OS AS CODIGO_OS,
-	                               ZNB.ZNB_NOMEOS AS NOME_OS,
-	                               ZG0.ZG0_IDDECI AS CODIGO_DISCIPLINA,
-	                               ZG0.ZG0_DEDECI AS NOME_DISCIPLINA
-                            FROM SRA010 SRA (NOLOCK)
-                            LEFT JOIN SRJ010 SRJ (NOLOCK) --FUNÇOES
-	                            ON SRJ.RJ_FILIAL = SRA.RA_FILIAL 
-	                            AND SRJ.RJ_FUNCAO = SRA.RA_CODFUNC 
-	                            AND SRJ.D_E_L_E_T_ = '' 
-                            LEFT JOIN UZD010 UZD (NOLOCK) --EQUIPE
-	                            ON UZD.UZD_FILIAL = SRA.RA_FILIAL 	
-	                            AND UZD.UZD_CODIGO = SRA.RA_YEQATUA	
-	                            AND UZD.D_E_L_E_T_ = ''
-                            LEFT JOIN ZA3010 AS ZA3 (NOLOCK) --PERFIL 
-	                            ON ZA3.ZA3_FILIAL = UZD.UZD_FILIAL  
-	                            AND ZA3.ZA3_CODIGO = UZD_CODPER 
-	                            AND ZA3.D_E_L_E_T_ = ''
-                            LEFT JOIN ZNB010 ZNB (NOLOCK) --OS
-	                            ON ZNB.ZNB_MATRIC = SRA.RA_MAT 
-	                            AND ZNB.D_E_L_E_T_=''
-                            LEFT JOIN ZG0010 ZG0 (NOLOCK) 
-	                            ON (TRY_CAST(ZG0.ZG0_NUMCAD AS INTEGER) = TRY_CAST(RA_YNUMCAD AS INTEGER) 
-	                            AND ZG0.ZG0_NUMEMP = SRA.RA_YNUMEMP 
-	                            AND ZG0.ZG0_TIPCOL = SRA.RA_YTIPCOL AND ZG0.D_E_L_E_T_ <> '*')
-                            WHERE SRA.RA_SITFOLH = ''
-	                            AND GETDATE() BETWEEN ZNB.ZNB_DTINI AND ZNB.ZNB_DTFIM
-	                            AND SRA.D_E_L_E_T_ = ''";
+                                       SRA.RA_CRACHA AS CRACHA,
+                                       SRA.RA_NOME AS NOME,
+				                       SRA.RA_NASC AS NASCIMENTO,
+				                       SRA.RA_CIC AS CPF,
+				                       SRA.RA_RG AS RG,
+				                       SRA.RA_ADMISSA AS DATA_ADIMISSAO,
+                                       SRJ.RJ_FUNCAO AS CODIGO_FUNCAO,
+                                       SRJ.RJ_DESC AS NOME_FUNCAO, 
+                                       UZD.UZD_CODIGO AS CODIGO_EQUIPE,
+                                       UZD.UZD_SIGLA AS NOME_EQUIPE,
+                                       ZA3.ZA3_DESC AS PERFIL,
+                                       ZNB.ZNB_OS AS CODIGO_OS,
+                                       ZNB.ZNB_NOMEOS AS NOME_OS,
+                                       ZG0.ZG0_IDDECI AS CODIGO_DISCIPLINA,
+                                       ZG0.ZG0_DEDECI AS NOME_DISCIPLINA
+                                FROM SRA010 SRA (NOLOCK)
+                                LEFT JOIN SRJ010 SRJ (NOLOCK) --FUNÇOES
+                                    ON SRJ.RJ_FILIAL = SRA.RA_FILIAL 
+                                    AND SRJ.RJ_FUNCAO = SRA.RA_CODFUNC 
+                                    AND SRJ.D_E_L_E_T_ = '' 
+                                LEFT JOIN UZD010 UZD (NOLOCK) --EQUIPE
+                                    ON UZD.UZD_FILIAL = SRA.RA_FILIAL 	
+                                    AND UZD.UZD_CODIGO = SRA.RA_YEQATUA	
+                                    AND UZD.D_E_L_E_T_ = ''
+                                LEFT JOIN ZA3010 AS ZA3 (NOLOCK) --PERFIL 
+                                    ON ZA3.ZA3_FILIAL = UZD.UZD_FILIAL  
+                                    AND ZA3.ZA3_CODIGO = UZD_CODPER 
+                                    AND ZA3.D_E_L_E_T_ = ''
+                                LEFT JOIN ZNB010 ZNB (NOLOCK) --OS
+                                    ON ZNB.ZNB_MATRIC = SRA.RA_MAT 
+                                    AND ZNB.D_E_L_E_T_=''
+                                LEFT JOIN ZG0010 ZG0 (NOLOCK) 
+                                    ON (TRY_CAST(ZG0.ZG0_NUMCAD AS INTEGER) = TRY_CAST(RA_YNUMCAD AS INTEGER) 
+                                    AND ZG0.ZG0_NUMEMP = SRA.RA_YNUMEMP 
+                                    AND ZG0.ZG0_TIPCOL = SRA.RA_YTIPCOL AND ZG0.D_E_L_E_T_ <> '*')
+                                WHERE SRA.RA_SITFOLH = ''
+                                    AND GETDATE() BETWEEN ZNB.ZNB_DTINI AND ZNB.ZNB_DTFIM
+                                    AND SRA.D_E_L_E_T_ = ''";
                 #endregion CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
 
 
@@ -270,6 +279,34 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 foreach (ColaboradorProtheusModel item in model.ListColaborador)
                 {
+                    ColaboradorDestra colaboradorDestra = new ColaboradorDestra()
+                    {
+                        nome = item.NOME,
+                        nascto = item.NASCIMENTO,
+                        cpf = item.CPF,
+                        rg = item.RG,
+                        passaporte = "",
+                        passaporteValidade = "",
+                        cnh = "",
+                        cnhCategoria = "",
+                        CnhValidade = "",
+                        crea = "",
+                        creaUF = "",
+                        idCidade = 2930774,
+                        cnpj = "31790710000609",
+                        funcao = item.NOME_FUNCAO,
+                        idVinculo = 1,
+                        dataAdmissao = item.DATA_ADIMISSAO,
+                        isTemporario = "",
+                        contratoDias = 1,
+                        contratoFim = "",
+                        salarioTipo = "",
+                        salarioValor = 1,
+
+                    };
+
+                    var jsonResponse = await _destraController.AddColaborador(colaboradorDestra) as OkObjectResult;
+
                     Colaborador colaborador = new Colaborador()
                     {
                         Id = new Guid(),
@@ -278,6 +315,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                         Nome = item.NOME,
                         Codigo_Funcao = item.CODIGO_FUNCAO,
                         Nome_Funcao = item.NOME_FUNCAO,
+                        SincronizadoDestra = true,
                         Codigo_Equipe = item.CODIGO_EQUIPE,
                         Nome_Equipe = item.NOME_EQUIPE,
                         Codigo_Disciplina = item.CODIGO_DISCIPLINA,
