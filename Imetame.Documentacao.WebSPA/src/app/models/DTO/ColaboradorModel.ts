@@ -30,6 +30,10 @@ export class ColaboradorProtheusModel extends BaseEntity {
     MATRICULA: string;
     CRACHA: string;
     NOME: string;
+    NASCIMENTO: string;
+    CPF: string;
+    RG: string;
+    DATA_ADIMISSAO: string;
     CODIGO_FUNCAO: string;
     NOME_FUNCAO: string;
     CODIGO_EQUIPE: string;

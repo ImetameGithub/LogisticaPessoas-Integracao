@@ -8,6 +8,7 @@ export class Colaborador extends BaseEntity{
     MudaFuncao: string;
     Codigo_Funcao: string;
     Nome_Funcao: string;
+    SincronizadoDestra: boolean;
     Codigo_Equipe: string;
     Nome_Equipe: string;
     Codigo_Disciplina: string;
