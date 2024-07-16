@@ -39,6 +39,13 @@ const routes: Routes = [
             ),
     },
     {
+        path: "documento",
+        loadChildren: () =>
+            import("./main/documento/documento.module").then(
+                (mod) => mod.DocumentoModule
+            ),
+    },
+    {
         path: "colaboradores",
         loadChildren: () =>
             import("./main/colaboradores/colaboradores.module").then(

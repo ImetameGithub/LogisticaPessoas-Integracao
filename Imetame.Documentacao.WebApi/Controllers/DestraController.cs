@@ -108,7 +108,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetDocumentos()
+        public async Task<string> GetDocumentos()
         {
             try
             {
@@ -121,19 +121,19 @@ namespace Imetame.Documentacao.WebApi.Controllers
                     var result = await _destraService.GetAsync(endPoint,response.Token);
                     if (result.IsSuccessStatusCode)
                     {
-                        return Ok(await result.Content.ReadAsStringAsync());
+                        return await result.Content.ReadAsStringAsync();
                     }
 
-                    return StatusCode((int)result.StatusCode, await result.Content.ReadAsStringAsync());                    
+                    throw new Exception(await result.Content.ReadAsStringAsync());
                 }
                 else
                 {
-                    return BadRequest(response.MensagemErro);
+                    throw new Exception(response.MensagemErro);
                 }
             }
             catch (Exception ex)
             {
-                return NotFound(ex);
+                throw new Exception("Erro ao obter documentos", ex);
             }
         }
         
@@ -164,6 +164,37 @@ namespace Imetame.Documentacao.WebApi.Controllers
             catch (Exception ex)
             {
                 throw new Exception("Erro ao obter atividades", ex);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddDocumento([FromBody] DocumentoDestra documento)
+        {
+            try
+            {
+                AuthResponse response = await Login();
+
+                if (!response.Erro)
+                {
+                    string endPoint = $"/service/docto/funcionario?=";
+                    string json = JsonSerializer.Serialize(documento);
+
+                    var result = await _destraService.PostAsync(endPoint, json, response.Token);
+                    if (result.IsSuccessStatusCode)
+                    {
+                        return Ok(await result.Content.ReadAsStringAsync());
+                    }
+
+                    return StatusCode((int)result.StatusCode, await result.Content.ReadAsStringAsync());
+                }
+                else
+                {
+                    return BadRequest(response.MensagemErro);
+                }                
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex);
             }
         }
     }

@@ -67,93 +67,93 @@ namespace Imetame.Documentacao.Domain.Services
         }
 
 
-        public async Task AtualizarDocumentacaoAsync(string numPedido, ColaboradorModel funcionario, Entities.ResultadoCadastro logFuncionario, string pasta, Guid idProcessamento, CancellationToken cancellationToken)
-        {
-            _consoleHelper.Log($"[{funcionario.Cpf}] - AtualizarDocumentacaoAsync Start", idProcessamento);
-            var listaDepara =await _credenciadoraDeParaRepository.ListarPorCredenciadoraAsync("Destra");
-            //Acessar os Termos de liberacao
-            try
-            {
-                _consoleHelper.Log("AcessarTermosLiberacao Start", idProcessamento);
-                driver.AcessarTermosLiberacao(numPedido);
-                _consoleHelper.Log("AcessarTermosLiberacao End", idProcessamento);
+        // public async Task AtualizarDocumentacaoAsync(string numPedido, ColaboradorModel funcionario, Entities.ResultadoCadastro logFuncionario, string pasta, Guid idProcessamento, CancellationToken cancellationToken)
+        // {
+        //     _consoleHelper.Log($"[{funcionario.Cpf}] - AtualizarDocumentacaoAsync Start", idProcessamento);
+        //     var listaDepara =await _credenciadoraDeParaRepository.ListarPorCredenciadoraAsync("Destra");
+        //     //Acessar os Termos de liberacao
+        //     try
+        //     {
+        //         _consoleHelper.Log("AcessarTermosLiberacao Start", idProcessamento);
+        //         driver.AcessarTermosLiberacao(numPedido);
+        //         _consoleHelper.Log("AcessarTermosLiberacao End", idProcessamento);
 
-            }
-            catch (Exception ex)
-            {
-                throw new DomainException($"O termo de liberação não foi localizado pelo número de pedido {numPedido}");
-            }
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         throw new DomainException($"O termo de liberação não foi localizado pelo número de pedido {numPedido}");
+        //     }
 
-            string dadosFuncionario = "";
-            var cadastrado = driver.VerificarFuncionarioCadastrado(funcionario.Cpf, out dadosFuncionario);
-            if (cadastrado)
-            {
-                _consoleHelper.Log($"[{funcionario.Cpf}] - GetDocumentosObrigatorios Start", idProcessamento);
+        //     string dadosFuncionario = "";
+        //     var cadastrado = driver.VerificarFuncionarioCadastrado(funcionario.Cpf, out dadosFuncionario);
+        //     if (cadastrado)
+        //     {
+        //         _consoleHelper.Log($"[{funcionario.Cpf}] - GetDocumentosObrigatorios Start", idProcessamento);
 
-                var documentosAtualizar = driver.GetDocumentosObrigatorios(funcionario.Cpf);
-                _consoleHelper.Log($"[{funcionario.Cpf}] - GetDocumentosObrigatorios End", idProcessamento);
+        //         var documentosAtualizar = driver.GetDocumentosObrigatorios(funcionario.Cpf);
+        //         _consoleHelper.Log($"[{funcionario.Cpf}] - GetDocumentosObrigatorios End", idProcessamento);
 
-                var documentosBase = await _colaboradorRepository.ListaDocumentosAsync(funcionario.Empresa, funcionario.NumCracha, cancellationToken);
+        //         var documentosBase = await _colaboradorRepository.ListaDocumentosAsync(funcionario.Empresa, funcionario.NumCracha, cancellationToken);
 
-                foreach (var doc in documentosAtualizar)
-                {
+        //         foreach (var doc in documentosAtualizar)
+        //         {
 
-                    if (doc.Status == "Sem documento")
-                    {
+        //             if (doc.Status == "Sem documento")
+        //             {
                         
-                        var doc1 = documentosBase.FirstOrDefault(q => listaDepara.Where(d=>d.De == q.Tipo).FirstOrDefault()?.Para.ToUpper() == doc.Nome.ToUpper().Substring(1));
-                        if (doc1 != null)
-                        {
-                            var imagem = await _colaboradorRepository.ObterDocumentoAsync(funcionario.Empresa, doc1.Id, cancellationToken);
-                            string pastaTemporaria = Path.Combine(pasta, $"upload/{funcionario.Cpf}");
+        //                 var doc1 = documentosBase.FirstOrDefault(q => listaDepara.Where(d=>d.De == q.Tipo).FirstOrDefault()?.Para.ToUpper() == doc.Nome.ToUpper().Substring(1));
+        //                 if (doc1 != null)
+        //                 {
+        //                     var imagem = await _colaboradorRepository.ObterDocumentoAsync(funcionario.Empresa, doc1.Id, cancellationToken);
+        //                     string pastaTemporaria = Path.Combine(pasta, $"upload/{funcionario.Cpf}");
 
-                            if (!Directory.Exists(pastaTemporaria))
-                            {
-                                Directory.CreateDirectory(pastaTemporaria);
-                            }
+        //                     if (!Directory.Exists(pastaTemporaria))
+        //                     {
+        //                         Directory.CreateDirectory(pastaTemporaria);
+        //                     }
 
-                            var ext = imagem.Nome.Split('.').Last();
+        //                     var ext = imagem.Nome.Split('.').Last();
 
-                            string pathArquivo = Path.Combine(pastaTemporaria, $"{Guid.NewGuid()}.{ext}");
+        //                     string pathArquivo = Path.Combine(pastaTemporaria, $"{Guid.NewGuid()}.{ext}");
 
                             
-                                File.WriteAllBytes(pathArquivo, imagem.Bytes);
+        //                         File.WriteAllBytes(pathArquivo, imagem.Bytes);
 
-                            _consoleHelper.Log($"[{doc.Nome}] - AtualizarDocumento Start", idProcessamento);
+        //                     _consoleHelper.Log($"[{doc.Nome}] - AtualizarDocumento Start", idProcessamento);
 
-                            driver.AtualizarDocumento(doc, pathArquivo, logFuncionario);
-                            _consoleHelper.Log($"[{doc.Nome}] - AtualizarDocumento End", idProcessamento);
+        //                     driver.AtualizarDocumento(doc, pathArquivo, logFuncionario);
+        //                     _consoleHelper.Log($"[{doc.Nome}] - AtualizarDocumento End", idProcessamento);
 
-                            logFuncionario.Log.Add($"Documento atualizado {doc.Nome}");
-                            _consoleHelper.Log($"[{funcionario.Cpf}] - Documento atualizado {doc.Nome}", idProcessamento);
+        //                     logFuncionario.Log.Add($"Documento atualizado {doc.Nome}");
+        //                     _consoleHelper.Log($"[{funcionario.Cpf}] - Documento atualizado {doc.Nome}", idProcessamento);
                             
 
-                        }
-                        else
-                        {
-                            logFuncionario.Log.Add($"Documento não encontrado na Imetame {doc.Nome}");
-                            _consoleHelper.Log($"[{funcionario.Cpf}] - Documento não encontrado na Imetame {doc.Nome}", idProcessamento);
+        //                 }
+        //                 else
+        //                 {
+        //                     logFuncionario.Log.Add($"Documento não encontrado na Imetame {doc.Nome}");
+        //                     _consoleHelper.Log($"[{funcionario.Cpf}] - Documento não encontrado na Imetame {doc.Nome}", idProcessamento);
 
-                        }
-                    }
-                    else
-                    {
-                        logFuncionario.Log.Add($"[Documento já está cadastrado {doc.Nome}");
-                        _consoleHelper.Log($"[{funcionario.Cpf}] - Documento já está cadastrado {doc.Nome}", idProcessamento);
-                    }
-                }
+        //                 }
+        //             }
+        //             else
+        //             {
+        //                 logFuncionario.Log.Add($"[Documento já está cadastrado {doc.Nome}");
+        //                 _consoleHelper.Log($"[{funcionario.Cpf}] - Documento já está cadastrado {doc.Nome}", idProcessamento);
+        //             }
+        //         }
 
-            }
-            else
-            {
-                logFuncionario.Log.Add($"[Funcionário não está cadastrado");
-                _consoleHelper.Log($"[{funcionario.Cpf}] - Funcionário não está cadastrado", idProcessamento);
-            }
+        //     }
+        //     else
+        //     {
+        //         logFuncionario.Log.Add($"[Funcionário não está cadastrado");
+        //         _consoleHelper.Log($"[{funcionario.Cpf}] - Funcionário não está cadastrado", idProcessamento);
+        //     }
 
-            _consoleHelper.Log($"[{funcionario.Cpf}] - AtualizarDocumentacaoAsync End", idProcessamento);
+        //     _consoleHelper.Log($"[{funcionario.Cpf}] - AtualizarDocumentacaoAsync End", idProcessamento);
 
 
-        }
+        // }
 
         public void Inicializar(string numPedido, Guid idProcessamento)
         {

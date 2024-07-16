@@ -13,7 +13,7 @@ namespace Imetame.Documentacao.Domain.Services
     {
         void Inicializar(string numPedido, Guid idProcessamento);
         void CadastrarFuncionario(string numPedido, ColaboradorModel funcionario, Entities.ResultadoCadastro logFuncionario, Guid idProcessamento);
-        Task AtualizarDocumentacaoAsync(string numPedido, ColaboradorModel funcionario, Entities.ResultadoCadastro logFuncionario,string pasta, Guid idProcessamento, CancellationToken cancellationToken);
+        // Task AtualizarDocumentacaoAsync(string numPedido, ColaboradorModel funcionario, Entities.ResultadoCadastro logFuncionario,string pasta, Guid idProcessamento, CancellationToken cancellationToken);
         void Quit(Guid idProcessamento);
     }
 }

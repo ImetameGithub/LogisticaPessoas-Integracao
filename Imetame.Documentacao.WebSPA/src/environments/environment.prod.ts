@@ -25,7 +25,16 @@ export const environment = {
         GetAllPaginated: `${baseUrl}/Credenciadora/GetAllPaginated`,
     },
     //#endregion
-
+    //#region PEDIDO
+    Documento: {
+        Get: `${baseUrl}/Documento/Get`,
+        Add: `${baseUrl}/Documento/Add`,
+        Update: `${baseUrl}/Documento/Update`,
+        Delete: `${baseUrl}/Documento/Delete`,
+        GetAll: `${baseUrl}/Documento/GetAll`,       
+        GetAllPaginated: `${baseUrl}/Documento/GetAllPaginated`,
+    },
+    //#endregion
     //#region COLABORADORES
     Colaboradores: {
         GetColaboradoresPorOs: `${baseUrl}/Colaboradores/GetColaboradoresPorOs`,
@@ -56,6 +65,12 @@ export const environment = {
     //#region PROTHEUS
     Protheus: {
         GetOs: `${baseUrl}/Protheus/GetOs`,
+    },
+    //#endregion
+
+    //#region DESTRA
+    Destra: {
+        GetDocumentosDestra: `${baseUrl}/Destra/GetDocumentos`,
     },
     //#endregion
 };

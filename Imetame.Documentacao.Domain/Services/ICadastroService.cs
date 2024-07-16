@@ -11,6 +11,6 @@ namespace Imetame.Documentacao.Domain.Services
 {
     public interface ICadastroService
     {
-        Task<List<Entities.ResultadoCadastro>> CadastrarAsync(CadastroModel model, CancellationToken CancellationToken);
+        // Task<List<Entities.ResultadoCadastro>> CadastrarAsync(CadastroModel model, CancellationToken CancellationToken);
     }
 }

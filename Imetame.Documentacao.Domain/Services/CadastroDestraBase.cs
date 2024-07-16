@@ -1,6 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.Drawing.Charts;
-using Imetame.Documentacao.Domain.Entities;
 using Imetame.Documentacao.Domain.Helpers;
 using Imetame.Documentacao.Domain.Models;
 using Microsoft.Win32;
@@ -207,108 +206,108 @@ namespace Imetame.Documentacao.Domain.Services
         }
 
 
-        #region AtualizarDocumentacao
-        public static List<Documento> GetDocumentosObrigatorios(this IWebDriver driver, string cpfFuncionario)
-        {
+        // #region AtualizarDocumentacao
+        // public static List<Documento> GetDocumentosObrigatorios(this IWebDriver driver, string cpfFuncionario)
+        // {
 
-            var trFuncionario = driver.PesquisaFuncionarioCadastrado(cpfFuncionario);
-            var paramsFuncionario = trFuncionario.FindElement(By.XPath("//td[8]/a[2]")).GetAttribute("href").Split('?')[1];
-            driver.Navigate().GoToUrl(trFuncionario.FindElement(By.XPath("//td[8]/a[2]")).GetAttribute("href"));
+        //     var trFuncionario = driver.PesquisaFuncionarioCadastrado(cpfFuncionario);
+        //     var paramsFuncionario = trFuncionario.FindElement(By.XPath("//td[8]/a[2]")).GetAttribute("href").Split('?')[1];
+        //     driver.Navigate().GoToUrl(trFuncionario.FindElement(By.XPath("//td[8]/a[2]")).GetAttribute("href"));
 
-            List<Documento> documentos = new List<Documento>();
+        //     List<Documento> documentos = new List<Documento>();
 
-            //Navegar nos documentos
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+        //     //Navegar nos documentos
+        //     WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
 
-            IWebElement selectElement = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.Name("table-documento_length")));
-            SelectElement select = new SelectElement(selectElement);
-            select.SelectByValue("100");
+        //     IWebElement selectElement = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.Name("table-documento_length")));
+        //     SelectElement select = new SelectElement(selectElement);
+        //     select.SelectByValue("100");
 
-            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.InvisibilityOfElementLocated(By.Id("table-documento_processing")));
+        //     wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.InvisibilityOfElementLocated(By.Id("table-documento_processing")));
 
-            IWebElement tabelaDocumento = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.Id("table-documento")));
+        //     IWebElement tabelaDocumento = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.Id("table-documento")));
 
-            TratarRegistrosDocumentos(tabelaDocumento, paramsFuncionario, documentos);
+        //     TratarRegistrosDocumentos(tabelaDocumento, paramsFuncionario, documentos);
 
-            // Se houver paginação, navegue para a próxima página e repita o processo
-            while (TableHelper.ExisteProximaPagina(driver, "table-documento_next"))
-            {
-                TableHelper.IrParaProximaPagina(driver, "table-documento_next");
-                wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.InvisibilityOfElementLocated(By.Id("table-documento_processing")));
+        //     // Se houver paginação, navegue para a próxima página e repita o processo
+        //     while (TableHelper.ExisteProximaPagina(driver, "table-documento_next"))
+        //     {
+        //         TableHelper.IrParaProximaPagina(driver, "table-documento_next");
+        //         wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.InvisibilityOfElementLocated(By.Id("table-documento_processing")));
 
-                IWebElement tabelaN = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.Id("table-documento")));
-                TratarRegistrosDocumentos(tabelaDocumento, paramsFuncionario, documentos);
-            }
+        //         IWebElement tabelaN = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.Id("table-documento")));
+        //         TratarRegistrosDocumentos(tabelaDocumento, paramsFuncionario, documentos);
+        //     }
 
-            return documentos.Where(d => d.Nome.StartsWith("*")).ToList();
+        //     return documentos.Where(d => d.Nome.StartsWith("*")).ToList();
 
-        }
-        public static void TratarRegistrosDocumentos(IWebElement tabela, string paramsFuncionario, List<Documento> documentos)
-        {
-            IList<IWebElement> registros = tabela.FindElements(By.TagName("tr"));
-            foreach (var registro in registros)
-            {
-                IList<IWebElement> colunas = registro.FindElements(By.TagName("td"));
-                if (colunas.Count > 0)
-                {
-                    Documento documento = new Documento();
-                    documento.Nome = colunas[0].Text;
-                    documento.Status = colunas[1].Text;
-                    documento.Observacao = colunas[2].Text;
-                    documento.Adicionais = colunas[3].Text;
-                    documento.Validade = colunas[4].Text == string.Empty ? null : DateTime.Parse(colunas[4].Text.Substring(0, 10));
-                    documento.IdRef = GetParametrosFuncao("upload", colunas[5].FindElements(By.TagName("a"))[0].GetAttribute("href"))[0];
-                    documento.UrlUpload = $"https://servicelayer.destra.net.br/destra/termoLiberacao/funcionario/documento/upload.do?cldoId={documento.IdRef}&{paramsFuncionario}";
-                    documentos.Add(documento);
-                }
-            }
-        }
-        public static bool AtualizarDocumento(this IWebDriver driver, Documento documento, string arquivo, Entities.ResultadoCadastro logFuncionario)
-        {
+        // }
+        // public static void TratarRegistrosDocumentos(IWebElement tabela, string paramsFuncionario, List<Documento> documentos)
+        // {
+        //     IList<IWebElement> registros = tabela.FindElements(By.TagName("tr"));
+        //     foreach (var registro in registros)
+        //     {
+        //         IList<IWebElement> colunas = registro.FindElements(By.TagName("td"));
+        //         if (colunas.Count > 0)
+        //         {
+        //             Documento documento = new Documento();
+        //             documento.Nome = colunas[0].Text;
+        //             documento.Status = colunas[1].Text;
+        //             documento.Observacao = colunas[2].Text;
+        //             documento.Adicionais = colunas[3].Text;
+        //             documento.Validade = colunas[4].Text == string.Empty ? null : DateTime.Parse(colunas[4].Text.Substring(0, 10));
+        //             documento.IdRef = GetParametrosFuncao("upload", colunas[5].FindElements(By.TagName("a"))[0].GetAttribute("href"))[0];
+        //             documento.UrlUpload = $"https://servicelayer.destra.net.br/destra/termoLiberacao/funcionario/documento/upload.do?cldoId={documento.IdRef}&{paramsFuncionario}";
+        //             documentos.Add(documento);
+        //         }
+        //     }
+        // }
+        // public static bool AtualizarDocumento(this IWebDriver driver, Documento documento, string arquivo, Entities.ResultadoCadastro logFuncionario)
+        // {
 
-            try
-            {
-                driver.Navigate().GoToUrl(documento.UrlUpload);
-                WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+        //     try
+        //     {
+        //         driver.Navigate().GoToUrl(documento.UrlUpload);
+        //         WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
 
-                IWebElement fileElement = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.Id("doc_file")));
+        //         IWebElement fileElement = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.Id("doc_file")));
 
-                fileElement.SendKeys(arquivo);
-                if (driver.FindElements(By.Id("dataValidade")).Count > 0)
-                    driver.FindElement(By.Id("dataValidade"))?.SendKeys(DateTime.Now.AddDays(60).ToString("ddMMyyyy"));
+        //         fileElement.SendKeys(arquivo);
+        //         if (driver.FindElements(By.Id("dataValidade")).Count > 0)
+        //             driver.FindElement(By.Id("dataValidade"))?.SendKeys(DateTime.Now.AddDays(60).ToString("ddMMyyyy"));
 
-                if (driver.FindElements(By.Name("valorCampoEspecifico")).Count > 0)
-                    driver.FindElement(By.Name("valorCampoEspecifico"))?.SendKeys("12");
+        //         if (driver.FindElements(By.Name("valorCampoEspecifico")).Count > 0)
+        //             driver.FindElement(By.Name("valorCampoEspecifico"))?.SendKeys("12");
 
 
 
-                driver.FindElement(By.XPath("//*[@id=\"page-wrapper\"]/div/div[3]/div/div/div[3]/button[2]")).Click();
-                Thread.Sleep(1000);
-            }
-            catch (UnhandledAlertException ex)
-            {
-                logFuncionario.Log.Add($"[{documento.Nome}] - Upload com erro {ex.AlertText}");
-                return false;
-            }
+        //         driver.FindElement(By.XPath("//*[@id=\"page-wrapper\"]/div/div[3]/div/div/div[3]/button[2]")).Click();
+        //         Thread.Sleep(1000);
+        //     }
+        //     catch (UnhandledAlertException ex)
+        //     {
+        //         logFuncionario.Log.Add($"[{documento.Nome}] - Upload com erro {ex.AlertText}");
+        //         return false;
+        //     }
             
 
-            return true;
-        }
+        //     return true;
+        // }
 
-        private static string[] GetParametrosFuncao(string funcao, string input)
-        {
-            string pattern = @$"{funcao}\(([^)]*)\);";
-            Regex regex = new Regex(pattern);
-            Match match = regex.Match(input);
-            if (match.Success)
-            {
-                string parametros = match.Groups[1].Value;
-                // Divida os parâmetros usando a vírgula como delimitador
-                string[] parametrosArray = parametros.Split(',');
-                return parametrosArray;
-            }
-            return new string[0];
-        }
-        #endregion
+        // private static string[] GetParametrosFuncao(string funcao, string input)
+        // {
+        //     string pattern = @$"{funcao}\(([^)]*)\);";
+        //     Regex regex = new Regex(pattern);
+        //     Match match = regex.Match(input);
+        //     if (match.Success)
+        //     {
+        //         string parametros = match.Groups[1].Value;
+        //         // Divida os parâmetros usando a vírgula como delimitador
+        //         string[] parametrosArray = parametros.Split(',');
+        //         return parametrosArray;
+        //     }
+        //     return new string[0];
+        // }
+        // #endregion
     }
 }

@@ -35,32 +35,32 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
 
 
-        [HttpPost()]
-        public async Task<IActionResult> Execucao([FromBody] CadastroModel model, CancellationToken cancellationToken)
-        {
+        // [HttpPost()]
+        // public async Task<IActionResult> Execucao([FromBody] CadastroModel model, CancellationToken cancellationToken)
+        // {
 
             
-            await semaphoreSlim.WaitAsync();
-            try// favor deixar o try catch para que o semaphoreSlim seja liberado
-            {
-                var resp = await _service.CadastrarAsync(model, cancellationToken);
-                return Ok(resp);
-            //}
-            //catch (Exception e)
-            //{
-            //    resp = new CadastroResponse() { Log = e.Message };
+        //     await semaphoreSlim.WaitAsync();
+        //     try// favor deixar o try catch para que o semaphoreSlim seja liberado
+        //     {
+        //         var resp = await _service.CadastrarAsync(model, cancellationToken);
+        //         return Ok(resp);
+        //     //}
+        //     //catch (Exception e)
+        //     //{
+        //     //    resp = new CadastroResponse() { Log = e.Message };
                 
-            }
-            finally
-            {
-                semaphoreSlim.Release();
-            }
+        //     }
+        //     finally
+        //     {
+        //         semaphoreSlim.Release();
+        //     }
 
             
 
 
 
-        }
+        // }
 
 
 

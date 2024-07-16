@@ -36,6 +36,13 @@ export const navigation: FuseNavigation[] = [
                 icon: "business",
             },
             {
+                id: "documento",
+                title: "Documentos",
+                type: "item",
+                url: "/documento",
+                icon: "business",
+            },
+            {
                 id: "de-para",
                 title: "De Para",
                 type: "item",
