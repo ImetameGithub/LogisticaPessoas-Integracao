@@ -29,6 +29,7 @@ import { FusePerfectScrollbarDirective } from "@fuse/directives/fuse-perfect-scr
 import { ShowLogDialogComponent } from "../show-log-dialog/show-log-dialog.component";
 import { DocumentoxColaboradorModel } from "app/models/DTO/DocumentoxColaboradorModel";
 import { DocumentosModalComponent } from "./documentos-modal/documentos-modal.component";
+import { ColaboradorProtheusModel } from "app/models/DTO/ColaboradorModel";
 
 @Component({
     selector: "colaboradores",
@@ -52,6 +53,7 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
     dataSource: FilesDataSource<any>;
     isBusy: boolean = false;
     isResult: boolean = false;
+    blockRequisicao: boolean = false;
 
     directiveScroll: FusePerfectScrollbarDirective;
     todoMundo: boolean = false;
@@ -204,6 +206,31 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
         )
 
 
+    }
+
+    enviarParaColaboradorDestra(){
+        let colaboradores = this.service.itens.filter(col => col.check);
+        
+        this.service.EnviarColaboradorDestra(colaboradores).subscribe(
+            {
+                next: (response: ColaboradorProtheusModel) => {
+                    this._fuseProgressBarService.hide();
+                    this.blockRequisicao = false;
+                    this._snackbar.open("Item enviado com sucesso", 'X', {
+                        duration: 2500,
+                        panelClass: 'snackbar-success',
+                    })
+                },
+                error: (error) => {
+                    this._fuseProgressBarService.hide();
+                    this.blockRequisicao = false;
+                    this._snackbar.open(error.error, 'X', {
+                        duration: 2500,
+                        panelClass: 'snackbar-error',
+                    })
+                }
+            }
+        )  
     }
 
     showError(error) {

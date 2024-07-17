@@ -174,7 +174,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 	                            AND ZNB.D_E_L_E_T_='' 	
                             WHERE SRA.RA_SITFOLH = ''
 	                            AND GETDATE() BETWEEN ZNB.ZNB_DTINI AND ZNB.ZNB_DTFIM
-	                            AND SRA.D_E_L_E_T_ = ''";                          
+	                            AND SRA.D_E_L_E_T_ = ''";
                 #endregion CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
 
 
@@ -262,6 +262,60 @@ namespace Imetame.Documentacao.WebApi.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> EnviarColaboradorDestra([FromBody] List<ColaboradorModel> listColaboradores)
+        {
+            try
+            {
+                StringBuilder erro = new StringBuilder();
+                if (!ModelState.IsValid)
+                {
+                    erro = ErrorHelper.GetErroModelState(ModelState.Values);
+                    throw new Exception("Falha ao Salvar Dados.\n" + erro);
+                }
+
+                List<Colaborador> colaboradores = new List<Colaborador>();
+
+                foreach (ColaboradorModel model in listColaboradores)
+                {
+                    //ColaboradorDestra colaboradorDestra = new ColaboradorDestra()
+                    //{
+                    //    nome = model.Nome,
+                    //    nascto = model.DataNascimento,
+                    //    cpf = model.Cpf,
+                    //    rg = model.R,
+                    //    passaporte = "",
+                    //    passaporteValidade = "",
+                    //    cnh = "",
+                    //    cnhCategoria = "",
+                    //    CnhValidade = "",
+                    //    crea = "",
+                    //    creaUF = "",
+                    //    idCidade = 2930774,
+                    //    cnpj = "31790710000609",
+                    //    funcao = model.NOME_FUNCAO,
+                    //    idVinculo = 1,
+                    //    dataAdmissao = model.DATA_ADIMISSAO,
+                    //    isTemporario = "",
+                    //    contratoDias = 1,
+                    //    contratoFim = "",
+                    //    salarioTipo = "",
+                    //    salarioValor = 1,
+
+                    //};
+
+                    //var jsonResponse = await _destraController.AddColaborador(colaboradorDestra) as OkObjectResult;
+                }
+
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ErrorHelper.GetException(ex));
+            }
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> RelacionarColaboradorxAtividade([FromBody] ColaboradorxAtividadeModel model, CancellationToken cancellationToken)
@@ -277,8 +331,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 List<Colaborador> colaboradores = new List<Colaborador>();
 
+
                 foreach (ColaboradorProtheusModel item in model.ListColaborador)
                 {
+
                     ColaboradorDestra colaboradorDestra = new ColaboradorDestra()
                     {
                         nome = item.NOME,
@@ -288,9 +344,6 @@ namespace Imetame.Documentacao.WebApi.Controllers
                         passaporte = "",
                         passaporteValidade = "",
                         cnh = "",
-                        cnhCategoria = "",
-                        CnhValidade = "",
-                        crea = "",
                         creaUF = "",
                         idCidade = 2930774,
                         cnpj = "31790710000609",
@@ -300,8 +353,6 @@ namespace Imetame.Documentacao.WebApi.Controllers
                         isTemporario = "",
                         contratoDias = 1,
                         contratoFim = "",
-                        salarioTipo = "",
-                        salarioValor = 1,
 
                     };
 
@@ -311,6 +362,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
                     {
                         Id = new Guid(),
                         Matricula = item.MATRICULA,
+                        Cpf = item.CPF,
+                        Rg = item.RG,
+                        Nascimento = item.NASCIMENTO,
+                        DataAdmissao = item.DATA_ADIMISSAO,
                         Cracha = item.CRACHA,
                         Nome = item.NOME,
                         Codigo_Funcao = item.CODIGO_FUNCAO,

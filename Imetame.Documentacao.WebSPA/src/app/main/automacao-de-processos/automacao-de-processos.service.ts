@@ -10,7 +10,7 @@ import { Finalizado } from './finalizados/finalizados.component';
 import { Log } from './logs/logs.component';
 import { environment } from 'environments/environment';
 import { Pedido } from 'app/models/Pedido';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ColaboradorModel } from 'app/models/DTO/ColaboradorModel';
 import { DocumentoxColaboradorModel } from 'app/models/DTO/DocumentoxColaboradorModel';
 
@@ -138,6 +138,11 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
                 tap((documentoxColaboradorRetorno: DocumentoxColaboradorModel[]) => {
                     this._documentoxColaborador.next(documentoxColaboradorRetorno);
                 }));
+    }
+
+    EnviarColaboradorDestra(Colaborador: any): Observable<any> {
+        const headers = new HttpHeaders().set('Content-Type', 'application/json');
+        return this._httpClient.post<any>(environment.Colaboradores.EnviarColaboradorDestra, Colaborador, { headers });
     }
 
     GetColaboradoresPorOs(): Promise<ColaboradorModel> {

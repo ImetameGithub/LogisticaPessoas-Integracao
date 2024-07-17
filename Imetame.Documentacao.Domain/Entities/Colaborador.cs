@@ -12,6 +12,10 @@ namespace Imetame.Documentacao.Domain.Entities
         public string Matricula { get; set; }
         public string Cracha { get; set; }
         public string Nome { get; set; }
+        public string Nascimento { get; set; }
+        public string Cpf { get; set; }
+        public string Rg { get; set; }
+        public string DataAdmissao { get; set; }
         public string MudaFuncao { get; set; }
         public string Codigo_Funcao { get; set; }
         public bool SincronizadoDestra { get; set; }

@@ -35,13 +35,29 @@
                     </div>
                     <!-- / SEARCH -->
                     <!-- ADD FILE BUTTON -->
-                    <div>
+                    <!-- <div>
                         <button mat-raised-button (click)="cadastrar()" [disabled]="isBusy || isResult"
                             aria-label="Cadastrar" [@animate]="{
                         value: '*',
                         params: { delay: '300ms', scale: '0.2' }
                     }">
                             Cadastrar
+                        </button>
+                    </div> -->
+                    <div class="file-uploader">
+                        <button
+                            matTooltip="Enviar colaboradores para Destra"
+                            mat-fab
+                            color="accent"
+                            class="add-file-button"
+                            (click)="enviarParaColaboradorDestra()"
+                            aria-label="Novo"
+                            [@animate]="{
+                                value: '*',
+                                params: { delay: '300ms', scale: '0.2' }
+                            }"
+                        >
+                        <mat-icon>cloud_upload</mat-icon>
                         </button>
                     </div>
                     <!-- / ADD FILE BUTTON -->
