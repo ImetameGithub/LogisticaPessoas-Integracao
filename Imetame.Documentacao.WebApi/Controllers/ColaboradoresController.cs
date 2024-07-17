@@ -276,35 +276,64 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 List<Colaborador> colaboradores = new List<Colaborador>();
 
-                foreach (ColaboradorModel model in listColaboradores)
+                // Carregar todos os itens de colaboradores cadastrados no sistema - Matheus Monfreides
+                List<Colaborador> itensCadastrados = _repColaborador.SelectContext()
+                    .AsNoTracking()                    
+                    .ToList();
+
+                // Buscar colaboradores que foi selecionado mas não possuem relação com atividade, ocasionando em não ter na tabela colaborador - Matheus Monfreides
+                List<ColaboradorModel> colaboradoresSemAtividade = listColaboradores
+                   .Where(ei => !itensCadastrados.Any(m => m.Matricula == ei.NumCad))
+                   .ToList();
+
+                if (colaboradoresSemAtividade.Any())
                 {
-                    //ColaboradorDestra colaboradorDestra = new ColaboradorDestra()
-                    //{
-                    //    nome = model.Nome,
-                    //    nascto = model.DataNascimento,
-                    //    cpf = model.Cpf,
-                    //    rg = model.R,
-                    //    passaporte = "",
-                    //    passaporteValidade = "",
-                    //    cnh = "",
-                    //    cnhCategoria = "",
-                    //    CnhValidade = "",
-                    //    crea = "",
-                    //    creaUF = "",
-                    //    idCidade = 2930774,
-                    //    cnpj = "31790710000609",
-                    //    funcao = model.NOME_FUNCAO,
-                    //    idVinculo = 1,
-                    //    dataAdmissao = model.DATA_ADIMISSAO,
-                    //    isTemporario = "",
-                    //    contratoDias = 1,
-                    //    contratoFim = "",
-                    //    salarioTipo = "",
-                    //    salarioValor = 1,
+                    var nomesColaboradores = colaboradoresSemAtividade.Select(colaborador => colaborador.Nome).ToList();
+                    string listaDeNomes = string.Join(", ", nomesColaboradores);
+                    if(nomesColaboradores.Count() > 1)
+                    {
+                        throw new Exception("Os colaboradores " + listaDeNomes + " não estão relacionado a nenhuma atividade específica.");
+                    }
+                    else
+                    {
+                        throw new Exception("O colaborador " + listaDeNomes + " não está relacionado a nenhuma atividade específica.");
+                    }
+                }
 
-                    //};
+                // Buscar os registro que foram selecionados da lista protheus dentro do nosso cadastro Colaborador 
+                List<Colaborador> listProtheusXlistColaborador = itensCadastrados
+                    .Where(m => listColaboradores.Any(ei => ei.NumCad == m.Matricula))
+                    .ToList();
 
-                    //var jsonResponse = await _destraController.AddColaborador(colaboradorDestra) as OkObjectResult;
+                foreach (Colaborador model in listProtheusXlistColaborador)
+                {
+                    ColaboradorDestra colaboradorDestra = new ColaboradorDestra()
+                    {
+                        nome = model.Nome,
+                        nascto = model.Nascimento,
+                        cpf = model.Cpf,
+                        rg = model.Rg,
+                        passaporte = "",
+                        passaporteValidade = "",
+                        cnh = "",
+                        cnhCategoria = "",
+                        CnhValidade = "",
+                        crea = "",
+                        creaUF = "",
+                        idCidade = 2930774,
+                        cnpj = "31790710000609",
+                        funcao = model.Nome_Funcao,
+                        idVinculo = 1,
+                        dataAdmissao = model.DataAdmissao,
+                        isTemporario = "",
+                        contratoDias = 1,
+                        contratoFim = "",
+                        salarioTipo = "",
+                        salarioValor = 1,
+
+                    };
+
+                    var jsonResponse = await _destraController.AddColaborador(colaboradorDestra) as OkObjectResult;
                 }
 
 
@@ -361,7 +390,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                     Colaborador colaborador = new Colaborador()
                     {
                         Id = new Guid(),
-                        Matricula = item.MATRICULA,
+                        Matricula = item.MATRICULA.Remove(0, 1), // É DESSA FORMA POIS O PROTHEUS É COM ZERO NO INICIO MAS A CONSULTA TIRA PARA A FUNÇÃO EnviarColaboradorDestra
                         Cpf = item.CPF,
                         Rg = item.RG,
                         Nascimento = item.NASCIMENTO,

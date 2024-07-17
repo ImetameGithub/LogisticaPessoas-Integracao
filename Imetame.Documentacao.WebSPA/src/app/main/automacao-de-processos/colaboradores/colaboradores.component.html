@@ -69,12 +69,12 @@
                         <ng-container matColumnDef="check" stickyStart>
                             <mat-header-cell *matHeaderCellDef class="w-100">
                                 <mat-checkbox [disabled]="isBusy || isResult" [(ngModel)]="todoMundo" [color]="Accent"
-                                    (ngModelChange)="toggleAllSelection()">
+                                    (change)="toggleAllSelection($event)">
                                 </mat-checkbox>
                             </mat-header-cell>
                             <mat-cell *matCellDef="let item" class="w-100">
                                 <mat-checkbox [disabled]="isBusy || isResult" [(ngModel)]="item.check" [color]="Accent"
-                                    (ngModelChange)="toggleSelection(item)">
+                                    (click)="toggleSelection(item)">
                                 </mat-checkbox>
                             </mat-cell>
                         </ng-container>
@@ -123,6 +123,7 @@
 
                         <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
                         <mat-row *matRowDef="let item; columns: displayedColumns" matRipple
+                            (click)="toggleSelection(item)"
                             [@animate]="{ value: '*', params: { y: '100%' } }">
                         </mat-row>
                     </mat-table>
