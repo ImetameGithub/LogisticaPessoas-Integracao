@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 
@@ -92,6 +93,21 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 #endregion CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
 
                 var lista = (await this.conn.QueryAsync<ColaboradorModel>(sql, new { Oss = processamento.Oss }));
+
+                List<Colaborador> itensCadastrados = _repColaborador.SelectContext()
+                 .AsNoTracking()
+                 .ToList();
+
+                foreach (var item in lista)
+                {
+                   bool existeCadastro = itensCadastrados.Where(m => m.Matricula == item.NumCad).Any();
+                    
+                    if (existeCadastro)
+                    {
+                       item.SincronizadoDestra = true;
+                    }                                
+                }
+
                 return Ok(lista);
             }
             catch (Exception ex)
@@ -489,8 +505,30 @@ namespace Imetame.Documentacao.WebApi.Controllers
                     if (doc.Bytes != null)
                     {
                         doc.Base64 = $"data:image/png;base64,{Convert.ToBase64String(doc.Bytes)}";
-                    }
+                    }              
                 });
+
+                DateTime dataAtual = DateTime.Now;
+
+                foreach (DocumentoxColaboradorModel item in documentos.Where(m => m.DtVencimento.Trim() != ""))
+                {
+                    //DateTime dtVencimento = Convert.ToDateTime(item.DtVencimento);
+                    item.DtVencimentoFormatada = DateTime.ParseExact(item.DtVencimento, "yyyyMMdd", CultureInfo.InvariantCulture);
+
+
+
+                    // Verificar se o documento está prestes a vencer em 10 dias - Matheus Monfreides
+                    if (item.DtVencimentoFormatada <= dataAtual.AddDays(10) && item.DtVencimentoFormatada > dataAtual)
+                    {
+                        item.Vencer = true;
+                    }
+
+                    // Verificar se o documento já está vencido - Matheus Monfreides
+                    if (item.DtVencimentoFormatada <= dataAtual)
+                    {
+                        item.Vencido = true;
+                    }
+                }
 
                 return Ok(documentos);
             }

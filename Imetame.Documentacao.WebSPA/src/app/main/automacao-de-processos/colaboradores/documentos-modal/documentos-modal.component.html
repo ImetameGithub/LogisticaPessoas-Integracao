@@ -33,12 +33,22 @@
     <mat-grid-tile [colspan]="colspanDocs" [rowspan]="4">
         <mat-dialog-content class="mat-typography">
             <div class="modal">
-                <div class="modal-content">
+                <div class="modal-content">               
                     <div class="document-grid">
-                        <div *ngFor="let doc of documentos" class="document-box">
-                            <button matTooltip={{doc.DescArquivo}} mat-button mat-raised-button
-                                (click)="docDetalhes(doc)">{{
-                                doc.DescArquivo }}</button>
+                        <div *ngFor="let doc of documentos" >
+                            <div class="document-btn-envio-destra">
+                                <button mat-icon-button>
+                                    <mat-icon>cloud_upload</mat-icon>
+                                  </button>
+                            </div>
+                            <div class="document-box">
+                                <button matTooltip={{doc.DescArquivo}} mat-button mat-raised-button
+                                    (click)="docDetalhes(doc)">{{
+                                    doc.DescArquivo}}
+                                    <h4 *ngIf="doc.Vencido">Vencido</h4>
+                                <h4 *ngIf="doc.Vencer">Á vencer - {{doc.DtVencimentoFormatada | date:"dd/MM/yyyy"}}</h4>
+                                </button>
+                            </div>                               
                         </div>
                     </div>
                 </div>

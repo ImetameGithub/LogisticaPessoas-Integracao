@@ -47,6 +47,7 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
         "funcao",
         "cracha",
         "equipe",
+        "sincronizadoDestra",
         "status",
         "documento",
     ];

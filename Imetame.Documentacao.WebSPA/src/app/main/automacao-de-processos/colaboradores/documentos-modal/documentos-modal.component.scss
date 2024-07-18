@@ -49,13 +49,25 @@
 }
 
 .document-box button {
-  width: 150px;
+  width: 175px;
+  height: 75px;
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: center;
   white-space: nowrap;
   padding: 10px;
   box-sizing: border-box;
+  h4{
+    color: #960202;
+    font-weight: bold;
+  }
+}
+
+.document-btn-envio-destra {
+  width: 175px;
+  height: 45px;
+  text-align: end;
+  padding: 10px;
 }
 .overflow-custom{
   overflow: hidden;

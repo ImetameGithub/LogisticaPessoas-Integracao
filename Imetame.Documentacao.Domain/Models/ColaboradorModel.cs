@@ -18,6 +18,7 @@ namespace Imetame.Documentacao.Domain.Models
         public string FuncaoInicial { get; set; }
         public DateTime DataAdmissao { get; set; }
         public DateTime DataNascimento { get; set; }
+        public bool SincronizadoDestra { get; set; } = false;
         public string Equipe { get; set; }
         public string Perfil { get; set; }
         public string Endereco { get; set; }

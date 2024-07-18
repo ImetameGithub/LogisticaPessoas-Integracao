@@ -32,5 +32,8 @@ namespace Imetame.Documentacao.Domain.Entities
         [NotMapped]
         public List<ColaboradorxAtividade> ColaboradorxAtividade { get; set; }
 
+        [NotMapped]
+        public List<DocumentoxColaborador> DocumentosxColaborador { get; set; }
+
     }
 }
