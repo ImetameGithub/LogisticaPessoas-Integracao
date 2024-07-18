@@ -17,7 +17,7 @@
                             value: '*',
                             params: { delay: '100ms', x: '-25px' }
                         }">
-                        Documento
+                        Documentos
                     </span>
                 </div>
             </div>
@@ -61,14 +61,14 @@
                         {{ row.Descricao }}</mat-cell>
                 </ng-container>
 
-                <ng-container matColumnDef="IdDestra">
+                <ng-container matColumnDef="DescricaoDestra">
                     <mat-header-cell *matHeaderCellDef>Codigo Destra</mat-header-cell>
-                    <mat-cell *matCellDef="let row"> {{ row.IdDestra }}</mat-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.DescricaoDestra }}</mat-cell>
                 </ng-container>
 
-                <ng-container matColumnDef="IdProtheus">
+                <ng-container matColumnDef="DescricaoProtheus">
                     <mat-header-cell *matHeaderCellDef>Codigo Protheus</mat-header-cell>
-                    <mat-cell *matCellDef="let row"> {{ row.IdProtheus }}</mat-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.DescricaoProtheus }}</mat-cell>
                 </ng-container>
 
                 <ng-container matColumnDef="buttons" stickyEnd>

@@ -1,3 +1,4 @@
+using Dapper;
 using Imetame.Documentacao.Domain.Entities;
 using Imetame.Documentacao.Domain.Models;
 using Imetame.Documentacao.Domain.Repositories;
@@ -5,6 +6,7 @@ using Imetame.Documentacao.WebAPI.Helpers;
 using Imetame.Documentacao.WebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using OpenIddict.Validation.AspNetCore;
 using System.Text;
@@ -20,11 +22,13 @@ namespace Imetame.Documentacao.WebApi.Controllers
         private readonly IBaseRepository<Documento> _repDocumento;
         private readonly DestraController _destraController;
         private readonly IConfiguration _configuration;
-        public DocumentoController(IBaseRepository<Documento> repDocumento, DestraController destraController,IConfiguration configuration)
+        protected readonly SqlConnection conn;
+        public DocumentoController(IBaseRepository<Documento> repDocumento, DestraController destraController, IConfiguration configuration)
         {
             _repDocumento = repDocumento;
             _destraController = destraController;
             _configuration = configuration;
+            conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
         }
 
         [HttpGet]
@@ -85,7 +89,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
             if (!ModelState.IsValid)
                 throw new Exception("Parametros necessarios nao informados");
 
-            Documento Documento = await _repDocumento.SelectContext()                                                            
+            Documento Documento = await _repDocumento.SelectContext()
                                                             .Where(e => e.Id.Equals(id))
                                                             .FirstAsync();
             return Ok(Documento);
@@ -117,7 +121,8 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 return BadRequest(ErrorHelper.GetException(ex));
             }
         }
-
+        #endregion
+        
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] Documento model, CancellationToken cancellationToken)
         {
@@ -140,9 +145,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 return BadRequest(ErrorHelper.GetException(ex));
             }
         }
+        
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id,CancellationToken cancellationToken)
         {
             try
             {
@@ -161,45 +167,60 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        #endregion
+        
 
         #region GET_ATIVIDADES_DESTRA
         [HttpGet()]
-        public async Task<IActionResult> GetDocumentosDestra()
+        public async Task<IActionResult> GetDocumentosDestra(CancellationToken cancellationToken)
         {
-            var jsonResponse = await _destraController.GetDocumentos();
+            try
+            {
+                var jsonResponse = await _destraController.GetDocumentos();
 
-            List<DocumentosDestra> listDocumentos = new List<DocumentosDestra>();
+                List<DocumentosDestra> listDocumentos = new List<DocumentosDestra>();
 
-            ListaDocumentosDestraModel listaModel = JsonSerializer.Deserialize<ListaDocumentosDestraModel>(jsonResponse);
+                ListaDocumentosDestraModel listaModel = JsonSerializer.Deserialize<ListaDocumentosDestraModel>(jsonResponse);
+                //var listaAux = JsonSerializer.Deserialize<string[]>(jsonResponse);
 
-            // Obtém os códigos ou Ids dos documentos da lista
-            //var codigosDocumentos = listaModel.LISTA.Select(a => a.codigo).ToList();
+                //return Ok(listaAux);
 
-            // Recupera as atividades existentes no banco de dados com base nos códigos
-            //var atividadesExistentes = _repAtividadeEspecifica
-            //    .SelectContext().Where(a => codigosAtividades.Contains(a.Codigo));
+                if (listaModel != null)
+                {
+                    return Ok(listaModel.LISTA);
+                }
+                else
+                {
+                    return BadRequest("Api de Documentos Destra vazia");
+                }
 
-            // Filtra as novas atividades para excluir as que já existem no banco de dados
-            // var novasAtividades = listaModel.LISTA                
-            //     .Select(item => new DocumentosDestra
-            //     {
-            //         codigo = item.codigo,
-            //         nome = item.nome,
-            //         impeditivo = item.impeditivo,
-            //         validade = item.validade // Gera um novo Guid para cada nova atividade
-            //     })
-            //     .ToList();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
-            // // Insere as novas atividades no banco de dados
-            // if (novasAtividades.Any())
-            // {
-            //     await _repAtividadeEspecifica.InsertRangeAsync(novasAtividades);
-            // }
 
-            return Ok(listaModel.LISTA );
         }
         #endregion
+
+        [HttpGet]
+        public async Task<IActionResult> GetDocumentosProtheus(CancellationToken cancellationToken)
+        {
+            try
+            {
+                conn.Open();
+                var sql = @"SELECT UZI_CODIGO AS codigo,TRIM(UZI_DESC) as nome FROM UZI010 WHERE D_E_L_E_T_ = '';";                
+                var documentos = (await this.conn.QueryAsync<DocumentosProtheus>(sql));
+               
+                return Ok(documentos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal Server Error: " + ex.Message);
+            }
+        }
+
         
+
     }
 }

@@ -33,6 +33,8 @@ export const environment = {
         Delete: `${baseUrl}/Documento/Delete`,
         GetAll: `${baseUrl}/Documento/GetAll`,       
         GetAllPaginated: `${baseUrl}/Documento/GetAllPaginated`,
+        GetDocumentosDestra: `${baseUrl}/Documento/GetDocumentosDestra`,
+        GetDocumentosProtheus: `${baseUrl}/Documento/GetDocumentosProtheus`,
     },
     //#endregion
     //#region COLABORADORES

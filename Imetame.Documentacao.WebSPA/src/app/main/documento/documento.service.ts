@@ -9,24 +9,31 @@ import { DataService } from "app/services/data.service";
 import { API_URL } from "app/config/tokens";
 import { map, tap } from "rxjs/operators";
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from "@angular/router";
+import { DocumentosDestra } from "app/models/DocumentosDestra";
+import { DocumentosProtheus } from "app/models/DocumentosProtheus";
 
 @Injectable()
 export class DocumentoService implements Resolve<Documento> {
     routeParams: any;
 
-    private _listDocumentosDestra: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
+    private _listDocumentosDestra: ReplaySubject<DocumentosDestra[]> = new ReplaySubject<DocumentosDestra[]>(1);
+    private _listDocumentosProtheus: ReplaySubject<DocumentosProtheus[]> = new ReplaySubject<DocumentosProtheus[]>(1);
     private _listDocumento: ReplaySubject<PaginatedResponse<Documento>> = new ReplaySubject<PaginatedResponse<Documento>>(1);
     private _selectDocumento: ReplaySubject<Documento> = new ReplaySubject<Documento>(1);
 
     constructor(private _httpClient: HttpClient, private dataService: DataService, @Inject(API_URL) private apiUrl: string) {
         this._listDocumentosDestra.next(null)
+        this._listDocumentosProtheus.next(null)
         this._listDocumento.next(null)
         this._selectDocumento.next(null)
     }
 
     //#region FUNÇÕES DE ECAPSULAMENTOS
-    get listDocumentosDestra$(): Observable<string[]> {
+    get listDocumentosDestra$(): Observable<DocumentosDestra[]>{
         return this._listDocumentosDestra.asObservable();
+    }
+    get listDocumentosProtheus$(): Observable<DocumentosProtheus[]>{
+        return this._listDocumentosProtheus.asObservable();
     }
     get listDocumento$(): Observable<PaginatedResponse<Documento>> {
         return this._listDocumento.asObservable();
@@ -89,15 +96,19 @@ export class DocumentoService implements Resolve<Documento> {
     }
     Delete(id: string): Observable<Documento> {
         return this._httpClient.delete<Documento>(`${environment.Documento.Delete}/${id}`)
-    }
-    //#endregion
-
-    getDocumentosDestra(): Observable<string[]> {
-        return this._httpClient.get<string[]>(environment.Destra.GetDocumentosDestra).pipe(
-            tap((listFeriados: string[]) => {
+    }    
+    getDocumentosDestra(): Observable<DocumentosDestra[]> {
+        return this._httpClient.get<DocumentosDestra[]>(environment.Documento.GetDocumentosDestra).pipe(
+            tap((listFeriados: DocumentosDestra[]) => {
                 this._listDocumentosDestra.next(listFeriados);
             })
         );
     }
-
+    getDocumentosProtheus(): Observable<DocumentosProtheus[]> {
+        return this._httpClient.get<DocumentosProtheus[]>(environment.Documento.GetDocumentosProtheus).pipe(
+            tap((listFeriados: DocumentosProtheus[]) => {
+                this._listDocumentosProtheus.next(listFeriados);
+            })
+        );
+    }
 }

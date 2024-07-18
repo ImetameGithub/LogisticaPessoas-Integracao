@@ -17,7 +17,9 @@ namespace Imetame.Documentacao.Infra.Data.Mappings
 
             builder.Property(c => c.Descricao).HasColumnType("varchar(50)").HasMaxLength(255).IsRequired();
             builder.Property(c => c.IdDestra).HasColumnType("varchar(50)").HasMaxLength(255).IsRequired();
+            builder.Property(c => c.DescricaoDestra).HasColumnType("varchar(255)").HasMaxLength(255).IsRequired();
             builder.Property(c => c.IdProtheus).HasColumnType("varchar(50)").HasMaxLength(255).IsRequired();
+            builder.Property(c => c.DescricaoProtheus).HasColumnType("varchar(255)").HasMaxLength(255).IsRequired();
         }
     }
 }

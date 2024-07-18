@@ -11,7 +11,9 @@ namespace Imetame.Documentacao.Domain.Entities
     {
         public string Descricao { get; set; }
         public string IdDestra { get; set; }
+        public string DescricaoDestra { get; set; }
         public string IdProtheus { get; set; }
+        public string DescricaoProtheus { get; set; }
 
     }
 }

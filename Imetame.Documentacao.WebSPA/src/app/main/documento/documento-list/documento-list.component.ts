@@ -60,7 +60,7 @@ import {
     //#endregion
   
     //#region DATA SOURCE E FORMULARIO
-    displayedColumns = ["Descricao", "IdDestra", "IdProtheus", "buttons"];
+    displayedColumns = ["Descricao", "DescricaoDestra", "DescricaoProtheus", "buttons"];
     dataSource: MatTableDataSource<Documento>;
     form: UntypedFormGroup;
     //#endregion

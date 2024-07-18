@@ -42,13 +42,13 @@ export const navigation: FuseNavigation[] = [
                 url: "/documento",
                 icon: "business",
             },
-            {
-                id: "de-para",
-                title: "De Para",
-                type: "item",
-                url: "/de-para",
-                icon: "business",
-            },
+            // {
+            //     id: "de-para",
+            //     title: "De Para",
+            //     type: "item",
+            //     url: "/de-para",
+            //     icon: "business",
+            // },
             {
                 id: "credenciadora",
                 title: "Credenciadora",

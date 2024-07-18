@@ -35,6 +35,9 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { DocumentoService } from "../documento.service";
 import { DatePipe } from "@angular/common";
 import { Documento } from "app/models/Documento";
+import { DocumentosDestra } from "app/models/DocumentosDestra";
+import { CustomOptionsSelect } from 'app/shared/components/custom-select/components.types';
+import { DocumentosProtheus } from "app/models/DocumentosProtheus";
 
 
 @Component({
@@ -54,7 +57,8 @@ export class DocumentoFormComponent implements OnInit {
     pageType: string;
 
     confirmDialogRef: MatDialogRef<ConfirmDialogComponent>;
-    documentosdestra: any[] = []
+    documentosdestra: CustomOptionsSelect[] = [];
+    documentosprotheus: CustomOptionsSelect[] = [];
 
     form: UntypedFormGroup;
 
@@ -73,15 +77,37 @@ export class DocumentoFormComponent implements OnInit {
         private _fuseProgressBarService: FuseProgressBarService,
     ) {
         this.form = new FormGroup({
-            Descricao: new FormControl('', [Validators.required]),
             IdDestra: new FormControl('', [Validators.required]),
             IdProtheus: new FormControl('', [Validators.required]),
+            Descricao: new FormControl('', [Validators.required]),            
         });
         this.titleService.setTitle("Novo - Documento - Imetame");
     }
 
 
     ngOnInit() {
+
+        this._Documentoservice.getDocumentosDestra().subscribe(
+            (documentosdestra:DocumentosDestra[]) => {
+                console.log(documentosdestra)
+                //this.documentosdestra = documentosdestra;
+                this.documentosdestra = documentosdestra.map(x => new CustomOptionsSelect(x.codigo.toString(), x.nome)) ?? [];
+            },
+            (error) => {
+                console.error('Erro ao buscar documentos Destra', error);
+            }
+        );
+
+        this._Documentoservice.getDocumentosProtheus().subscribe(
+            (documentosprotheus:DocumentosProtheus[]) => {
+                console.log(documentosprotheus)
+                //this.documentosdestra = documentosdestra;
+                this.documentosprotheus = documentosprotheus.map(x => new CustomOptionsSelect(x.codigo, x.nome)) ?? [];
+            },
+            (error) => {
+                console.error('Erro ao buscar documentos Destra', error);
+            }
+        );
 
         this._Documentoservice._selectDocumento$.subscribe(
             (data: any) => {
@@ -106,15 +132,7 @@ export class DocumentoFormComponent implements OnInit {
         
 
 
-        this._Documentoservice.getDocumentosDestra().subscribe(
-            (documentosdestra) => {
-                console.log(documentosdestra)
-                this.documentosdestra = documentosdestra;
-            },
-            (error) => {
-                console.error('Erro ao buscar documentos Destra', error);
-            }
-        );
+       
     }
 
 
@@ -139,6 +157,9 @@ export class DocumentoFormComponent implements OnInit {
     }
 
     add(model: Documento) {
+        
+        model.DescricaoDestra = this.documentosdestra.find(m => m.value == model.IdDestra).display
+        model.DescricaoProtheus = this.documentosprotheus.find(m => m.value == model.IdProtheus).display
         this._fuseProgressBarService.setMode("indeterminate");
         this._fuseProgressBarService.show();
         this.blockRequisicao = true;
@@ -166,6 +187,8 @@ export class DocumentoFormComponent implements OnInit {
     }
 
     update(model: Documento) {
+        model.DescricaoDestra = this.documentosdestra.find(m => m.value == model.IdDestra).display
+        model.DescricaoProtheus = this.documentosprotheus.find(m => m.value == model.IdProtheus).display
         this._fuseProgressBarService.setMode("indeterminate");
         this._fuseProgressBarService.show();
         this.blockRequisicao = true;
