@@ -137,8 +137,6 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 return BadRequest(ErrorHelper.GetException(ex));
             }
         }
-        #endregion
-        
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] Documento model, CancellationToken cancellationToken)
         {
@@ -175,8 +173,6 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 return BadRequest(ErrorHelper.GetException(ex));
             }
         }
-        
-
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id,CancellationToken cancellationToken)
         {
@@ -197,6 +193,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        #endregion
+        
+        
+
         
 
         #region GET_ATIVIDADES_DESTRA

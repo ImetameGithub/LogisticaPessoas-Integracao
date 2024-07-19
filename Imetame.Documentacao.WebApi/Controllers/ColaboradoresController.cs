@@ -24,6 +24,8 @@ namespace Imetame.Documentacao.WebApi.Controllers
     {
         private readonly IColaboradorRepository _repository;
         private readonly IBaseRepository<Domain.Entities.Processamento> _repProcessamento;
+        private readonly IBaseRepository<Domain.Entities.DocumentoxColaborador> _repDocxColaborador;
+        private readonly IBaseRepository<Domain.Entities.Documento> _repDocumento;
         private readonly IBaseRepository<Domain.Entities.Colaborador> _repColaborador;
         private readonly IBaseRepository<ColaboradorxAtividade> _repColaboradorxAtividade;
         private readonly DestraController _destraController;
@@ -33,7 +35,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
         public ColaboradoresController(IColaboradorRepository repository, IBaseRepository<Domain.Entities.Processamento> repProcessamento,
             IConfiguration configuration, IBaseRepository<Domain.Entities.Colaborador> repColaborador,
-            IBaseRepository<ColaboradorxAtividade> repColaboradorxAtividade, DestraController destraController)
+            IBaseRepository<ColaboradorxAtividade> repColaboradorxAtividade, DestraController destraController, IBaseRepository<Documento> repDocumento, IBaseRepository<DocumentoxColaborador> repDocxColaborador)
         {
             _repository = repository;
             _configuration = configuration;
@@ -42,7 +44,112 @@ namespace Imetame.Documentacao.WebApi.Controllers
             _repColaborador = repColaborador;
             _repColaboradorxAtividade = repColaboradorxAtividade;
             _destraController = destraController;
+            _repDocumento = repDocumento;
+            _repDocxColaborador = repDocxColaborador;
         }
+
+        #region FUNÇÕES DE APOIO 
+
+        [HttpPost]
+        public async Task<IActionResult> RelacionarColaboradorxAtividade([FromBody] ColaboradorxAtividadeModel model, CancellationToken cancellationToken)
+        {
+            try
+            {
+                StringBuilder erro = new StringBuilder();
+                if (!ModelState.IsValid)
+                {
+                    erro = ErrorHelper.GetErroModelState(ModelState.Values);
+                    throw new Exception("Falha ao Salvar Dados.\n" + erro);
+                }
+
+                List<Colaborador> colaboradores = new List<Colaborador>();
+
+
+                foreach (ColaboradorProtheusModel item in model.ListColaborador)
+                {
+
+                    ColaboradorDestra colaboradorDestra = new ColaboradorDestra()
+                    {
+                        nome = item.NOME,
+                        nascto = item.NASCIMENTO,
+                        cpf = item.CPF,
+                        rg = item.RG,
+                        passaporte = "",
+                        passaporteValidade = "",
+                        cnh = "",
+                        creaUF = "",
+                        idCidade = 2930774,
+                        cnpj = "31790710000609",
+                        funcao = item.NOME_FUNCAO,
+                        idVinculo = 1,
+                        dataAdmissao = item.DATA_ADIMISSAO,
+                        isTemporario = "",
+                        contratoDias = 1,
+                        contratoFim = "",
+
+                    };
+
+                    var jsonResponse = await _destraController.AddColaborador(colaboradorDestra) as OkObjectResult;
+
+                    Colaborador colaborador = new Colaborador()
+                    {
+                        Id = new Guid(),
+                        Matricula = item.MATRICULA.Remove(0, 1), // É DESSA FORMA POIS O PROTHEUS É COM ZERO NO INICIO MAS A CONSULTA TIRA PARA A FUNÇÃO EnviarColaboradorDestra
+                        Cpf = item.CPF,
+                        Rg = item.RG,
+                        Nascimento = item.NASCIMENTO,
+                        DataAdmissao = item.DATA_ADIMISSAO,
+                        Cracha = item.CRACHA,
+                        Nome = item.NOME,
+                        Codigo_Funcao = item.CODIGO_FUNCAO,
+                        Nome_Funcao = item.NOME_FUNCAO,
+                        SincronizadoDestra = true,
+                        Codigo_Equipe = item.CODIGO_EQUIPE,
+                        Nome_Equipe = item.NOME_EQUIPE,
+                        Codigo_Disciplina = item.CODIGO_DISCIPLINA,
+                        Nome_Disciplina = item.NOME_DISCIPLINA,
+                        Perfil = item.PERFIL,
+                        Codigo_OS = item.CODIGO_OS,
+                        MudaFuncao = "N",// DEFINIR COMO A CONSULTA VAI TRAZER
+                        Nome_OS = item.NOME_OS
+                    };
+
+                    colaboradores.Add(colaborador);
+                }
+
+                await _repColaborador.InsertRangeAsync(colaboradores);
+
+                List<ColaboradorxAtividade> colaboradorxAtividades = new List<ColaboradorxAtividade>();
+
+                // Cria as relações entre colaboradores e atividades
+                foreach (var colaborador in colaboradores)
+                {
+                    foreach (var atividadeId in model.ListAtividade)
+                    {
+                        ColaboradorxAtividade relacao = new ColaboradorxAtividade()
+                        {
+                            Id = new Guid(),
+                            CXA_IDCOLABORADOR = colaborador.Id, // Assumindo que o Id do colaborador seja do tipo Guid e esteja gerado
+                            CXA_IDATIVIDADE_ESPECIFICA = atividadeId
+                        };
+
+                        colaboradorxAtividades.Add(relacao);
+                    }
+                }
+
+                await _repColaboradorxAtividade.InsertRangeAsync(colaboradorxAtividades);
+                //model.Id = new Guid();
+                //await _repAtividadeEspecifica.SaveAsync(model);
+
+                return Ok(model);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ErrorHelper.GetException(ex));
+            }
+        }
+
+        #region FUNÇÕES GET DE TODOS OS TIPOS - Matheus Monfreides
 
         [HttpGet("{idProcessamento}")]
         public async Task<IActionResult> GetColaboradoresPorOs(Guid idProcessamento, CancellationToken cancellationToken)
@@ -100,12 +207,12 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 foreach (var item in lista)
                 {
-                   bool existeCadastro = itensCadastrados.Where(m => m.Matricula == item.NumCad).Any();
-                    
+                    bool existeCadastro = itensCadastrados.Where(m => m.Matricula == item.NumCad).Any();
+
                     if (existeCadastro)
                     {
-                       item.SincronizadoDestra = true;
-                    }                                
+                        item.SincronizadoDestra = true;
+                    }
                 }
 
                 return Ok(lista);
@@ -278,6 +385,97 @@ namespace Imetame.Documentacao.WebApi.Controllers
             }
         }
 
+        [HttpGet("{matricula}")]
+        public async Task<IActionResult> GetDocumentosProtheus(string matricula, CancellationToken cancellationToken)
+        {
+            try
+            {
+                conn.Open();
+                var sql = @"SELECT 
+                            UZI.UZI_CODIGO AS Codigo,
+                            UZJ.R_E_C_N_O_ AS Id,
+                            UZI.UZI_DESC AS DescArquivo,
+                            UZJ.UZJ_VENC AS DtVencimento,
+                            SRA.RA_NOME AS NomeColaborador,
+                            SRA.RA_MAT AS Matricula,
+                            UZJ.UZJ_DOC AS NomeArquivo,
+                            UZJ.UZJ_IMG AS Bytes
+                        FROM 
+                            DADOSADV..UZJ010 UZJ
+                            INNER JOIN DADOSADV..UZI010 UZI 
+    	                        ON UZI.UZI_FILIAL = UZJ.UZJ_FILIAL 
+    	                        AND UZI.UZI_CODIGO = UZJ.UZJ_CODTDO           
+                                AND UZI.D_E_L_E_T_ = ''
+                            INNER JOIN DADOSADV..SRA010 SRA ON SRA.RA_FILIAL = UZJ.UZJ_FILIAL  
+                                AND SRA.RA_MAT = UZJ.UZJ_MAT 
+                                AND SRA.D_E_L_E_T_ = ''
+                        WHERE 
+                            UZJ.UZJ_FILIAL = ''
+                            AND UZJ.UZJ_MAT = @Matricula 
+                            AND UZJ.UZJ_CODTDO <> '01' 
+                            AND UZJ.UZJ_SEQ = (
+                                SELECT MAX(UZJ_SEQ) 
+                                FROM DADOSADV..UZJ010 
+                                WHERE UZJ_FILIAL = UZJ.UZJ_FILIAL 
+                                    AND UZJ_MAT = UZJ.UZJ_MAT 
+                                    AND UZJ_CODTDO = UZJ.UZJ_CODTDO 
+                                    AND D_E_L_E_T_ = ''
+                            )
+                            AND UZJ.D_E_L_E_T_ = ''";
+
+                var documentos = (await conn.QueryAsync<DocumentoxColaboradorModel>(sql, new { Matricula = matricula })).ToList();
+
+                // Convertendo bytes para Base64
+                documentos.ForEach(doc =>
+                {
+                    if (doc.Bytes != null)
+                    {
+                        doc.Base64 = $"data:image/png;base64,{Convert.ToBase64String(doc.Bytes)}";
+                    }
+                });
+
+                DateTime dataAtual = DateTime.Now;
+
+                foreach (DocumentoxColaboradorModel item in documentos.Where(m => m.DtVencimento.Trim() != ""))
+                {
+                    //DateTime dtVencimento = Convert.ToDateTime(item.DtVencimento);
+                    item.DtVencimentoFormatada = DateTime.ParseExact(item.DtVencimento, "yyyyMMdd", CultureInfo.InvariantCulture);
+
+                    Documento? docRelacao = await _repDocumento.SelectContext().AsNoTracking().Where(m => m.IdProtheus == item.Codigo).FirstOrDefaultAsync();
+
+                    if (docRelacao is null)
+                    {
+                        item.SincronizadoDestra = true;
+                    }
+
+
+                    // Verificar se o documento está prestes a vencer em 10 dias - Matheus Monfreides
+                    if (item.DtVencimentoFormatada <= dataAtual.AddDays(10) && item.DtVencimentoFormatada > dataAtual)
+                    {
+                        item.Vencer = true;
+                    }
+
+                    // Verificar se o documento já está vencido - Matheus Monfreides
+                    if (item.DtVencimentoFormatada <= dataAtual)
+                    {
+                        item.Vencido = true;
+                    }
+                }
+
+                return Ok(documentos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal Server Error: " + ex.Message);
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+
+        #region FUNÇÕE DE ENVIO PARA DESTRA
         [HttpPost]
         public async Task<IActionResult> EnviarColaboradorDestra([FromBody] List<ColaboradorModel> listColaboradores)
         {
@@ -294,7 +492,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 // Carregar todos os itens de colaboradores cadastrados no sistema - Matheus Monfreides
                 List<Colaborador> itensCadastrados = _repColaborador.SelectContext()
-                    .AsNoTracking()                    
+                    .AsNoTracking()
                     .ToList();
 
                 // Buscar colaboradores que foi selecionado mas não possuem relação com atividade, ocasionando em não ter na tabela colaborador - Matheus Monfreides
@@ -306,7 +504,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 {
                     var nomesColaboradores = colaboradoresSemAtividade.Select(colaborador => colaborador.Nome).ToList();
                     string listaDeNomes = string.Join(", ", nomesColaboradores);
-                    if(nomesColaboradores.Count() > 1)
+                    if (nomesColaboradores.Count() > 1)
                     {
                         throw new Exception("Os colaboradores " + listaDeNomes + " não estão relacionado a nenhuma atividade específica.");
                     }
@@ -361,9 +559,8 @@ namespace Imetame.Documentacao.WebApi.Controllers
             }
         }
 
-
         [HttpPost]
-        public async Task<IActionResult> RelacionarColaboradorxAtividade([FromBody] ColaboradorxAtividadeModel model, CancellationToken cancellationToken)
+        public async Task<IActionResult> EnviarDocumentoParaDestra([FromBody] DocumentoxColaboradorModel documento)
         {
             try
             {
@@ -374,86 +571,41 @@ namespace Imetame.Documentacao.WebApi.Controllers
                     throw new Exception("Falha ao Salvar Dados.\n" + erro);
                 }
 
-                List<Colaborador> colaboradores = new List<Colaborador>();
+                Documento? docRelacao = await _repDocumento.SelectContext().AsNoTracking().Where(m => m.IdProtheus == documento.Codigo).FirstOrDefaultAsync();
 
+                if (docRelacao is null)
+                    throw new Exception("Documento selecionado não possue nenhuma relação com os documentos da Destra");
 
-                foreach (ColaboradorProtheusModel item in model.ListColaborador)
+                Colaborador? colaboradorCadastrado = await _repColaborador.SelectContext().AsNoTracking().Where(m => m.Matricula == documento.Matricula.Remove(0, 1)).FirstOrDefaultAsync();
+
+                if (colaboradorCadastrado is null)
+                    throw new Exception("O colaborador " + documento.NomeColaborador + " não está relacionado a nenhuma atividade específica.");
+
+                DocumentoDestra itemDestra = new DocumentoDestra
                 {
+                    idDocto = docRelacao.IdDestra,
+                    cpf = colaboradorCadastrado.Cpf,
+                    arquivo = documento.Base64,
+                    //arquivo = documento.Bytes,
+                    validade = DateTime.Now.AddYears(1).ToString("yyyy-MM-dd"),
+                    //validade = documento.DtVencimento,
+                };
 
-                    ColaboradorDestra colaboradorDestra = new ColaboradorDestra()
-                    {
-                        nome = item.NOME,
-                        nascto = item.NASCIMENTO,
-                        cpf = item.CPF,
-                        rg = item.RG,
-                        passaporte = "",
-                        passaporteValidade = "",
-                        cnh = "",
-                        creaUF = "",
-                        idCidade = 2930774,
-                        cnpj = "31790710000609",
-                        funcao = item.NOME_FUNCAO,
-                        idVinculo = 1,
-                        dataAdmissao = item.DATA_ADIMISSAO,
-                        isTemporario = "",
-                        contratoDias = 1,
-                        contratoFim = "",
+                var jsonResponse = await _destraController.AddDocumento(itemDestra) as OkObjectResult;
 
-                    };
-
-                    var jsonResponse = await _destraController.AddColaborador(colaboradorDestra) as OkObjectResult;
-
-                    Colaborador colaborador = new Colaborador()
-                    {
-                        Id = new Guid(),
-                        Matricula = item.MATRICULA.Remove(0, 1), // É DESSA FORMA POIS O PROTHEUS É COM ZERO NO INICIO MAS A CONSULTA TIRA PARA A FUNÇÃO EnviarColaboradorDestra
-                        Cpf = item.CPF,
-                        Rg = item.RG,
-                        Nascimento = item.NASCIMENTO,
-                        DataAdmissao = item.DATA_ADIMISSAO,
-                        Cracha = item.CRACHA,
-                        Nome = item.NOME,
-                        Codigo_Funcao = item.CODIGO_FUNCAO,
-                        Nome_Funcao = item.NOME_FUNCAO,
-                        SincronizadoDestra = true,
-                        Codigo_Equipe = item.CODIGO_EQUIPE,
-                        Nome_Equipe = item.NOME_EQUIPE,
-                        Codigo_Disciplina = item.CODIGO_DISCIPLINA,
-                        Nome_Disciplina = item.NOME_DISCIPLINA,
-                        Perfil = item.PERFIL,
-                        Codigo_OS = item.CODIGO_OS,
-                        MudaFuncao = "N",// DEFINIR COMO A CONSULTA VAI TRAZER
-                        Nome_OS = item.NOME_OS
-                    };
-
-                    colaboradores.Add(colaborador);
-                }
-
-                await _repColaborador.InsertRangeAsync(colaboradores);
-
-                List<ColaboradorxAtividade> colaboradorxAtividades = new List<ColaboradorxAtividade>();
-
-                // Cria as relações entre colaboradores e atividades
-                foreach (var colaborador in colaboradores)
+                DocumentoxColaborador item = new DocumentoxColaborador
                 {
-                    foreach (var atividadeId in model.ListAtividade)
-                    {
-                        ColaboradorxAtividade relacao = new ColaboradorxAtividade()
-                        {
-                            Id = new Guid(),
-                            CXA_IDCOLABORADOR = colaborador.Id, // Assumindo que o Id do colaborador seja do tipo Guid e esteja gerado
-                            CXA_IDATIVIDADE_ESPECIFICA = atividadeId
-                        };
+                    DXC_CODPROTHEUS = documento.Codigo,
+                    DXC_DESCPROTHEUS = documento.DescArquivo,
+                    DXC_CODDESTRA = docRelacao.IdDestra,
+                    DXC_DESCDESTRA = docRelacao.DescricaoDestra,
+                    DXC_IDCOLABORADOR = colaboradorCadastrado.Id,
+                    DXC_BASE64 = documento.Base64
+                };
 
-                        colaboradorxAtividades.Add(relacao);
-                    }
-                }
+                //await _repDocxColaborador.SaveAsync(item);
 
-                await _repColaboradorxAtividade.InsertRangeAsync(colaboradorxAtividades);
-                //model.Id = new Guid();
-                //await _repAtividadeEspecifica.SaveAsync(model);
-
-                return Ok(model);
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -461,82 +613,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
             }
         }
 
-        [HttpGet("{matricula}")]
-        public async Task<IActionResult> GetDocumentosProtheus(string matricula, CancellationToken cancellationToken)
-        {
-            try
-            {
-                conn.Open();
-                var sql = @"SELECT 
-                            UZJ.R_E_C_N_O_ AS Id,
-                            UZI.UZI_DESC AS DescArquivo,
-                            UZJ.UZJ_VENC AS DtVencimento,
-                            SRA.RA_NOME AS NomeColaborador,
-                            UZJ.UZJ_DOC AS NomeArquivo,
-                            UZJ.UZJ_IMG AS Bytes
-                        FROM 
-                            DADOSADV..UZJ010 UZJ
-                            INNER JOIN DADOSADV..UZI010 UZI 
-    	                        ON UZI.UZI_FILIAL = UZJ.UZJ_FILIAL 
-    	                        AND UZI.UZI_CODIGO = UZJ.UZJ_CODTDO           
-                                AND UZI.D_E_L_E_T_ = ''
-                            INNER JOIN DADOSADV..SRA010 SRA ON SRA.RA_FILIAL = UZJ.UZJ_FILIAL  
-                                AND SRA.RA_MAT = UZJ.UZJ_MAT 
-                                AND SRA.D_E_L_E_T_ = ''
-                        WHERE 
-                            UZJ.UZJ_FILIAL = ''
-                            AND UZJ.UZJ_MAT = @Matricula 
-                            AND UZJ.UZJ_CODTDO <> '01' 
-                            AND UZJ.UZJ_SEQ = (
-                                SELECT MAX(UZJ_SEQ) 
-                                FROM DADOSADV..UZJ010 
-                                WHERE UZJ_FILIAL = UZJ.UZJ_FILIAL 
-                                    AND UZJ_MAT = UZJ.UZJ_MAT 
-                                    AND UZJ_CODTDO = UZJ.UZJ_CODTDO 
-                                    AND D_E_L_E_T_ = ''
-                            )
-                            AND UZJ.D_E_L_E_T_ = ''";
-
-                var documentos = (await conn.QueryAsync<DocumentoxColaboradorModel>(sql, new { Matricula = matricula })).ToList();
-
-                // Convertendo bytes para Base64
-                documentos.ForEach(doc =>
-                {
-                    if (doc.Bytes != null)
-                    {
-                        doc.Base64 = $"data:image/png;base64,{Convert.ToBase64String(doc.Bytes)}";
-                    }              
-                });
-
-                DateTime dataAtual = DateTime.Now;
-
-                foreach (DocumentoxColaboradorModel item in documentos.Where(m => m.DtVencimento.Trim() != ""))
-                {
-                    //DateTime dtVencimento = Convert.ToDateTime(item.DtVencimento);
-                    item.DtVencimentoFormatada = DateTime.ParseExact(item.DtVencimento, "yyyyMMdd", CultureInfo.InvariantCulture);
-
-
-
-                    // Verificar se o documento está prestes a vencer em 10 dias - Matheus Monfreides
-                    if (item.DtVencimentoFormatada <= dataAtual.AddDays(10) && item.DtVencimentoFormatada > dataAtual)
-                    {
-                        item.Vencer = true;
-                    }
-
-                    // Verificar se o documento já está vencido - Matheus Monfreides
-                    if (item.DtVencimentoFormatada <= dataAtual)
-                    {
-                        item.Vencido = true;
-                    }
-                }
-
-                return Ok(documentos);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Internal Server Error: " + ex.Message);
-            }
-        }
+        #endregion
 
 
         #region FUNÇÕES CRUD - MATHEUS MONFREIDES FARTEC SISTEMAS

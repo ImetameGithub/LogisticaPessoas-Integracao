@@ -11,8 +11,11 @@ namespace Imetame.Documentacao.Domain.Entities
     public class DocumentoxColaborador : Entity
     {
         public string DXC_CODPROTHEUS { get; set; }
+        public string DXC_DESCPROTHEUS { get; set; }
         public string DXC_CODDESTRA { get; set; }
+        public string DXC_DESCDESTRA { get; set; }
         public string DXC_BASE64 { get; set; }
+        public DateTime DXC_DTENVIO { get; set; }
 
 
         [ForeignKey("Colaborador")]

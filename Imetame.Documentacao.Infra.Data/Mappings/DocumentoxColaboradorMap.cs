@@ -18,6 +18,7 @@ namespace Imetame.Documentacao.Infra.Data.Mappings
             builder.Property(c => c.DXC_CODPROTHEUS).IsRequired();
             builder.Property(c => c.DXC_CODDESTRA).IsRequired();
             builder.Property(c => c.DXC_BASE64).IsRequired();
+            builder.Property(c => c.DXC_DTENVIO).HasDefaultValue(DateTime.Now).IsRequired();
 
             builder.HasOne(x => x.Colaborador)
                  .WithMany(x => x.DocumentosxColaborador)

@@ -145,6 +145,11 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
         return this._httpClient.post<any>(environment.Colaboradores.EnviarColaboradorDestra, Colaborador, { headers });
     }
 
+    EnviarDocumentoParaDestra(Documento: DocumentoxColaboradorModel): Observable<any> {
+        const headers = new HttpHeaders().set('Content-Type', 'application/json');
+        return this._httpClient.post<any>(environment.Colaboradores.EnviarDocumentoParaDestra, Documento, { headers });
+    }
+
     GetColaboradoresPorOs(): Promise<ColaboradorModel> {
         return new Promise((resolve, reject) => {
             this.dataService.getList(`${environment.Colaboradores.GetColaboradoresPorOs}/${this.routeParams.processamento}`, {})

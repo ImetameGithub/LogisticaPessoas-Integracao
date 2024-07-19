@@ -22,6 +22,9 @@ export class DocumentosModalComponent implements OnInit {
   colspanDocs: number = 6
   rowspan: number = 4
   colspanImg: number = 0
+
+  blockRequisicao: boolean = false;
+
   constructor(
     public service: AutomacaoDeProcessosService,
     public dialogRef: MatDialogRef<DocumentosModalComponent>,
@@ -48,6 +51,31 @@ export class DocumentosModalComponent implements OnInit {
         },
         error: (error) => { console.log(error.error) }
       });
+
+  }
+
+  enviarDocsParaDestra(documento: DocumentoxColaboradorModel){
+
+    this.service.EnviarDocumentoParaDestra(documento).subscribe(
+      {
+          next: (response: DocumentoxColaboradorModel) => {
+              this._fuseProgressBarService.hide();
+              this.blockRequisicao = false;
+              this._snackbar.open("Item enviado para com sucesso", 'X', {
+                  duration: 2500,
+                  panelClass: 'snackbar-success',
+              })
+          },
+          error: (error) => {
+              this._fuseProgressBarService.hide();
+              this.blockRequisicao = false;
+              this._snackbar.open(error.error, 'X', {
+                  duration: 4000,
+                  panelClass: 'snackbar-error',
+              })
+          }
+      }
+  )  
 
   }
 
