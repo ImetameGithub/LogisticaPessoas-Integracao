@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Validation.AspNetCore;
 using System.Text;
 using System.Text.Json;
@@ -112,6 +113,21 @@ namespace Imetame.Documentacao.WebApi.Controllers
                     throw new Exception("Falha ao Salvar Dados.\n" + erro);
                 }
                 model.Id = new Guid();
+
+                //Verificar se o documento Destra ou Protheus já está sendo utilizado
+                List<Documento> listDocumentosDestra = _repDocumento.SelectContext().Where(e => e.IdDestra == model.IdDestra).ToList();
+                List<Documento> listDocumentosProtheus = _repDocumento.SelectContext().Where(e => e.IdProtheus == model.IdProtheus).ToList();
+
+                if (listDocumentosDestra.Count() > 0)
+                {
+                     throw new Exception("O documento DESTRA esta vinculado para outro documento PROTHEUS");
+                }
+
+                if (listDocumentosProtheus.Count() > 0)
+                {
+                     throw new Exception("O documento PROTHEUS esta vinculado para outro documento DESTRA");
+                }
+
                 await _repDocumento.SaveAsync(model);
 
                 return Ok(model);
@@ -133,6 +149,20 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 {
                     erro = ErrorHelper.GetErroModelState(ModelState.Values);
                     throw new Exception("Falha ao Salvar Dados.\n" + erro);
+                }
+
+                //Verificar se o documento Destra ou Protheus já está sendo utilizado
+                List<Documento> listDocumentosDestra = _repDocumento.SelectContext().Where(e => e.Id != model.Id && e.IdDestra == model.IdDestra).ToList();
+                List<Documento> listDocumentosProtheus = _repDocumento.SelectContext().Where(e => e.Id != model.Id && e.IdProtheus == model.IdProtheus).ToList();
+
+                if (listDocumentosDestra.Count() > 0)
+                {
+                     throw new Exception("O documento DESTRA esta vinculado para outro documento PROTHEUS");
+                }
+
+                if (listDocumentosProtheus.Count() > 0)
+                {
+                     throw new Exception("O documento PROTHEUS esta vinculado para outro documento DESTRA");
                 }
 
                 await _repDocumento.UpdateAsync(model);
