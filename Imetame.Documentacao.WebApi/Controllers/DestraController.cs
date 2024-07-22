@@ -168,6 +168,36 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 throw new Exception("Erro ao obter atividades", ex);
             }
         }
+        
+        [HttpGet("{Id}")]
+        public async Task<string> GetDocumentosRequeridos(string Id)
+        {
+            try
+            {
+                AuthResponse response = await Login();
+
+                string endPoint = $"/service/docto/funcionario/lista?atividadeEspecifica=" + Id;
+
+                if (!response.Erro)
+                {
+                    var result = await _destraService.GetAsync(endPoint, response.Token);
+                    if (result.IsSuccessStatusCode)
+                    {
+                        return await result.Content.ReadAsStringAsync();
+                    }
+
+                    throw new Exception(await result.Content.ReadAsStringAsync());
+                }
+                else
+                {
+                    throw new Exception(response.MensagemErro);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro ao obter documentos da atividade atividades", ex);
+            }
+        }
 
         [HttpPost]
         public async Task<IActionResult> AddDocumento([FromBody] DocumentoDestra documento)
@@ -199,5 +229,6 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 return NotFound(ex);
             }
         }
+    
     }
 }

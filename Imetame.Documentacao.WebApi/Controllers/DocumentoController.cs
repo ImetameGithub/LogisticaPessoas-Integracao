@@ -24,7 +24,12 @@ namespace Imetame.Documentacao.WebApi.Controllers
         private readonly DestraController _destraController;
         private readonly IConfiguration _configuration;
         protected readonly SqlConnection conn;
-        public DocumentoController(IBaseRepository<Documento> repDocumento, DestraController destraController, IConfiguration configuration)
+        public DocumentoController
+        (
+            IBaseRepository<Documento> repDocumento, 
+            DestraController destraController, 
+            IConfiguration configuration
+        )
         {
             _repDocumento = repDocumento;
             _destraController = destraController;
@@ -67,10 +72,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
             }
         }
 
-
-        #region FUNÇÕES DE APOIO - MATHEUS MONFREIDES FARTEC SISTEMAS
-
-        #region GET ALL
+        #region FUNÇÕES DE APOIO - MATHEUS MONFREIDES FARTEC SISTEMAS        
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -81,9 +83,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                                                             .ToListAsync();
             return Ok(listaPedido);
         }
-        #endregion GET ALL
 
-        #region GET
         [HttpGet("{id}")]
         public async Task<IActionResult> GetItem(Guid id)
         {
@@ -95,9 +95,6 @@ namespace Imetame.Documentacao.WebApi.Controllers
                                                             .FirstAsync();
             return Ok(Documento);
         }
-        #endregion GET ALL        
-
-
         #endregion
 
         #region FUNÇÕES CRUD - MATHEUS MONFREIDES FARTEC SISTEMAS
@@ -120,12 +117,12 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 if (listDocumentosDestra.Count() > 0)
                 {
-                     throw new Exception("O documento DESTRA esta vinculado para outro documento PROTHEUS");
+                    throw new Exception("O documento DESTRA esta vinculado para outro documento PROTHEUS");
                 }
 
                 if (listDocumentosProtheus.Count() > 0)
                 {
-                     throw new Exception("O documento PROTHEUS esta vinculado para outro documento DESTRA");
+                    throw new Exception("O documento PROTHEUS esta vinculado para outro documento DESTRA");
                 }
 
                 await _repDocumento.SaveAsync(model);
@@ -137,6 +134,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 return BadRequest(ErrorHelper.GetException(ex));
             }
         }
+
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] Documento model, CancellationToken cancellationToken)
         {
@@ -155,12 +153,12 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 if (listDocumentosDestra.Count() > 0)
                 {
-                     throw new Exception("O documento DESTRA esta vinculado para outro documento PROTHEUS");
+                    throw new Exception("O documento DESTRA esta vinculado para outro documento PROTHEUS");
                 }
 
                 if (listDocumentosProtheus.Count() > 0)
                 {
-                     throw new Exception("O documento PROTHEUS esta vinculado para outro documento DESTRA");
+                    throw new Exception("O documento PROTHEUS esta vinculado para outro documento DESTRA");
                 }
 
                 await _repDocumento.UpdateAsync(model);
@@ -173,8 +171,9 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 return BadRequest(ErrorHelper.GetException(ex));
             }
         }
+
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id,CancellationToken cancellationToken)
+        public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
         {
             try
             {
@@ -194,12 +193,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
             }
         }
         #endregion
-        
-        
 
-        
-
-        #region GET_ATIVIDADES_DESTRA
         [HttpGet()]
         public async Task<IActionResult> GetDocumentosDestra(CancellationToken cancellationToken)
         {
@@ -210,9 +204,6 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 List<DocumentosDestra> listDocumentos = new List<DocumentosDestra>();
 
                 ListaDocumentosDestraModel listaModel = JsonSerializer.Deserialize<ListaDocumentosDestraModel>(jsonResponse);
-                //var listaAux = JsonSerializer.Deserialize<string[]>(jsonResponse);
-
-                //return Ok(listaAux);
 
                 if (listaModel != null)
                 {
@@ -222,16 +213,12 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 {
                     return BadRequest("Api de Documentos Destra vazia");
                 }
-
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-
-
         }
-        #endregion
 
         [HttpGet]
         public async Task<IActionResult> GetDocumentosProtheus(CancellationToken cancellationToken)
@@ -239,9 +226,9 @@ namespace Imetame.Documentacao.WebApi.Controllers
             try
             {
                 conn.Open();
-                var sql = @"SELECT UZI_CODIGO AS codigo,TRIM(UZI_DESC) as nome FROM UZI010 WHERE D_E_L_E_T_ = '';";                
+                var sql = @"SELECT UZI_CODIGO AS codigo,TRIM(UZI_DESC) as nome FROM UZI010 WHERE D_E_L_E_T_ = '';";
                 var documentos = (await this.conn.QueryAsync<DocumentosProtheus>(sql));
-               
+
                 return Ok(documentos);
             }
             catch (Exception ex)
@@ -249,8 +236,5 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 return StatusCode(500, "Internal Server Error: " + ex.Message);
             }
         }
-
-        
-
     }
 }
