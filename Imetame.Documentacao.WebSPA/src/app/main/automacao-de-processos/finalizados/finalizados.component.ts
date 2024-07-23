@@ -41,7 +41,7 @@ export class FinalizadosComponent {
 
   
 ngOnInit() {
-    this.watchProcessamentoId();
+    // this.watchProcessamentoId();
   }
 
 watchProcessamentoId() {
@@ -52,7 +52,7 @@ watchProcessamentoId() {
         if (idProcessamento) {
           this.finalizadosService.limparFinalizados();
 
-          this.finalizadosService.iniciarObservacaoFinalizados(idProcessamento);
+          // this.finalizadosService.iniciarObservacaoFinalizados(idProcessamento);
           this.finalizadosService.buscarEAdicionarResultados(idProcessamento)
             .then(() => {}).catch(error => {
               console.error('Erro ao atualizar finalizados:', error);

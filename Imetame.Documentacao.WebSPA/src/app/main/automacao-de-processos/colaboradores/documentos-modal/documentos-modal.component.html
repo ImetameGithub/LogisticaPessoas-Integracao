@@ -1,46 +1,57 @@
 <div class="chamada">
-    <span>{{documentos[0].NomeColaborador}}</span>
+    <div fxFlex="80">
+        <span>{{documentos[0].NomeColaborador}}</span>
+    </div>
+
+    <div fxFlex="20" style="color: white;">
+        <!-- <strong>Documentos Obrigatórios</strong>
+        <i (click)="getInfo()">
+            <mat-icon>cloud_upload</mat-icon>
+        </i> -->
+        <button (click)="getDocumentosObrigatorioStatus(documentos)" mat-button>
+            <mat-icon>warning</mat-icon>
+            <strong>Documentos Obrigatórios</strong>
+        </button>
+    </div>
+
 </div>
 
 <mat-grid-list cols="6" rowHeight="100px">
-    <mat-grid-tile [colspan]="colspanImg" [rowspan]="4">
+    <mat-dialog-content class="mat-typography">
+        <mat-grid-tile [colspan]="colspanImg" [rowspan]="4">
+            <div class="overflow-custom">
+                <div class="btnClose">
+                    <span class="closeImg" (click)="closeModal()">&times;</span>
+                </div>
+                <div class="wh-full img">
+                    <!-- <h1>asdsa</h1> -->
+                    <img [src]="imageSource" alt="Image Source">
+                    <form class="w-95-p" fxLayout="row wrap" fxLayoutAlign="space-between">
+                        <mat-form-field fxFlex="100" style="margin-left: 20px;" appearance="outline"
+                            [style.margin-top]="'10px'">
+                            <mat-label>Data de Vencimento</mat-label>
+                            <input formControlName="dtVencimento" matInput #inputData [matDatepicker]="dataPicker"
+                                [placeholder]="'DD/MM/YYYY'">
+                            <mat-datepicker-toggle matSuffix [for]="dataPicker"></mat-datepicker-toggle>
+                            <mat-datepicker #dataPicker></mat-datepicker>
+                            <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_outline:calendar'"></mat-icon>
+                        </mat-form-field>
 
-
-        <div class="overflow-custom">
-            <div class="btnClose">
-                <span class="closeImg" (click)="closeModal()">&times;</span>
+                        <mat-form-field style="margin-left: 20px;" fxFlex="100" appearance="outline">
+                            <input formControlName="arquivo" type="file" accept="image/png, image/jpeg" matInput>
+                        </mat-form-field>
+                    </form>
+                </div>
             </div>
-            <div class="wh-full img">
-                <!-- <h1>asdsa</h1> -->
-                <img [src]="imageSource" alt="Image Source">
-                <form class="w-95-p" fxLayout="row wrap" fxLayoutAlign="space-between">
-                    <mat-form-field fxFlex="100" style="margin-left: 20px;" appearance="outline"
-                        [style.margin-top]="'10px'">
-                        <mat-label>Data de Vencimento</mat-label>
-                        <input formControlName="dtVencimento" matInput #inputData [matDatepicker]="dataPicker"
-                            [placeholder]="'DD/MM/YYYY'">
-                        <mat-datepicker-toggle matSuffix [for]="dataPicker"></mat-datepicker-toggle>
-                        <mat-datepicker #dataPicker></mat-datepicker>
-                        <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_outline:calendar'"></mat-icon>
-                    </mat-form-field>
 
-                    <mat-form-field style="margin-left: 20px;" fxFlex="100" appearance="outline">
-                        <input formControlName="arquivo" type="file" accept="image/png, image/jpeg" matInput>
-                    </mat-form-field>
-                </form>
-            </div>
-        </div>
-
-    </mat-grid-tile>
-    <mat-grid-tile [colspan]="colspanDocs" [rowspan]="4">
-        <mat-dialog-content class="mat-typography">
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="colspanDocs" [rowspan]="4">
             <div class="modal">
                 <div class="modal-content">
                     <div class="document-grid">
                         <div *ngFor="let doc of documentos">
                             <div class="document-btn-envio-destra">
-                                <button (click)="enviarDocsParaDestra(doc)" mat-icon-button
-                                        [ngStyle]="{
+                                <button (click)="enviarDocsParaDestra(doc)" mat-icon-button [ngStyle]="{
                                             'color': (doc.SincronizadoDestra) ? 'inherit' : 'inherit'
                                         }">
                                     <mat-icon>cloud_upload</mat-icon>
@@ -48,8 +59,7 @@
                             </div>
                             <div class="document-box">
                                 <button matTooltip="{{doc.DescArquivo}}" mat-button mat-raised-button
-                                    (click)="docDetalhes(doc)"
-                                    [ngStyle]="{
+                                    (click)="docDetalhes(doc)" [ngStyle]="{
                                         'color': (doc.Vencido || doc.Vencer) ? 'red' : 'inherit',
                                         'font-weight': (doc.Vencido || doc.Vencer) ? 'bold' : 'normal',
                                         'border': (doc.Vencido || doc.Vencer) ? '1px solid red' : 'none'
@@ -64,9 +74,10 @@
                     </div>
                 </div>
             </div>
-        </mat-dialog-content>
 
-    </mat-grid-tile>
+
+        </mat-grid-tile>
+    </mat-dialog-content>
 </mat-grid-list>
 
 <mat-dialog-actions align="end" class="padding-border">

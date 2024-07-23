@@ -150,6 +150,11 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
         return this._httpClient.post<any>(environment.Colaboradores.EnviarDocumentoParaDestra, Documento, { headers });
     }
 
+    GetDocumentosObrigatorios(Documentos: DocumentoxColaboradorModel[]): Observable<any> {
+        const headers = new HttpHeaders().set('Content-Type', 'application/json');
+        return this._httpClient.post<DocumentoxColaboradorModel[]>(environment.Colaboradores.GetDocumentosObrigatorios, Documentos);
+    }
+
     GetColaboradoresPorOs(): Promise<ColaboradorModel> {
         return new Promise((resolve, reject) => {
             this.dataService.getList(`${environment.Colaboradores.GetColaboradoresPorOs}/${this.routeParams.processamento}`, {})
@@ -222,28 +227,28 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
         this.intervaloDeLogs = setInterval(carregarLogs, 5000)
     }
 
-    iniciarObservacaoFinalizados(idProcessamento: string, pageIndex: number = 0, pageSize: number = 50) {
-        const carregarFinalizados = () => {
-            this.buscarEAdicionarResultados(idProcessamento, pageIndex, pageSize).then((finalizados: any) => {
-                const finalizadosAtuais = this._finalizadosSource.getValue();
+    // iniciarObservacaoFinalizados(idProcessamento: string, pageIndex: number = 0, pageSize: number = 50) {
+    //     const carregarFinalizados = () => {
+    //         this.buscarEAdicionarResultados(idProcessamento, pageIndex, pageSize).then((finalizados: any) => {
+    //             const finalizadosAtuais = this._finalizadosSource.getValue();
 
-                const novosFinalizados = finalizados.data.filter((novoFinalizado: any) => {
-                    return !finalizadosAtuais.some((atual: any) => atual.id === novoFinalizado.id);
-                });
+    //             const novosFinalizados = finalizados.data.filter((novoFinalizado: any) => {
+    //                 return !finalizadosAtuais.some((atual: any) => atual.id === novoFinalizado.id);
+    //             });
 
-                if (novosFinalizados.length > 0) {
-                    const todosFinalizados = [...finalizadosAtuais, ...novosFinalizados];
-                    this._finalizadosSource.next(todosFinalizados);
-                }
+    //             if (novosFinalizados.length > 0) {
+    //                 const todosFinalizados = [...finalizadosAtuais, ...novosFinalizados];
+    //                 this._finalizadosSource.next(todosFinalizados);
+    //             }
 
-            }).catch((error) => {
-                console.error("Erro ao atualizar:", error);
-            });
-        };
+    //         }).catch((error) => {
+    //             console.error("Erro ao atualizar:", error);
+    //         });
+    //     };
 
-        carregarFinalizados();
-        this.intervaloDeFinalizados = setInterval(carregarFinalizados, 5000);
-    }
+    //     carregarFinalizados();
+    //     this.intervaloDeFinalizados = setInterval(carregarFinalizados, 5000);
+    // }
 
 
 

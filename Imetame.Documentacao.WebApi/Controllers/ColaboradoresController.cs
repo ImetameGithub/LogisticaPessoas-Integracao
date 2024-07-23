@@ -683,5 +683,85 @@ namespace Imetame.Documentacao.WebApi.Controllers
             }
         }
         #endregion
+
+
+
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> GetDocumentosObrigatorios(List<DocumentoxColaboradorModel> lista)
+        {
+            try
+            {
+                List<string> StatusDocumentoObrigatoriosDTO = new List<string>();
+
+                // Verifica se a lista está vazia ou não possui elementos
+                if (lista == null || lista.Count == 0)
+                {
+                    throw new ArgumentException("A lista de documentos do colaborador está vazia.");
+                }
+
+                Colaborador? colaboradorCadastrado = await _repColaborador.SelectContext().AsNoTracking()
+                    .Where(m => m.Matricula == lista[0].Matricula.Remove(0, 1))
+                    .Include(m => m.ColaboradorxAtividade)
+                        .ThenInclude(m => m.AtividadeEspecifica)
+                    .FirstOrDefaultAsync();
+
+                if (colaboradorCadastrado is null)
+                    throw new Exception("O colaborador " + lista[0].NomeColaborador + " não está relacionado a nenhuma atividade específica.");
+
+                // Armazena todos os documentos que a Destra solicita pelas atividades nas quais o colaborador foi atrelado 
+                List<DocumentosDestra> todosOsDocsDestra = new List<DocumentosDestra>();
+
+                // Busca todos os documentos que a Destra obriga ter para as atividades que o colaborador foi atrelado
+                foreach (var colaboradorAtividade in colaboradorCadastrado.ColaboradorxAtividade)
+                {
+                    var jsonResponse = await _destraController.GetDocumentosRequeridos(colaboradorAtividade.AtividadeEspecifica.IdDestra.ToString());
+
+                    ListaDocumentosDestraModel DocsPorAtividade = JsonSerializer.Deserialize<ListaDocumentosDestraModel>(jsonResponse);
+
+                    todosOsDocsDestra.AddRange(DocsPorAtividade.LISTA);
+                }
+
+                // Verifica a relação entre documentos da Destra e documentos do Protheus
+                List<Documento> relacaoDestraProtheus = new List<Documento>();
+
+                foreach (var docDestra in todosOsDocsDestra)
+                {
+                    Documento docRelacao = await _repDocumento.SelectContext()
+                        .Where(m => m.IdDestra == docDestra.codigo.ToString()) // Ajustado para usar IdDestra
+                        .FirstOrDefaultAsync();
+
+                    if (docRelacao == null)
+                    {
+                        StatusDocumentoObrigatoriosDTO.Add("O documento " + docDestra.nome + " não possui uma relação com nenhum documento do Protheus");
+                    }
+                    else
+                    {
+                        relacaoDestraProtheus.Add(docRelacao);
+                    }
+                }
+
+                // Verifica se o colaborador possui todos os documentos obrigatórios
+                foreach (var docRelacao in relacaoDestraProtheus)
+                {
+                    bool possuiDocumento = lista.Any(d => d.Codigo == docRelacao.IdProtheus);
+
+                    if (!possuiDocumento)
+                    {
+                        StatusDocumentoObrigatoriosDTO.Add("O colaborador não possui o documento " + docRelacao.DescricaoDestra + " na sua lista de documentos do Protheus");
+                    }
+                }
+
+                return Ok(StatusDocumentoObrigatoriosDTO);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocorreu um erro: " + ex.Message);
+            }
+        }
+
+
     }
 }

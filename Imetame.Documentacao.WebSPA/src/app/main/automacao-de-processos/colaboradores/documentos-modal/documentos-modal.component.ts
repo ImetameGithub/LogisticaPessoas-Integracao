@@ -9,6 +9,10 @@ import { FilesDataSource } from 'app/utils/files-data-source';
 import { Subject } from 'rxjs';
 import { AutomacaoDeProcessosService } from '../../automacao-de-processos.service';
 
+import { ColaboradorProtheusModel } from 'app/models/DTO/ColaboradorModel';
+import { FuseConfirmationService } from '@fuse/services/confirmation';
+
+
 @Component({
   selector: 'documentos-modal',
   templateUrl: './documentos-modal.component.html',
@@ -30,6 +34,7 @@ export class DocumentosModalComponent implements OnInit {
     public dialogRef: MatDialogRef<DocumentosModalComponent>,
     private titleService: Title,
     private _fuseProgressBarService: FuseProgressBarService,
+    private _fuseConfirmationService: FuseConfirmationService,
     public dialog: MatDialog,
     private _snackbar: MatSnackBar,
     private sanitizer: DomSanitizer,
@@ -38,7 +43,7 @@ export class DocumentosModalComponent implements OnInit {
     this.form = new FormGroup({
       dtVencimento: new FormControl(new Date, [Validators.required]),
       arquivo: new FormControl('', [Validators.required]),
-  });
+    });
   }
 
   ngOnInit(): void {
@@ -54,28 +59,28 @@ export class DocumentosModalComponent implements OnInit {
 
   }
 
-  enviarDocsParaDestra(documento: DocumentoxColaboradorModel){
+  enviarDocsParaDestra(documento: DocumentoxColaboradorModel) {
 
     this.service.EnviarDocumentoParaDestra(documento).subscribe(
       {
-          next: (response: DocumentoxColaboradorModel) => {
-              this._fuseProgressBarService.hide();
-              this.blockRequisicao = false;
-              this._snackbar.open("Item enviado para com sucesso", 'X', {
-                  duration: 2500,
-                  panelClass: 'snackbar-success',
-              })
-          },
-          error: (error) => {
-              this._fuseProgressBarService.hide();
-              this.blockRequisicao = false;
-              this._snackbar.open(error.error, 'X', {
-                  duration: 4000,
-                  panelClass: 'snackbar-error',
-              })
-          }
+        next: (response: DocumentoxColaboradorModel) => {
+          this._fuseProgressBarService.hide();
+          this.blockRequisicao = false;
+          this._snackbar.open("Item enviado para com sucesso", 'X', {
+            duration: 2500,
+            panelClass: 'snackbar-success',
+          })
+        },
+        error: (error) => {
+          this._fuseProgressBarService.hide();
+          this.blockRequisicao = false;
+          this._snackbar.open(error.error, 'X', {
+            duration: 4000,
+            panelClass: 'snackbar-error',
+          })
+        }
       }
-  )  
+    )
 
   }
 
@@ -91,4 +96,57 @@ export class DocumentosModalComponent implements OnInit {
     this.colspanDocs = 6
     this.colspanImg = 0
   }
+
+  getDocumentosObrigatorioStatus(documentos: DocumentoxColaboradorModel[]) {
+    this.service.GetDocumentosObrigatorios(documentos).subscribe(
+      {
+        next: (response: string[]) => { // Ajustado o tipo de resposta para string[]
+          this._fuseProgressBarService.hide();
+          this.blockRequisicao = false;
+  
+          // Construir o corpo da mensagem dinamicamente
+          let body = `
+          <div>
+              <ul class="custom-list">`;
+        response.forEach(item => {
+          body += `<li><b>${item}</b></li>`;
+        });
+        body += `</ul>
+          </div>`;
+  
+          // Abrir o modal com a mensagem dinâmica
+          this._fuseConfirmationService.open({
+            title: "Documentos Obrigatórios",
+            message: body,
+            icon: {
+              show: false,
+              name: "warning",
+              color: "primary"
+            },
+            actions: {
+              confirm: {
+                show: true,
+                label: "Fechar",
+                color: "primary"
+              },
+              cancel: {
+                show: false,
+                label: "Confirmar"
+              }
+            },
+            dismissible: false
+          });
+        },
+        error: (error) => {
+          this._fuseProgressBarService.hide();
+          this.blockRequisicao = false;
+          this._snackbar.open(error.error, 'X', {
+            duration: 4000,
+            panelClass: 'snackbar-error',
+          });
+        }
+      }
+    );
+  }
+  
 }

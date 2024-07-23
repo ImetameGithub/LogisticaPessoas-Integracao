@@ -5,7 +5,7 @@
     padding: 25px;
 }
 
-.myDialog .mat-dialog-container  {
+.myDialog .mat-dialog-container {
     padding: 0;
 }
 
@@ -20,21 +20,23 @@
     background-color: #00984a !important;
 }
 
-.btn-success{
-    background-color: rgb(22, 163, 74); 
+.btn-success {
+    background-color: rgb(22, 163, 74);
     color: white;
 }
 
-.btn-danger{
-    background-color: rgb(157, 27, 27); 
+.btn-danger {
+    background-color: rgb(157, 27, 27);
     color: white;
 }
 
 /* Aplica estilo ao contêiner que envolve o ícone para usar flexbox */
 .icon-container {
     display: flex;
-    justify-content: center; /* Alinha horizontalmente ao centro */
-    align-items: center; /* Alinha verticalmente ao centro */
+    justify-content: center;
+    /* Alinha horizontalmente ao centro */
+    align-items: center;
+    /* Alinha verticalmente ao centro */
     background-color: bisque;
     padding: 15px;
     border-radius: 40px;
@@ -44,7 +46,8 @@
    aplique esses estilos diretamente ao contêiner da caixa de diálogo. */
 .dialog-container {
     display: flex;
-    flex-direction: column; /* Para garantir que os itens sejam alinhados verticalmente */
+    flex-direction: column;
+    /* Para garantir que os itens sejam alinhados verticalmente */
     justify-content: center;
     align-items: center;
 }
@@ -57,13 +60,16 @@
     font-size: 50px;
 }
 
-.btnConfirm{
+.btnConfirm {
     margin-right: 5px;
     margin-left: 10px;
 }
 
-.btnCancel{
-   background-color: lightsteelblue !important;
+.btnCancel {
+    background-color: lightsteelblue !important;
 }
 
 
+.custom-list {
+    text-align: left;
+}
