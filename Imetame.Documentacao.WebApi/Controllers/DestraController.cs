@@ -3,6 +3,8 @@ using Imetame.Documentacao.CrossCutting.Services.Destra.Models;
 using Imetame.Documentacao.Domain.Entities;
 using Imetame.Documentacao.Domain.Models;
 using Imetame.Documentacao.Domain.Repositories;
+using Imetame.Documentacao.Infra.Data.Migrations;
+using Irony.Parsing;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
@@ -229,6 +231,31 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 return NotFound(ex);
             }
         }
-    
+        [HttpPost]
+        public async Task<HttpResponseMessage> EnviarDocumentoParaApiDoCliente(DocumentoDestra documento, string NomeDoc)
+        {
+            using (var client = new HttpClient())
+            {
+                string endPoint = $"https://api.destra.armata.cloud/homolog/api/v1/service/docto/funcionario?=";
+                var form = new MultipartFormDataContent();
+
+                AuthResponse response = await Login();
+
+                form.Add(new StringContent(documento.cpf), "cpf");
+                form.Add(new StringContent(documento.idDocto.ToString()), "idDocto");
+                form.Add(new StringContent(documento.validade), "validade");
+
+                var arquivoContent = new ByteArrayContent(documento.arquivo);
+                arquivoContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+                form.Add(arquivoContent, "arquivo", NomeDoc);
+
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer",response.Token);
+
+                var result = await client.PostAsync(endPoint, form);
+
+                return result;
+            }
+        }
+
     }
 }

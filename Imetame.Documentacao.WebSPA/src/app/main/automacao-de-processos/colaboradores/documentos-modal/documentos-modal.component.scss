@@ -112,6 +112,25 @@
   padding: 0 10px;
 }
 
+.dflex{
+  display: flex;
+}
+
+.docs-obrigatorios {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 15px 5px;
+}
+
+.docs-obrigatorios-icon {
+  margin-right: 8px;
+}
+
+.docs-obrigatorios-text {
+  font-weight: bold;
+}
+
 
 
 

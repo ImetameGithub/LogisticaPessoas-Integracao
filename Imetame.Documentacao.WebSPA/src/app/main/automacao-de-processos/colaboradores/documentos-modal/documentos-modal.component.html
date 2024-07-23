@@ -1,17 +1,23 @@
 <div class="chamada">
-    <div fxFlex="80">
+    <div fxFlex="75" fxLayout="row" fxLayoutAlign="start center">
         <span>{{documentos[0].NomeColaborador}}</span>
     </div>
 
-    <div fxFlex="20" style="color: white;">
-        <!-- <strong>Documentos Obrigatórios</strong>
-        <i (click)="getInfo()">
-            <mat-icon>cloud_upload</mat-icon>
-        </i> -->
-        <button (click)="getDocumentosObrigatorioStatus(documentos)" mat-button>
-            <mat-icon>warning</mat-icon>
-            <strong>Documentos Obrigatórios</strong>
-        </button>
+    <div fxFlex="25" style="color: white;">
+        <div *ngIf="StatusDocumentoObrigatoriosModel.length > 0" (click)="openDocsObrigatorio()"
+            class="docs-obrigatorios" fxLayout="row" fxLayoutAlign="start center" aria-label="Documentos Obrigatórios">
+            <div class="docs-obrigatorios-icon">
+                <mat-icon>warning</mat-icon>
+            </div>
+            <span class="docs-obrigatorios-text">Documentos Obrigatórios</span>
+        </div>
+
+        <!-- <div *ngIf="StatusDocumentoObrigatoriosModel.length == 0" fxLayout="row" fxLayoutAlign="start center">
+            <div style="padding: 15px 5px;">
+                <mat-icon>done_outline</mat-icon>
+            </div>
+            <h3><strong>Todos os documentos estão relacionados</strong></h3>
+        </div> -->
     </div>
 
 </div>
@@ -49,10 +55,10 @@
             <div class="modal">
                 <div class="modal-content">
                     <div class="document-grid">
-                        <div *ngFor="let doc of documentos">
+                        <div *ngFor="let doc of documentos, let i = index">
                             <div class="document-btn-envio-destra">
-                                <button (click)="enviarDocsParaDestra(doc)" mat-icon-button [ngStyle]="{
-                                            'color': (doc.SincronizadoDestra) ? 'inherit' : 'inherit'
+                                <button (click)="enviarDocsParaDestra(doc,i)" mat-icon-button [ngStyle]="{
+                                            'color': (doc.SincronizadoDestra) ? 'green' : 'red'
                                         }">
                                     <mat-icon>cloud_upload</mat-icon>
                                 </button>
@@ -65,7 +71,8 @@
                                         'border': (doc.Vencido || doc.Vencer) ? '1px solid red' : 'none'
                                     }">
                                     {{ doc.DescArquivo }}
-                                    <h4 *ngIf="doc.Vencido">Vencido</h4>
+                                    <h4 *ngIf="doc.Vencido">Vencido - {{doc.DtVencimentoFormatada | date:"dd/MM/yyyy"}}
+                                    </h4>
                                     <h4 *ngIf="doc.Vencer">A vencer - {{doc.DtVencimentoFormatada | date:"dd/MM/yyyy"}}
                                     </h4>
                                 </button>

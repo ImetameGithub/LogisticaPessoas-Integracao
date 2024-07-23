@@ -29,8 +29,13 @@
 
                 <!-- Title -->
                 <ng-container *ngIf="data.title">
-                    <h2 class="text-xl leading-6 font-medium " [innerHTML]="data.title"></h2>
+                    <div class="chamada">
+                            <span [innerHTML]="data.title"></span>
+                    </div>
                 </ng-container>
+                <!-- <ng-container *ngIf="data.title">
+                    <h2 class="text-xl leading-6 font-medium chamada" [innerHTML]="data.title"></h2>
+                </ng-container> -->
 
                 <!-- Message -->
                 <ng-container *ngIf="data.message">

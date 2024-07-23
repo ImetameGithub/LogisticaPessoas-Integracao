@@ -11,6 +11,7 @@ import { AutomacaoDeProcessosService } from '../../automacao-de-processos.servic
 
 import { ColaboradorProtheusModel } from 'app/models/DTO/ColaboradorModel';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
+import { StatusDocumentoObrigatoriosModel } from 'app/models/DTO/StatusDocumentoObrigatoriosModel';
 
 
 @Component({
@@ -28,6 +29,8 @@ export class DocumentosModalComponent implements OnInit {
   colspanImg: number = 0
 
   blockRequisicao: boolean = false;
+
+  StatusDocumentoObrigatoriosModel: StatusDocumentoObrigatoriosModel[] = []
 
   constructor(
     public service: AutomacaoDeProcessosService,
@@ -53,19 +56,38 @@ export class DocumentosModalComponent implements OnInit {
       {
         next: (response: DocumentoxColaboradorModel[]) => {
           this.documentos = response;
+          this.getDocumentosObrigatorioStatus(this.documentos);
         },
         error: (error) => { console.log(error.error) }
       });
 
   }
 
-  enviarDocsParaDestra(documento: DocumentoxColaboradorModel) {
+  enviarDocsParaDestra(documento: DocumentoxColaboradorModel, index: any) {
+
+    if(documento.SincronizadoDestra){
+      this._snackbar.open("O documento já foi enviado para Destra", 'X', {
+        duration: 2500,
+        panelClass: 'snackbar-error',
+      })
+      return
+    }
+
+    if(documento.Vencer || documento.Vencido){
+      this._snackbar.open("Atualize a data de vencimento e tente novamente", 'X', {
+        duration: 2500,
+        panelClass: 'snackbar-error',
+      })
+      return
+    }
 
     this.service.EnviarDocumentoParaDestra(documento).subscribe(
       {
         next: (response: DocumentoxColaboradorModel) => {
           this._fuseProgressBarService.hide();
           this.blockRequisicao = false;
+          this.documentos[index] = { ...response};
+          
           this._snackbar.open("Item enviado para com sucesso", 'X', {
             duration: 2500,
             panelClass: 'snackbar-success',
@@ -100,42 +122,11 @@ export class DocumentosModalComponent implements OnInit {
   getDocumentosObrigatorioStatus(documentos: DocumentoxColaboradorModel[]) {
     this.service.GetDocumentosObrigatorios(documentos).subscribe(
       {
-        next: (response: string[]) => { // Ajustado o tipo de resposta para string[]
+        next: (response: StatusDocumentoObrigatoriosModel[]) => {
           this._fuseProgressBarService.hide();
           this.blockRequisicao = false;
-  
-          // Construir o corpo da mensagem dinamicamente
-          let body = `
-          <div>
-              <ul class="custom-list">`;
-        response.forEach(item => {
-          body += `<li><b>${item}</b></li>`;
-        });
-        body += `</ul>
-          </div>`;
-  
-          // Abrir o modal com a mensagem dinâmica
-          this._fuseConfirmationService.open({
-            title: "Documentos Obrigatórios",
-            message: body,
-            icon: {
-              show: false,
-              name: "warning",
-              color: "primary"
-            },
-            actions: {
-              confirm: {
-                show: true,
-                label: "Fechar",
-                color: "primary"
-              },
-              cancel: {
-                show: false,
-                label: "Confirmar"
-              }
-            },
-            dismissible: false
-          });
+          this.StatusDocumentoObrigatoriosModel = response;
+
         },
         error: (error) => {
           this._fuseProgressBarService.hide();
@@ -148,5 +139,57 @@ export class DocumentosModalComponent implements OnInit {
       }
     );
   }
-  
+
+  openDocsObrigatorio() {
+
+    // Construir o corpo da mensagem dinamicamente
+    let body = `
+     <div>
+         <table class="table">
+           <thead>
+             <tr>
+               <th class="tableList">Documento Destra</th>
+               <th class="tableList">Documento Protheus</th>
+               <th class="tableList">Status</th>
+             </tr>
+           </thead>
+           <tbody>`;
+    this.StatusDocumentoObrigatoriosModel.forEach(item => {
+      body += `
+             <tr>
+               <td class="tableList break-word">${item.DocDestra}</td>
+               <td class="tableList break-word">${item.DocProtheus}</td>
+               <td class="tableList">${item.Status}</td>
+             </tr>`;
+    });
+    body += `
+           </tbody>
+         </table>
+     </div>`;
+
+    // Abrir o modal com a mensagem dinâmica
+    this._fuseConfirmationService.open({
+      title: "Documentos Obrigatórios",
+      message: body,
+      icon: {
+        show: false,
+        name: "warning",
+        color: "primary"
+      },
+      actions: {
+        confirm: {
+          show: true,
+          label: "Fechar",
+          color: "primary"
+        },
+        cancel: {
+          show: false,
+          label: "Confirmar"
+        }
+      },
+      dismissible: false
+    });
+  }
+
+
 }

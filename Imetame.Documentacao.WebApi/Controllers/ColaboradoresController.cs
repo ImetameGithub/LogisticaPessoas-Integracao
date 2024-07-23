@@ -425,40 +425,40 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 var documentos = (await conn.QueryAsync<DocumentoxColaboradorModel>(sql, new { Matricula = matricula })).ToList();
 
-                // Convertendo bytes para Base64
-                documentos.ForEach(doc =>
+
+                foreach (DocumentoxColaboradorModel item in documentos)
                 {
-                    if (doc.Bytes != null)
+                    if (item.Bytes != null)
                     {
-                        doc.Base64 = $"data:image/png;base64,{Convert.ToBase64String(doc.Bytes)}";
+                        item.Base64 = $"data:image/png;base64,{Convert.ToBase64String(item.Bytes)}";
                     }
-                });
 
-                DateTime dataAtual = DateTime.Now;
+                    DocumentoxColaborador? docRelacao = await _repDocxColaborador.SelectContext().AsNoTracking().Where(m => m.DXC_CODPROTHEUS == item.Codigo).FirstOrDefaultAsync();
 
-                foreach (DocumentoxColaboradorModel item in documentos.Where(m => m.DtVencimento.Trim() != ""))
-                {
-                    //DateTime dtVencimento = Convert.ToDateTime(item.DtVencimento);
-                    item.DtVencimentoFormatada = DateTime.ParseExact(item.DtVencimento, "yyyyMMdd", CultureInfo.InvariantCulture);
-
-                    Documento? docRelacao = await _repDocumento.SelectContext().AsNoTracking().Where(m => m.IdProtheus == item.Codigo).FirstOrDefaultAsync();
-
-                    if (docRelacao is null)
+                    if (docRelacao is not null)
                     {
                         item.SincronizadoDestra = true;
                     }
+                }
 
+
+                DateTime dataAtual = DateTime.Now;
+
+                foreach (DocumentoxColaboradorModel vencidos in documentos.Where(m => m.DtVencimento.Trim() != ""))
+                {
+                    //DateTime dtVencimento = Convert.ToDateTime(item.DtVencimento);
+                    vencidos.DtVencimentoFormatada = DateTime.ParseExact(vencidos.DtVencimento, "yyyyMMdd", CultureInfo.InvariantCulture);               
 
                     // Verificar se o documento está prestes a vencer em 10 dias - Matheus Monfreides
-                    if (item.DtVencimentoFormatada <= dataAtual.AddDays(10) && item.DtVencimentoFormatada > dataAtual)
+                    if (vencidos.DtVencimentoFormatada <= dataAtual.AddDays(10) && vencidos.DtVencimentoFormatada > dataAtual)
                     {
-                        item.Vencer = true;
+                        vencidos.Vencer = true;
                     }
 
                     // Verificar se o documento já está vencido - Matheus Monfreides
-                    if (item.DtVencimentoFormatada <= dataAtual)
+                    if (vencidos.DtVencimentoFormatada <= dataAtual)
                     {
-                        item.Vencido = true;
+                        vencidos.Vencido = true;
                     }
                 }
 
@@ -585,27 +585,31 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 {
                     idDocto = docRelacao.IdDestra,
                     cpf = colaboradorCadastrado.Cpf,
-                    arquivo = documento.Base64,
-                    //arquivo = documento.Bytes,
+                    arquivo = documento.Bytes,
                     validade = DateTime.Now.AddYears(1).ToString("yyyy-MM-dd"),
-                    //validade = documento.DtVencimento,
                 };
 
-                var jsonResponse = await _destraController.AddDocumento(itemDestra) as OkObjectResult;
-
-                DocumentoxColaborador item = new DocumentoxColaborador
+                var jsonResponse = await _destraController.EnviarDocumentoParaApiDoCliente(itemDestra, documento.DescArquivo.Trim() + ".pdf");
+                if (jsonResponse.IsSuccessStatusCode)
                 {
-                    DXC_CODPROTHEUS = documento.Codigo,
-                    DXC_DESCPROTHEUS = documento.DescArquivo,
-                    DXC_CODDESTRA = docRelacao.IdDestra,
-                    DXC_DESCDESTRA = docRelacao.DescricaoDestra,
-                    DXC_IDCOLABORADOR = colaboradorCadastrado.Id,
-                    DXC_BASE64 = documento.Base64
-                };
+                    documento.SincronizadoDestra = true;
 
-                //await _repDocxColaborador.SaveAsync(item);
+                    DocumentoxColaborador item = new DocumentoxColaborador
+                    {
+                        Id = new Guid(),
+                        DXC_CODPROTHEUS = documento.Codigo,
+                        DXC_DESCPROTHEUS = documento.DescArquivo,
+                        DXC_CODDESTRA = docRelacao.IdDestra,
+                        DXC_DESCDESTRA = docRelacao.DescricaoDestra,
+                        DXC_IDCOLABORADOR = colaboradorCadastrado.Id,
+                        DXC_BASE64 = documento.Base64
+                    };
 
-                return Ok();
+                    await _repDocxColaborador.SaveAsync(item);
+                }
+
+
+                return Ok(documento);
             }
             catch (Exception ex)
             {
@@ -694,7 +698,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
         {
             try
             {
-                List<string> StatusDocumentoObrigatoriosDTO = new List<string>();
+                List<StatusDocumentoObrigatoriosModel> StatusDocumentoObrigatoriosDTO = new List<StatusDocumentoObrigatoriosModel>();
 
                 // Verifica se a lista está vazia ou não possui elementos
                 if (lista == null || lista.Count == 0)
@@ -735,7 +739,17 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                     if (docRelacao == null)
                     {
-                        StatusDocumentoObrigatoriosDTO.Add("O documento " + docDestra.nome + " não possui uma relação com nenhum documento do Protheus");
+                        //StatusDocumentoObrigatoriosDTO.Add("O documento " + docDestra.nome + " não possui uma relação com nenhum documento do Protheus");
+
+                        StatusDocumentoObrigatoriosDTO.Add(
+                          new StatusDocumentoObrigatoriosModel
+                          {
+                              DocDestra = docDestra.nome,
+                              DocProtheus = "-",
+                              Status = "-"
+
+                          }
+                        );
                     }
                     else
                     {
@@ -750,7 +764,16 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                     if (!possuiDocumento)
                     {
-                        StatusDocumentoObrigatoriosDTO.Add("O colaborador não possui o documento " + docRelacao.DescricaoDestra + " na sua lista de documentos do Protheus");
+                        //StatusDocumentoObrigatoriosDTO.Add("O colaborador não possui o documento " + docRelacao.DescricaoDestra + " na sua lista de documentos do Protheus");
+
+                        StatusDocumentoObrigatoriosDTO.Add(
+                        new StatusDocumentoObrigatoriosModel
+                        {
+                            DocDestra = docRelacao.DescricaoDestra,
+                            DocProtheus = docRelacao.DescricaoProtheus,
+                            Status = "Pendente"
+                        }
+                      );
                     }
                 }
 
