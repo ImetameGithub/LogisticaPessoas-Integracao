@@ -399,7 +399,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                             SRA.RA_NOME AS NomeColaborador,
                             SRA.RA_MAT AS Matricula,
                             UZJ.UZJ_DOC AS NomeArquivo,
-                            UZJ.UZJ_IMG AS Bytes
+                            UZJ.R_E_C_N_O_ AS Recno
                         FROM 
                             DADOSADV..UZJ010 UZJ
                             INNER JOIN DADOSADV..UZI010 UZI 
@@ -428,10 +428,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 foreach (DocumentoxColaboradorModel item in documentos)
                 {
-                    if (item.Bytes != null)
-                    {
-                        item.Base64 = $"data:image/png;base64,{Convert.ToBase64String(item.Bytes)}";
-                    }
+                    //if (item.Bytes != null)
+                    //{
+                    //    item.Base64 = $"data:image/png;base64,{Convert.ToBase64String(item.Bytes)}";
+                    //}
 
                     DocumentoxColaborador? docRelacao = await _repDocxColaborador.SelectContext().AsNoTracking().Where(m => m.DXC_CODPROTHEUS == item.Codigo).FirstOrDefaultAsync();
 
@@ -464,6 +464,33 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 }
 
                 return Ok(documentos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal Server Error: " + ex.Message);
+            }
+        }
+
+        [HttpGet("{recno}")]
+        public async Task<IActionResult> GetImagemProtheus(string recno, CancellationToken cancellationToken)
+        {
+            try
+            {
+                conn.Open();
+                var sql = @"SELECT UZJ_IMG as Bytes FROM UZJ010 WHERE R_E_C_N_O_ =  @Recno";
+
+                var imagens = (await conn.QueryAsync<byte[]>(sql, new { Recno = recno })).ToList();
+
+                string imagem = "";
+                foreach (byte[] item in imagens)
+                {
+                    if (item != null)
+                    {
+                       imagem = $"data:image/png;base64,{Convert.ToBase64String(item)}";
+                    }                    
+                }
+                                
+                return Ok(imagem);
             }
             catch (Exception ex)
             {
