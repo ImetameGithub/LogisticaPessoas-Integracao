@@ -11,6 +11,7 @@ export class DocumentoxColaboradorModel{
     Base64: string;
     Vencido: boolean;
     Vencer: boolean;
+    DiasVencer: number;
     SincronizadoDestra: boolean;
     ImageSource;
 }

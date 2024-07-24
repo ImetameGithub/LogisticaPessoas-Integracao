@@ -114,9 +114,7 @@ export class DocumentosModalComponent implements OnInit {
   }
 
   closeModal() {
-    // this.dialogRef.close();
-    this.colspanDocs = 6
-    this.colspanImg = 0
+    this.visualizarImagem = false;
   }
 
   getDocumentosObrigatorioStatus(documentos: DocumentoxColaboradorModel[]) {

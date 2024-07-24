@@ -25,5 +25,7 @@ namespace Imetame.Documentacao.Domain.Models
         // REGRAS PARA VALIDAÇÃO DE DOCUMENTOS 
         public bool Vencido { get; set; } = false;
         public bool Vencer { get; set; } = false;
+        public int DiasVencer { get; set; }
+
     }
 }

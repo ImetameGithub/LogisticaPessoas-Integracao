@@ -22,7 +22,71 @@
 
 </div>
 
-<mat-grid-list cols="6" rowHeight="100px">
+<mat-dialog-content class="mat-typography">
+    <div *ngIf="visualizarImagem" fxFlex="40">
+        <div class="overflow-custom">
+            <div class="btnClose">
+                <span class="closeImg" (click)="closeModal()">&times;</span>
+            </div>
+            <div class="wh-full img">
+                <img [src]="imageSource" alt="Image Source">
+                <form class="w-95-p" fxLayout="row wrap" fxLayoutAlign="space-between">
+                    <mat-form-field fxFlex="100" style="margin-left: 20px;" appearance="outline"
+                        [style.margin-top]="'10px'">
+                        <mat-label>Data de Vencimento</mat-label>
+                        <input formControlName="dtVencimento" matInput #inputData [matDatepicker]="dataPicker"
+                            [placeholder]="'DD/MM/YYYY'">
+                        <mat-datepicker-toggle matSuffix [for]="dataPicker"></mat-datepicker-toggle>
+                        <mat-datepicker #dataPicker></mat-datepicker>
+                        <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_outline:calendar'"></mat-icon>
+                    </mat-form-field>
+
+                    <mat-form-field style="margin-left: 20px;" fxFlex="100" appearance="outline">
+                        <input formControlName="arquivo" type="file" accept="image/png, image/jpeg" matInput>
+                    </mat-form-field>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div fxFlex="100">
+        <div class="modal">
+            <div class="modal-content">
+                <div class="document-grid">
+                    <div *ngFor="let doc of documentos, let i = index">
+                        <div class="document-btn-envio-destra">
+                            <button (click)="enviarDocsParaDestra(doc,i)" mat-icon-button [ngStyle]="{
+                                        'color': (doc.SincronizadoDestra) ? 'green' : 'red'
+                                    }">
+                                <mat-icon>cloud_upload</mat-icon>
+                            </button>
+                        </div>
+                        <div class="document-box">
+                            <button matTooltip="{{doc.DescArquivo}}" mat-button mat-raised-button
+                                (click)="docDetalhes(doc)" 
+                                [ngClass]="{
+                                    'vencidoXVencer': doc.Vencido || doc.Vencer,            
+                                    'sincronizado-destra': doc.SincronizadoDestra
+                                }">
+                                {{ doc.DescArquivo }}
+                                <h4 *ngIf="doc.Vencido">
+                                    Vencido - {{ doc.DtVencimentoFormatada | date:'dd/MM/yyyy' }}
+                                </h4>
+                                <h4 *ngIf="doc.Vencer">
+                                    A vencer - {{ doc.DtVencimentoFormatada | date:'dd/MM/yyyy' }} <br> {{doc.DiasVencer}} Dias
+                                </h4>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</mat-dialog-content>
+
+
+
+
+<!-- <mat-grid-list cols="6" rowHeight="100px">
     <mat-dialog-content class="mat-typography">
         <mat-grid-tile [colspan]="colspanImg" [rowspan]="4">
             <div class="overflow-custom">
@@ -30,7 +94,6 @@
                     <span class="closeImg" (click)="closeModal()">&times;</span>
                 </div>
                 <div class="wh-full img">
-                    <!-- <h1>asdsa</h1> -->
                     <img [src]="imageSource" alt="Image Source">
                     <form class="w-95-p" fxLayout="row wrap" fxLayoutAlign="space-between">
                         <mat-form-field fxFlex="100" style="margin-left: 20px;" appearance="outline"
@@ -52,40 +115,12 @@
 
         </mat-grid-tile>
         <mat-grid-tile [colspan]="colspanDocs" [rowspan]="4">
-            <div class="modal">
-                <div class="modal-content">
-                    <div class="document-grid">
-                        <div *ngFor="let doc of documentos, let i = index">
-                            <div class="document-btn-envio-destra">
-                                <button (click)="enviarDocsParaDestra(doc,i)" mat-icon-button [ngStyle]="{
-                                            'color': (doc.SincronizadoDestra) ? 'green' : 'red'
-                                        }">
-                                    <mat-icon>cloud_upload</mat-icon>
-                                </button>
-                            </div>
-                            <div class="document-box">
-                                <button matTooltip="{{doc.DescArquivo}}" mat-button mat-raised-button
-                                    (click)="docDetalhes(doc)" [ngStyle]="{
-                                        'color': (doc.Vencido || doc.Vencer) ? 'red' : 'inherit',
-                                        'font-weight': (doc.Vencido || doc.Vencer) ? 'bold' : 'normal',
-                                        'border': (doc.Vencido || doc.Vencer) ? '1px solid red' : 'none'
-                                    }">
-                                    {{ doc.DescArquivo }}
-                                    <h4 *ngIf="doc.Vencido">Vencido - {{doc.DtVencimentoFormatada | date:"dd/MM/yyyy"}}
-                                    </h4>
-                                    <h4 *ngIf="doc.Vencer">A vencer - {{doc.DtVencimentoFormatada | date:"dd/MM/yyyy"}}
-                                    </h4>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
 
 
         </mat-grid-tile>
     </mat-dialog-content>
-</mat-grid-list>
+</mat-grid-list> -->
 
 <mat-dialog-actions align="end" class="padding-border">
     <button class="btn-fechar" mat-button mat-dialog-close>Fechar</button>

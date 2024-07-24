@@ -453,6 +453,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                     if (vencidos.DtVencimentoFormatada <= dataAtual.AddDays(10) && vencidos.DtVencimentoFormatada > dataAtual)
                     {
                         vencidos.Vencer = true;
+                        vencidos.DiasVencer = (vencidos.DtVencimentoFormatada - dataAtual).Days;
                     }
 
                     // Verificar se o documento já está vencido - Matheus Monfreides

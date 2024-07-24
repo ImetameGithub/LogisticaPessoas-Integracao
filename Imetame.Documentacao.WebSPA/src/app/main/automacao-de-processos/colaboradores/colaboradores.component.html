@@ -119,10 +119,13 @@
 
                         <ng-container matColumnDef="documento">
                             <mat-header-cell *matHeaderCellDef></mat-header-cell>
-                            <mat-cell  *matCellDef="let item; let i = index">
-                                <button mat-raised-button style="background-color: darkgray; color: white;" (click)="getDocumentosProtheus(item.NumCad)">
-                                    Visualizar Documento
-                                </button>
+                            <mat-cell *matCellDef="let item; let i = index">
+                                <div>
+                                    <button mat-button style="background-color: darkgray; color: white;" (click)="getDocumentosProtheus(item.NumCad)">
+                                        Visualizar Documento
+                                    </button>
+                                </div>
+                               
                             </mat-cell>
                         </ng-container>
 

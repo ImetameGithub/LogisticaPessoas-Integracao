@@ -46,22 +46,40 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 50px;
+  padding: 10px;
 }
 
 .document-box button {
-  width: 175px;
+  width: 190px;
   height: 75px;
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: center;
-  white-space: nowrap;
+  white-space: normal; /* Permitir quebras de linha */
   padding: 10px;
   box-sizing: border-box;
-  h4{
-    color: red;
-    font-weight: bold;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.document-box button h4 {
+  color: red;
+  font-weight: bold;
+  margin: 0; /* Remover margens padrão */
+}
+
+.vencidoXVencer {
+  color: red !important;
+  font-weight: bold;
+  border: 3px solid red !important;
+}
+
+.sincronizado-destra {
+  color: green !important;
+  font-weight: bold;
+  border: 3px solid green !important;
 }
 
 .document-btn-envio-destra {
@@ -73,7 +91,6 @@
 .overflow-custom{
   overflow: hidden;
   overflow-y: auto;
-  height: 100%;
 }
 .h-full{
   height: 100%;
@@ -84,7 +101,8 @@
 }
 .wh-full{
   width: 100% !important;
-  height: 100% !important
+  height: 100% !important;
+  padding: 10px;
 }
 
 .btn-fechar {
@@ -107,6 +125,7 @@
 .btnClose{
   display: flex;
   width: 100% !important;
+  padding: 10px !important;
   justify-content: end;
   align-items: center;
   padding: 0 10px;
@@ -129,6 +148,24 @@
 
 .docs-obrigatorios-text {
   font-weight: bold;
+}
+
+.vencido {
+  color: red;
+  font-weight: bold;
+  border: 1px solid red;
+}
+
+.a-vencer {
+  color: red;
+  font-weight: bold;
+  border: 1px solid red;
+}
+
+.sincronizado-destra {
+  color: green;
+  font-weight: bold;
+  border: 1px solid green;
 }
 
 
