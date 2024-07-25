@@ -50,8 +50,8 @@
 }
 
 .document-box button {
-  width: 190px;
-  height: 75px;
+  width: 200px;
+  height: 90px;
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: center;
@@ -64,7 +64,7 @@
   justify-content: center;
 }
 
-.document-box button h4 {
+.btnH4 {
   color: red;
   font-weight: bold;
   margin: 0; /* Remover margens padrão */
@@ -83,7 +83,7 @@
 }
 
 .document-btn-envio-destra {
-  width: 175px;
+  width: 200px;
   height: 45px;
   text-align: end;
   padding: 10px;

@@ -16,11 +16,9 @@ namespace Imetame.Documentacao.Domain.Models
         public string NomeColaborador { get; set; }
         public string Matricula { get; set; }
         public string NomeArquivo { get; set; }
-        public byte[] Bytes { get; set; } // Alterado de string para byte[]
-        public string Base64 { get; set; } // Adicionado campo para armazenar a versão em base64
         public string Recno { get; set; } // Adicionado campo para armazenar a versão em base64
-
         public bool SincronizadoDestra { get; set; } = false;
+        public string ConcatAtividades { get; set; } = "";
 
 
 

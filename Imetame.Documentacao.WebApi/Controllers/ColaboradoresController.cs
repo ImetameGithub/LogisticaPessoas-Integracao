@@ -201,16 +201,23 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 var lista = (await this.conn.QueryAsync<ColaboradorModel>(sql, new { Oss = processamento.Oss }));
 
-                List<Colaborador> itensCadastrados = _repColaborador.SelectContext()
-                 .AsNoTracking()
-                 .ToList();
-
                 foreach (var item in lista)
                 {
-                    bool existeCadastro = itensCadastrados.Where(m => m.Matricula == item.NumCad).Any();
+                    Colaborador? colaboradorCad = await _repColaborador.SelectContext().AsNoTracking()
+                         .Where(m => m.Matricula == item.NumCad)
+                         .Include(m => m.ColaboradorxAtividade)
+                             .ThenInclude(m => m.AtividadeEspecifica)
+                         .FirstOrDefaultAsync();
 
-                    if (existeCadastro)
+                    item.SincronizadoDestra = false;
+                    if (colaboradorCad is not null)
                     {
+                        //var nomeAtividades = colaboradorCad.ColaboradorxAtividade.Select(m => m.AtividadeEspecifica.Descricao).ToList();
+                        //string listaDeNomes = string.Join(", ", nomeAtividades);
+
+                        //item.ConcatAtividades = listaDeNomes;
+
+                        // SE O COLABORADOR NÃO FOR SINCRONIZADO PARA DESTRA NÃO TEM COLABORADOR CADASTRO NO SISTEMA
                         item.SincronizadoDestra = true;
                     }
                 }
@@ -400,6 +407,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                             SRA.RA_MAT AS Matricula,
                             UZJ.UZJ_DOC AS NomeArquivo,
                             UZJ.R_E_C_N_O_ AS Recno
+
                         FROM 
                             DADOSADV..UZJ010 UZJ
                             INNER JOIN DADOSADV..UZI010 UZI 
@@ -428,12 +436,23 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 foreach (DocumentoxColaboradorModel item in documentos)
                 {
-                    //if (item.Bytes != null)
-                    //{
-                    //    item.Base64 = $"data:image/png;base64,{Convert.ToBase64String(item.Bytes)}";
-                    //}
+                    Colaborador? colaboradorCad = await _repColaborador.SelectContext().AsNoTracking()
+                       .Where(m => m.Matricula == matricula.Remove(0, 1))
+                       .Include(m => m.ColaboradorxAtividade)
+                           .ThenInclude(m => m.AtividadeEspecifica)
+                       .FirstOrDefaultAsync();
 
-                    DocumentoxColaborador? docRelacao = await _repDocxColaborador.SelectContext().AsNoTracking().Where(m => m.DXC_CODPROTHEUS == item.Codigo).FirstOrDefaultAsync();
+                    if (colaboradorCad is not null)
+                    {
+                        var nomeAtividades = colaboradorCad.ColaboradorxAtividade.Select(m => m.AtividadeEspecifica.Descricao).ToList();
+                        string listaDeNomes = string.Join(", ", nomeAtividades);
+
+                        item.NomeColaborador = item.NomeColaborador + " - " + listaDeNomes;
+                    }
+
+                    DocumentoxColaborador? docRelacao = await _repDocxColaborador.SelectContext().AsNoTracking()
+                        .Include(m => m.Colaborador)
+                        .Where(m => m.DXC_CODPROTHEUS == item.Codigo && m.Colaborador.Matricula == matricula.Remove(0, 1)).FirstOrDefaultAsync();
 
                     if (docRelacao is not null)
                     {
@@ -447,7 +466,8 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 foreach (DocumentoxColaboradorModel vencidos in documentos.Where(m => m.DtVencimento.Trim() != ""))
                 {
                     //DateTime dtVencimento = Convert.ToDateTime(item.DtVencimento);
-                    vencidos.DtVencimentoFormatada = DateTime.ParseExact(vencidos.DtVencimento, "yyyyMMdd", CultureInfo.InvariantCulture);               
+                    vencidos.DtVencimentoFormatada = DateTime.ParseExact(vencidos.DtVencimento, "yyyyMMdd", CultureInfo.InvariantCulture);
+                    vencidos.DiasVencer = (vencidos.DtVencimentoFormatada - dataAtual).Days;
 
                     // Verificar se o documento está prestes a vencer em 10 dias - Matheus Monfreides
                     if (vencidos.DtVencimentoFormatada <= dataAtual.AddDays(10) && vencidos.DtVencimentoFormatada > dataAtual)
@@ -741,7 +761,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                     .FirstOrDefaultAsync();
 
                 if (colaboradorCadastrado is null)
-                    throw new Exception("O colaborador " + lista[0].NomeColaborador + " não está relacionado a nenhuma atividade específica.");
+                    throw new Exception("O colaborador " + lista[0].NomeColaborador + " não está relacionado a nenhuma atividade específica. Por isso não é possivel consultar seus documentos obrigatórios");
 
                 // Armazena todos os documentos que a Destra solicita pelas atividades nas quais o colaborador foi atrelado 
                 List<DocumentosDestra> todosOsDocsDestra = new List<DocumentosDestra>();

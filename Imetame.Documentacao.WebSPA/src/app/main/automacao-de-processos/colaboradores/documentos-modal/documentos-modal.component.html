@@ -68,10 +68,13 @@
                                     'sincronizado-destra': doc.SincronizadoDestra
                                 }">
                                 {{ doc.DescArquivo }}
-                                <h4 *ngIf="doc.Vencido">
+                                <h4 *ngIf="!doc.Vencido && !doc.Vencer && doc.DtVencimentoFormatada != '0001-01-01T00:00:00'">
+                                    Vencimento - {{ doc.DtVencimentoFormatada | date:'dd/MM/yyyy' }} <br> {{doc.DiasVencer}} Dias
+                                </h4>
+                                <h4 class="btnH4" *ngIf="doc.Vencido">
                                     Vencido - {{ doc.DtVencimentoFormatada | date:'dd/MM/yyyy' }}
                                 </h4>
-                                <h4 *ngIf="doc.Vencer">
+                                <h4 class="btnH4" *ngIf="doc.Vencer">
                                     A vencer - {{ doc.DtVencimentoFormatada | date:'dd/MM/yyyy' }} <br> {{doc.DiasVencer}} Dias
                                 </h4>
                             </button>
@@ -82,45 +85,6 @@
         </div>
     </div>
 </mat-dialog-content>
-
-
-
-
-<!-- <mat-grid-list cols="6" rowHeight="100px">
-    <mat-dialog-content class="mat-typography">
-        <mat-grid-tile [colspan]="colspanImg" [rowspan]="4">
-            <div class="overflow-custom">
-                <div class="btnClose">
-                    <span class="closeImg" (click)="closeModal()">&times;</span>
-                </div>
-                <div class="wh-full img">
-                    <img [src]="imageSource" alt="Image Source">
-                    <form class="w-95-p" fxLayout="row wrap" fxLayoutAlign="space-between">
-                        <mat-form-field fxFlex="100" style="margin-left: 20px;" appearance="outline"
-                            [style.margin-top]="'10px'">
-                            <mat-label>Data de Vencimento</mat-label>
-                            <input formControlName="dtVencimento" matInput #inputData [matDatepicker]="dataPicker"
-                                [placeholder]="'DD/MM/YYYY'">
-                            <mat-datepicker-toggle matSuffix [for]="dataPicker"></mat-datepicker-toggle>
-                            <mat-datepicker #dataPicker></mat-datepicker>
-                            <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_outline:calendar'"></mat-icon>
-                        </mat-form-field>
-
-                        <mat-form-field style="margin-left: 20px;" fxFlex="100" appearance="outline">
-                            <input formControlName="arquivo" type="file" accept="image/png, image/jpeg" matInput>
-                        </mat-form-field>
-                    </form>
-                </div>
-            </div>
-
-        </mat-grid-tile>
-        <mat-grid-tile [colspan]="colspanDocs" [rowspan]="4">
-            
-
-
-        </mat-grid-tile>
-    </mat-dialog-content>
-</mat-grid-list> -->
 
 <mat-dialog-actions align="end" class="padding-border">
     <button class="btn-fechar" mat-button mat-dialog-close>Fechar</button>

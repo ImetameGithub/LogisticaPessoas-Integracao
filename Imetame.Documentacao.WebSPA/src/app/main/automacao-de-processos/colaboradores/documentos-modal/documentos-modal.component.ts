@@ -127,8 +127,6 @@ export class DocumentosModalComponent implements OnInit {
 
         },
         error: (error) => {
-          this._fuseProgressBarService.hide();
-          this.blockRequisicao = false;
           this._snackbar.open(error.error, 'X', {
             duration: 4000,
             panelClass: 'snackbar-error',
