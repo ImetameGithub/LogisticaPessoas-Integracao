@@ -1,5 +1,5 @@
 export class DocumentoxColaboradorModel{
-    Id: string;
+    // Id: string;
     Codigo: string;
     DescArquivo: string;
     DtVencimento: string;
@@ -7,6 +7,7 @@ export class DocumentoxColaboradorModel{
     NomeColaborador: string;
     Matricula: string;
     NomeArquivo: string;
+    Recno: string;
     Bytes: string;
     Base64: string;
     Vencido: boolean;
@@ -14,4 +15,9 @@ export class DocumentoxColaboradorModel{
     DiasVencer: number;
     SincronizadoDestra: boolean;
     ImageSource;
+}
+
+export class ImagemProtheus{
+    Bytes: string;
+    Base64: string;
 }

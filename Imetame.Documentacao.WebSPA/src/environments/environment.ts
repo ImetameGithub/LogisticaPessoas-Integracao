@@ -47,6 +47,7 @@ export const environment = {
         GetDocumentosProtheus: `${baseUrl}/Colaboradores/GetDocumentosProtheus`,
         GetDocumentosObrigatorios: `${baseUrl}/Colaboradores/GetDocumentosObrigatorios`,
         RelacionarColaboradorxAtividade: `${baseUrl}/Colaboradores/RelacionarColaboradorxAtividade`,
+        GetImagemProtheus: `${baseUrl}/Colaboradores/GetImagemProtheus`,
         GetItem: `${baseUrl}/Colaboradores/GetItem`,   
         Add: `${baseUrl}/Colaboradores/Add`,
         Update: `${baseUrl}/Colaboradores/Update`,

@@ -12,7 +12,7 @@ import { environment } from 'environments/environment';
 import { Pedido } from 'app/models/Pedido';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ColaboradorModel } from 'app/models/DTO/ColaboradorModel';
-import { DocumentoxColaboradorModel } from 'app/models/DTO/DocumentoxColaboradorModel';
+import { DocumentoxColaboradorModel, ImagemProtheus } from 'app/models/DTO/DocumentoxColaboradorModel';
 
 
 
@@ -138,6 +138,10 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
                 tap((documentoxColaboradorRetorno: DocumentoxColaboradorModel[]) => {
                     this._documentoxColaborador.next(documentoxColaboradorRetorno);
                 }));
+    }
+
+    GetImagemProtheus(recno: string): Observable<ImagemProtheus> {
+        return this._httpClient.get<ImagemProtheus>(`${environment.Colaboradores.GetImagemProtheus}/${recno}`)         
     }
 
     EnviarColaboradorDestra(Colaborador: any): Observable<any> {

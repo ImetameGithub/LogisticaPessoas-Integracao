@@ -418,7 +418,8 @@ namespace Imetame.Documentacao.WebApi.Controllers
                                 AND UZJ.UZJ_CODTDO <> '01'  
                         WHERE RA_FILIAL = '' 
                             AND RA_MAT = @Matricula
-                            AND SRA.D_E_L_E_T_  = ''";
+                            AND SRA.D_E_L_E_T_  = ''
+                            AND UZJ.UZJ_SEQ = '001'";
 
                 var documentos = (await conn.QueryAsync<DocumentoxColaboradorModel>(sql, new { Matricula = matricula })).ToList();
 
@@ -490,16 +491,17 @@ namespace Imetame.Documentacao.WebApi.Controllers
                         
                 var imagens = (await conn.QueryAsync<byte[]>(sql, new { Recno = recno })).ToList();
 
-                string imagem = "";
+                ImagemProtheus objeto = new ImagemProtheus();
                 foreach (byte[] item in imagens)
                 {
-                    if (item != null)
+                    objeto = new ImagemProtheus
                     {
-                       imagem = $"data:image/png;base64,{Convert.ToBase64String(item)}";
-                    }                    
+                        Bytes = item,
+                        Base64 = $"data:image/png;base64,{Convert.ToBase64String(item)}"
+                    };
                 }
-                                
-                return Ok(imagem);
+
+                return Ok(objeto);
             }
             catch (Exception ex)
             {

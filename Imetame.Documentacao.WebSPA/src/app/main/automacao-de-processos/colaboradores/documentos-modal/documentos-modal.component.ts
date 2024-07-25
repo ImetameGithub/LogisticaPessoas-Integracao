@@ -4,7 +4,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer, Title } from '@angular/platform-browser';
 import { FuseProgressBarService } from '@fuse/components/progress-bar/progress-bar.service';
-import { DocumentoxColaboradorModel } from 'app/models/DTO/DocumentoxColaboradorModel';
+import { DocumentoxColaboradorModel, ImagemProtheus } from 'app/models/DTO/DocumentoxColaboradorModel';
 import { FilesDataSource } from 'app/utils/files-data-source';
 import { Subject } from 'rxjs';
 import { AutomacaoDeProcessosService } from '../../automacao-de-processos.service';
@@ -107,10 +107,27 @@ export class DocumentosModalComponent implements OnInit {
   }
 
   docDetalhes(item: DocumentoxColaboradorModel) {
-    this.visualizarImagem = true;
-    this.colspanDocs = 4
-    this.colspanImg = 2
-    this.imageSource = this.sanitizer.bypassSecurityTrustResourceUrl(`${item.Base64}`);
+    this._fuseProgressBarService.show();
+    this.service.GetImagemProtheus(item.Recno).subscribe(
+      {
+        next: (response: ImagemProtheus) => {
+          this._fuseProgressBarService.hide();
+          this.blockRequisicao = false;
+          this.visualizarImagem = true;
+          this.colspanDocs = 4
+          this.colspanImg = 2
+          this.imageSource = this.sanitizer.bypassSecurityTrustResourceUrl(`${response.Base64}`);
+        },
+        error: (error) => {
+          this._fuseProgressBarService.hide();
+          this._snackbar.open(error.error, 'X', {
+            duration: 4000,
+            panelClass: 'snackbar-error',
+          });
+        }
+      }
+    );
+   
   }
 
   closeModal() {
