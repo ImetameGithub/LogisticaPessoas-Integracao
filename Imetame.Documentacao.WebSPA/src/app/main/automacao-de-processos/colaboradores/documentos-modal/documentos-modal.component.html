@@ -1,11 +1,18 @@
 <div class="chamada">
     <div fxFlex="75" fxLayout="row" fxLayoutAlign="start center">
         <span>{{documentos[0].NomeColaborador}}</span>
+
+        <div style="color: white;" (click)="openAbaAtividadeEspecifica()"  matTooltip="Relacionar colaborador com atividade"
+            class="docs-obrigatorios" fxLayout="row" fxLayoutAlign="end center">
+            <div class="docs-obrigatorios-icon">
+                <mat-icon>update</mat-icon>
+            </div>
+        </div>
     </div>
 
     <div fxFlex="25" style="color: white;">
         <div *ngIf="StatusDocumentoObrigatoriosModel.length > 0" (click)="openDocsObrigatorio()"
-            class="docs-obrigatorios" fxLayout="row" fxLayoutAlign="start center" aria-label="Documentos Obrigatórios">
+            class="docs-obrigatorios" fxLayout="row" fxLayoutAlign="end center">
             <div class="docs-obrigatorios-icon">
                 <mat-icon>warning</mat-icon>
             </div>

@@ -43,6 +43,7 @@ export const environment = {
         GetColaboradoresPorOs: `${baseUrl}/Colaboradores/GetColaboradoresPorOs`,
         GetColaboradores: `${baseUrl}/Colaboradores/GetColaboradores`,
         EnviarColaboradorDestra: `${baseUrl}/Colaboradores/EnviarColaboradorDestra`,
+        EnviarDocsArrayDestra: `${baseUrl}/Colaboradores/EnviarDocsArrayDestra`,
         EnviarDocumentoParaDestra: `${baseUrl}/Colaboradores/EnviarDocumentoParaDestra`,
         GetDocumentosProtheus: `${baseUrl}/Colaboradores/GetDocumentosProtheus`,
         GetDocumentosObrigatorios: `${baseUrl}/Colaboradores/GetDocumentosObrigatorios`,

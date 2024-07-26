@@ -148,6 +148,10 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
         const headers = new HttpHeaders().set('Content-Type', 'application/json');
         return this._httpClient.post<any>(environment.Colaboradores.EnviarColaboradorDestra, Colaborador, { headers });
     }
+    EnviarDocsArrayDestra(Colaborador: any): Observable<any> {
+        const headers = new HttpHeaders().set('Content-Type', 'application/json');
+        return this._httpClient.post<any>(environment.Colaboradores.EnviarDocsArrayDestra, Colaborador, { headers });
+    }
 
     EnviarDocumentoParaDestra(Documento: DocumentoxColaboradorModel): Observable<any> {
         const headers = new HttpHeaders().set('Content-Type', 'application/json');

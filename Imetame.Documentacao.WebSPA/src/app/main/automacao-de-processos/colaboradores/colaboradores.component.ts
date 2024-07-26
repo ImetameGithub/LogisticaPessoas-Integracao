@@ -114,20 +114,6 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
         this._unsubscribeAll.complete();
     }
 
-    // toggleSelection(item): void {
-    //     if (item.check) {
-    //         this.todoMundo = true;
-    //     } else {
-    //         this.todoMundo = false;
-    //         this.service.itens.forEach((i) => {
-    //             if (i.check) {
-    //                 this.todoMundo = true;
-    //                 return true;
-    //             }
-    //         });
-    //     }
-    // }
-
     toggleSelection(item): void {
         item.check = !item.check;
         this.todoMundo = this.service.itens.some(i => i.check);
@@ -216,9 +202,38 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
     }
 
     enviarParaColaboradorDestra(){
+        this._fuseProgressBarService.setMode("indeterminate");
+        this._fuseProgressBarService.show();
         let colaboradores = this.service.itens.filter(col => col.check);
 
         this.service.EnviarColaboradorDestra(colaboradores).subscribe(
+            {
+                next: (response: ColaboradorProtheusModel) => {
+                    this._fuseProgressBarService.hide();
+                    this.blockRequisicao = false;
+                    this._snackbar.open("Item enviado para com sucesso", 'X', {
+                        duration: 2500,
+                        panelClass: 'snackbar-success',
+                    })
+                },
+                error: (error) => {
+                    this._fuseProgressBarService.hide();
+                    this.blockRequisicao = false;
+                    this._snackbar.open(error.error, 'X', {
+                        duration: 4000,
+                        panelClass: 'snackbar-error',
+                    })
+                }
+            }
+        )  
+    }
+
+    enviarDocumentosParaDestra(){
+        this._fuseProgressBarService.setMode("indeterminate");
+        this._fuseProgressBarService.show();
+        let colaboradores = this.service.itens.filter(col => col.check);
+
+        this.service.EnviarDocsArrayDestra(colaboradores).subscribe(
             {
                 next: (response: ColaboradorProtheusModel) => {
                     this._fuseProgressBarService.hide();

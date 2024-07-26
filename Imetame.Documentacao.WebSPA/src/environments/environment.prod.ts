@@ -7,7 +7,7 @@ export const environment = {
     hmr: false,
     //#region PEDIDO
     Pedido: {
-        Get: `${baseUrl}/Pedido/Get`,
+        GetItem: `${baseUrl}/Pedido/GetItem`,
         Add: `${baseUrl}/Pedido/Add`,
         Update: `${baseUrl}/Pedido/Update`,
         Delete: `${baseUrl}/Pedido/Delete`,
@@ -17,7 +17,7 @@ export const environment = {
     //#endregion
     //#region CREDENCIADORA
     Credenciadora: {
-        Get: `${baseUrl}/Credenciadora/Get`,
+        GetItem: `${baseUrl}/Credenciadora/GetItem`,   
         Add: `${baseUrl}/Credenciadora/Add`,
         Update: `${baseUrl}/Credenciadora/Update`,
         Delete: `${baseUrl}/Credenciadora/Delete`,
@@ -25,25 +25,30 @@ export const environment = {
         GetAllPaginated: `${baseUrl}/Credenciadora/GetAllPaginated`,
     },
     //#endregion
+
     //#region PEDIDO
     Documento: {
-        Get: `${baseUrl}/Documento/Get`,
+        GetItem: `${baseUrl}/Documento/GetItem`,
         Add: `${baseUrl}/Documento/Add`,
         Update: `${baseUrl}/Documento/Update`,
         Delete: `${baseUrl}/Documento/Delete`,
-        GetAll: `${baseUrl}/Documento/GetAll`,       
+        GetAll: `${baseUrl}/Documento/GetAll`,        
         GetAllPaginated: `${baseUrl}/Documento/GetAllPaginated`,
         GetDocumentosDestra: `${baseUrl}/Documento/GetDocumentosDestra`,
         GetDocumentosProtheus: `${baseUrl}/Documento/GetDocumentosProtheus`,
     },
     //#endregion
+
     //#region COLABORADORES
     Colaboradores: {
         GetColaboradoresPorOs: `${baseUrl}/Colaboradores/GetColaboradoresPorOs`,
         GetColaboradores: `${baseUrl}/Colaboradores/GetColaboradores`,
+        EnviarColaboradorDestra: `${baseUrl}/Colaboradores/EnviarColaboradorDestra`,
+        EnviarDocsArrayDestra: `${baseUrl}/Colaboradores/EnviarDocsArrayDestra`,
+        EnviarDocumentoParaDestra: `${baseUrl}/Colaboradores/EnviarDocumentoParaDestra`,
         GetDocumentosProtheus: `${baseUrl}/Colaboradores/GetDocumentosProtheus`,
-        RelacionarColaboradorxAtividade: `${baseUrl}/Colaboradores/RelacionarColaboradorxAtividade`,
         GetDocumentosObrigatorios: `${baseUrl}/Colaboradores/GetDocumentosObrigatorios`,
+        RelacionarColaboradorxAtividade: `${baseUrl}/Colaboradores/RelacionarColaboradorxAtividade`,
         GetImagemProtheus: `${baseUrl}/Colaboradores/GetImagemProtheus`,
         GetItem: `${baseUrl}/Colaboradores/GetItem`,   
         Add: `${baseUrl}/Colaboradores/Add`,
@@ -72,8 +77,8 @@ export const environment = {
     },
     //#endregion
 
-    //#region DESTRA
-    Destra: {
+      //#region DESTRA
+      Destra: {
         GetDocumentosDestra: `${baseUrl}/Destra/GetDocumentos`,
     },
     //#endregion

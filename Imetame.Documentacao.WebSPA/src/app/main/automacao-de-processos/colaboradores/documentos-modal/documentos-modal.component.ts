@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, UntypedFormGroup, Validators } from '@angular/forms';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer, Title } from '@angular/platform-browser';
 import { FuseProgressBarService } from '@fuse/components/progress-bar/progress-bar.service';
@@ -12,6 +12,7 @@ import { AutomacaoDeProcessosService } from '../../automacao-de-processos.servic
 import { ColaboradorProtheusModel } from 'app/models/DTO/ColaboradorModel';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { StatusDocumentoObrigatoriosModel } from 'app/models/DTO/StatusDocumentoObrigatoriosModel';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -39,6 +40,7 @@ export class DocumentosModalComponent implements OnInit {
     private _fuseProgressBarService: FuseProgressBarService,
     private _fuseConfirmationService: FuseConfirmationService,
     public dialog: MatDialog,
+    private router: Router,
     private _snackbar: MatSnackBar,
     private sanitizer: DomSanitizer,
     public snackBar: MatSnackBar
@@ -205,4 +207,13 @@ export class DocumentosModalComponent implements OnInit {
   }
 
 
+
+ public openAbaAtividadeEspecifica(): void {
+    // Gera a URL completa usando a rota do Angular
+    const url = this.router.serializeUrl(
+      this.router.createUrlTree(['colaboradores'])
+    );
+    // Abre a URL em uma nova aba
+    window.open(url, '_blank');
+  }
 }

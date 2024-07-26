@@ -391,37 +391,62 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 throw;
             }
         }
-
+        
         [HttpGet("{matricula}")]
-        public async Task<IActionResult> GetDocumentosProtheus(string matricula, CancellationToken cancellationToken)
+        private async Task<List<DocumentoxColaboradorModel>> ConsultaDocsProtheus(string matricula, bool envioArray)
         {
             try
             {
                 conn.Open();
-                 var sql = @"SELECT 
+                var sql = @"SELECT 
                             UZI.UZI_CODIGO AS Codigo,
                             SRA.RA_NOME AS NomeColaborador,
                             SRA.RA_MAT AS Matricula,
                             UZI.UZI_DESC AS DescArquivo,
                             UZJ.UZJ_VENC AS DtVencimento,
                             UZJ.UZJ_DOC AS NomeArquivo,
-                            UZJ.R_E_C_N_O_ AS Recno   
-                        FROM SRA010 SRA
-                        INNER JOIN DADOSADV..UZJ010 UZJ 
-                                ON SRA.RA_FILIAL = UZJ.UZJ_FILIAL  
-                                AND SRA.RA_MAT = UZJ.UZJ_MAT 
-                                AND SRA.D_E_L_E_T_ = ''
-                        INNER JOIN DADOSADV..UZI010 UZI 
-                                ON UZI.UZI_FILIAL = UZJ.UZJ_FILIAL 
-                                AND UZI.UZI_CODIGO = UZJ.UZJ_CODTDO           
-                                AND UZI.D_E_L_E_T_ = ''
-                                AND UZJ.UZJ_CODTDO <> '01'  
-                        WHERE RA_FILIAL = '' 
-                            AND RA_MAT = @Matricula
-                            AND SRA.D_E_L_E_T_  = ''
-                            AND UZJ.UZJ_SEQ = '001'";
+                            UZJ.R_E_C_N_O_ AS Recno";
 
-                var documentos = (await conn.QueryAsync<DocumentoxColaboradorModel>(sql, new { Matricula = matricula })).ToList();
+                if (envioArray)
+                {
+                    sql += @",
+                            UZJ.UZJ_SEQ AS Sequencia,
+                            UZJ.UZJ_IMG AS Bytes";
+                }
+
+                sql += @"
+                          FROM SRA010 SRA
+                          INNER JOIN DADOSADV_LUC..UZJ010 UZJ 
+                                  ON  UZJ.UZJ_FILIAL = SRA.RA_FILIAL
+                                  AND UZJ.UZJ_MAT = SRA.RA_MAT
+                                  AND UZJ.D_E_L_E_T_ = ''
+                          INNER JOIN DADOSADV_LUC..UZI010 UZI 
+                                  ON UZI.UZI_FILIAL = UZJ.UZJ_FILIAL 
+                                  AND UZI.UZI_CODIGO = UZJ.UZJ_CODTDO           
+                                  AND UZI.D_E_L_E_T_ = ''
+                                  AND UZJ.UZJ_CODTDO <> '01'  
+                          WHERE RA_FILIAL = '' 
+                              AND RA_MAT = @Matricula
+                              AND SRA.D_E_L_E_T_  = ''";
+
+
+                List<DocumentoxColaboradorModel> documentos = (await conn.QueryAsync<DocumentoxColaboradorModel>(sql, new { Matricula = matricula })).ToList();
+
+                return documentos;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        [HttpGet("{matricula}")]
+        public async Task<IActionResult> GetDocumentosProtheus(string matricula)
+        {
+            try
+            {
+                List<DocumentoxColaboradorModel> documentos =await ConsultaDocsProtheus(matricula, false);
+
 
 
                 foreach (DocumentoxColaboradorModel item in documentos)
@@ -463,7 +488,6 @@ namespace Imetame.Documentacao.WebApi.Controllers
                     if (vencidos.DtVencimentoFormatada <= dataAtual.AddDays(10) && vencidos.DtVencimentoFormatada > dataAtual)
                     {
                         vencidos.Vencer = true;
-                        vencidos.DiasVencer = (vencidos.DtVencimentoFormatada - dataAtual).Days;
                     }
 
                     // Verificar se o documento já está vencido - Matheus Monfreides
@@ -597,6 +621,109 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 return BadRequest(ErrorHelper.GetException(ex));
             }
         }
+        
+        [HttpPost]
+        public async Task<IActionResult> EnviarDocsArrayDestra([FromBody] List<ColaboradorModel> listColaboradores)
+        {
+            try
+            {
+                StringBuilder erro = new StringBuilder();
+                if (!ModelState.IsValid)
+                {
+                    erro = ErrorHelper.GetErroModelState(ModelState.Values);
+                    throw new Exception("Falha ao Salvar Dados.\n" + erro);
+                }
+
+                List<Colaborador> colaboradores = new List<Colaborador>();
+
+                // Carregar todos os itens de colaboradores cadastrados no sistema - Matheus Monfreides
+                List<Colaborador> itensCadastrados = _repColaborador.SelectContext()     
+                    .AsNoTracking()
+                    .ToList();
+
+                // Buscar colaboradores que foi selecionado mas não possuem relação com atividade, ocasionando em não ter na tabela colaborador - Matheus Monfreides
+                List<ColaboradorModel> colaboradoresSemAtividade = listColaboradores
+                   .Where(ei => !itensCadastrados.Any(m => m.Matricula == ei.NumCad))
+                   .ToList();
+
+                if (colaboradoresSemAtividade.Any())
+                {
+                    var nomesColaboradores = colaboradoresSemAtividade.Select(colaborador => colaborador.Nome).ToList();
+                    string listaDeNomes = string.Join(", ", nomesColaboradores);
+                    if (nomesColaboradores.Count() > 1)
+                    {
+                        throw new Exception("Os colaboradores " + listaDeNomes + " não estão relacionado a nenhuma atividade específica.");
+                    }
+                    else
+                    {
+                        throw new Exception("O colaborador " + listaDeNomes + " não está relacionado a nenhuma atividade específica.");
+                    }
+                }
+
+                List<string> colaboradoresComDocsVencidos = new List<string>();
+                List<string> docsSemRelacao = new List<string>();
+
+                foreach (ColaboradorModel item in listColaboradores)
+                {
+                    List<DocumentoxColaboradorModel> docsColaborador = await ConsultaDocsProtheus("0" + item.NumCad, true);
+
+                    var validDocs = docsColaborador
+                        .Where(m => !string.IsNullOrWhiteSpace(m.DtVencimento))
+                        .ToList();
+
+                    foreach (var doc in validDocs)
+                    {
+                        doc.DtVencimentoFormatada = DateTime.ParseExact(doc.DtVencimento, "yyyyMMdd", CultureInfo.InvariantCulture);
+                    }
+
+                    DateTime dataAtual = DateTime.Now;
+
+                    List<DocumentoxColaboradorModel> docsVencidos = validDocs
+                        .Where(m => m.DtVencimentoFormatada <= dataAtual.AddDays(10) && m.DtVencimentoFormatada > dataAtual || m.DtVencimentoFormatada <= dataAtual)
+                        .ToList();
+
+                    docsColaborador = docsColaborador.Except(docsVencidos).ToList();
+
+                    foreach (var doc in docsColaborador)
+                    {
+                        Documento? docRelacao = await _repDocumento.SelectContext().AsNoTracking().Where(m => m.IdProtheus == doc.Codigo).FirstOrDefaultAsync();
+
+                        if (docRelacao is null)
+                        {
+                            docsSemRelacao.Add(doc.DescArquivo);
+                        }
+
+                        await EnviarDocumentoParaDestra(doc);
+                    }
+
+                    if (docsVencidos.Count > 0)
+                    {
+                        colaboradoresComDocsVencidos.Add(item.Nome);
+                    }
+                }
+
+                if (docsSemRelacao.Count > 0)
+                {
+                    string docsSemRelacaoStr = string.Join(", ", docsSemRelacao);
+                    throw new Exception("Os seguintes documentos não possuem nenhuma relação com os documentos da Destra: " + docsSemRelacaoStr);
+                }
+
+                if (colaboradoresComDocsVencidos.Count > 0)
+                {
+                    string colaboradoresComDocsVencidosStr = string.Join(", ", colaboradoresComDocsVencidos);
+                    throw new Exception("Os seguintes colaboradores estão com documentos vencidos ou a vencer: " + colaboradoresComDocsVencidosStr);
+                }
+
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ErrorHelper.GetException(ex));
+            }
+        }
+
+
 
         [HttpPost]
         public async Task<IActionResult> EnviarDocumentoParaDestra([FromBody] DocumentoxColaboradorModel documento)
@@ -613,7 +740,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 Documento? docRelacao = await _repDocumento.SelectContext().AsNoTracking().Where(m => m.IdProtheus == documento.Codigo).FirstOrDefaultAsync();
 
                 if (docRelacao is null)
-                    throw new Exception("Documento selecionado não possue nenhuma relação com os documentos da Destra");
+                    throw new Exception("O documento "+ documento.DescArquivo + " não possue nenhuma relação com os documentos da Destra");
 
                 Colaborador? colaboradorCadastrado = await _repColaborador.SelectContext().AsNoTracking().Where(m => m.Matricula == documento.Matricula.Remove(0, 1)).FirstOrDefaultAsync();
 
@@ -641,7 +768,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                         DXC_CODDESTRA = docRelacao.IdDestra,
                         DXC_DESCDESTRA = docRelacao.DescricaoDestra,
                         DXC_IDCOLABORADOR = colaboradorCadastrado.Id,
-                        DXC_BASE64 = documento.Base64
+                        DXC_BASE64 = $"data:image/png;base64,{Convert.ToBase64String(documento.Bytes)}"
                     };
 
                     await _repDocxColaborador.SaveAsync(item);
