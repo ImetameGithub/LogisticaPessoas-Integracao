@@ -1,9 +1,9 @@
 import { Credenciadora } from "app/models/Crendenciadora";
 
-const baseUrl = 'https://reuniaodiariaapi.imetame.com.br:443/api';
+const baseUrl = 'https://jaguare.imetame.com.br:5012/api';
 export const environment = {
     production: true,
-    urlApi: 'https://reuniaodiariaapi.imetame.com.br:443/api',
+    urlApi: 'https://jaguare.imetame.com.br:5012/api',
     hmr: false,
     //#region PEDIDO
     Pedido: {

@@ -391,7 +391,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 throw;
             }
         }
-        
+
         [HttpGet("{matricula}")]
         private async Task<List<DocumentoxColaboradorModel>> ConsultaDocsProtheus(string matricula, bool envioArray)
         {
@@ -405,12 +405,13 @@ namespace Imetame.Documentacao.WebApi.Controllers
                             UZI.UZI_DESC AS DescArquivo,
                             UZJ.UZJ_VENC AS DtVencimento,
                             UZJ.UZJ_DOC AS NomeArquivo,
-                            UZJ.R_E_C_N_O_ AS Recno";
+                            UZJ.R_E_C_N_O_ AS Recno,
+                            UZJ.UZJ_SEQ AS Sequencia";
 
                 if (envioArray)
                 {
                     sql += @",
-                            UZJ.UZJ_SEQ AS Sequencia,
+                           
                             UZJ.UZJ_IMG AS Bytes";
                 }
 
@@ -445,37 +446,24 @@ namespace Imetame.Documentacao.WebApi.Controllers
         {
             try
             {
-                List<DocumentoxColaboradorModel> documentos =await ConsultaDocsProtheus(matricula, false);
+                List<DocumentoxColaboradorModel> documentos = await ConsultaDocsProtheus(matricula, false);
 
+                Colaborador? colaboradorCad = await _repColaborador.SelectContext().AsNoTracking()
+                   .Where(m => m.Matricula == matricula.Remove(0, 1))
+                   .Include(m => m.ColaboradorxAtividade)
+                       .ThenInclude(m => m.AtividadeEspecifica)
+                   .FirstOrDefaultAsync();
 
-
-                foreach (DocumentoxColaboradorModel item in documentos)
+                if (colaboradorCad is not null)
                 {
-                    Colaborador? colaboradorCad = await _repColaborador.SelectContext().AsNoTracking()
-                       .Where(m => m.Matricula == matricula.Remove(0, 1))
-                       .Include(m => m.ColaboradorxAtividade)
-                           .ThenInclude(m => m.AtividadeEspecifica)
-                       .FirstOrDefaultAsync();
+                    var nomeAtividades = colaboradorCad.ColaboradorxAtividade.Select(m => m.AtividadeEspecifica.Descricao).ToList();
+                    string listaDeNomes = string.Join(", ", nomeAtividades);
 
-                    if (colaboradorCad is not null)
-                    {
-                        var nomeAtividades = colaboradorCad.ColaboradorxAtividade.Select(m => m.AtividadeEspecifica.Descricao).ToList();
-                        string listaDeNomes = string.Join(", ", nomeAtividades);
-
-                        item.NomeColaborador = item.NomeColaborador + " - " + listaDeNomes;
-                    }
-
-                    DocumentoxColaborador? docRelacao = await _repDocxColaborador.SelectContext().AsNoTracking()
-                        .Include(m => m.Colaborador)
-                        .Where(m => m.DXC_CODPROTHEUS == item.Codigo && m.Colaborador.Matricula == matricula.Remove(0, 1)).FirstOrDefaultAsync();
-
-                    if (docRelacao is not null)
-                    {
-                        item.SincronizadoDestra = true;
-                    }
+                    documentos[0].NomeColaborador = documentos[0].NomeColaborador + " - " + listaDeNomes;
                 }
 
 
+     
                 DateTime dataAtual = DateTime.Now;
 
                 foreach (DocumentoxColaboradorModel vencidos in documentos.Where(m => m.DtVencimento.Trim() != ""))
@@ -497,6 +485,18 @@ namespace Imetame.Documentacao.WebApi.Controllers
                     }
                 }
 
+                foreach (DocumentoxColaboradorModel item in documentos.Where(m => m.Vencido || m.Vencer != true))
+                {
+                    bool docRelacao = await _repDocxColaborador.SelectContext().AsNoTracking()
+                        .Include(m => m.Colaborador)
+                        .Where(m => m.DXC_CODPROTHEUS == item.Codigo && m.Colaborador.Matricula == matricula.Remove(0, 1)).AnyAsync();
+
+                    if (docRelacao)
+                    {
+                        item.SincronizadoDestra = true;
+                    }
+                }
+
                 return Ok(documentos);
             }
             catch (Exception ex)
@@ -506,13 +506,13 @@ namespace Imetame.Documentacao.WebApi.Controllers
         }
 
         [HttpGet("{recno}")]
-        public async Task<IActionResult> GetImagemProtheus(string recno, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetImagemProtheus(string recno)
         {
             try
             {
                 conn.Open();
                 var sql = @"SELECT UZJ_IMG as Bytes FROM UZJ010 WHERE R_E_C_N_O_ =  @Recno";
-                        
+
                 var imagens = (await conn.QueryAsync<byte[]>(sql, new { Recno = recno })).ToList();
 
                 ImagemProtheus objeto = new ImagemProtheus();
@@ -621,7 +621,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 return BadRequest(ErrorHelper.GetException(ex));
             }
         }
-        
+
         [HttpPost]
         public async Task<IActionResult> EnviarDocsArrayDestra([FromBody] List<ColaboradorModel> listColaboradores)
         {
@@ -637,7 +637,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 List<Colaborador> colaboradores = new List<Colaborador>();
 
                 // Carregar todos os itens de colaboradores cadastrados no sistema - Matheus Monfreides
-                List<Colaborador> itensCadastrados = _repColaborador.SelectContext()     
+                List<Colaborador> itensCadastrados = _repColaborador.SelectContext()
                     .AsNoTracking()
                     .ToList();
 
@@ -740,12 +740,31 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 Documento? docRelacao = await _repDocumento.SelectContext().AsNoTracking().Where(m => m.IdProtheus == documento.Codigo).FirstOrDefaultAsync();
 
                 if (docRelacao is null)
-                    throw new Exception("O documento "+ documento.DescArquivo + " não possue nenhuma relação com os documentos da Destra");
+                    throw new Exception("O documento " + documento.DescArquivo + " não possue nenhuma relação com os documentos da Destra");
 
                 Colaborador? colaboradorCadastrado = await _repColaborador.SelectContext().AsNoTracking().Where(m => m.Matricula == documento.Matricula.Remove(0, 1)).FirstOrDefaultAsync();
 
                 if (colaboradorCadastrado is null)
                     throw new Exception("O colaborador " + documento.NomeColaborador + " não está relacionado a nenhuma atividade específica.");
+
+                if (documento.Bytes is null)
+                {
+                    var response = await GetImagemProtheus(documento.Recno);
+
+                    if (response is OkObjectResult okResult)
+                    {
+                        ImagemProtheus objeto = okResult.Value as ImagemProtheus;
+                        if (objeto != null)
+                        {
+                            documento.Bytes = objeto.Bytes;
+                            documento.Base64 = objeto.Base64;
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("Erro ao obter a imagem Protheus.");
+                    }
+                }
 
                 DocumentoDestra itemDestra = new DocumentoDestra
                 {
@@ -753,6 +772,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                     cpf = colaboradorCadastrado.Cpf,
                     arquivo = documento.Bytes,
                     validade = DateTime.Now.AddYears(1).ToString("yyyy-MM-dd"),
+                    pagina = documento.Sequencia,
                 };
 
                 var jsonResponse = await _destraController.EnviarDocumentoParaApiDoCliente(itemDestra, documento.DescArquivo.Trim() + ".pdf");
