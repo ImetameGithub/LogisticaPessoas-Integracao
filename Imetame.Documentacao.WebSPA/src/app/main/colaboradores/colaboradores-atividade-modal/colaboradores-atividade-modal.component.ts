@@ -15,6 +15,7 @@ import { ColaboradorModel, ColaboradorProtheusModel } from 'app/models/DTO/Colab
 import { AtividadeEspecifica } from 'app/models/AtividadeEspecifica';
 import { CustomOptionsSelect } from 'app/shared/components/custom-select/components.types';
 import { ColaboradorxAtividadeModel } from 'app/models/DTO/ColaboradorxAtividadeModel';
+import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
     selector: 'colaboradores-atividade-modal',
@@ -22,6 +23,9 @@ import { ColaboradorxAtividadeModel } from 'app/models/DTO/ColaboradorxAtividade
     styleUrls: ['./colaboradores-atividade-modal.component.scss']
 })
 export class ColaboradoresAtividadeModalComponent implements OnInit {
+    displayedColumns = ["check", "NOME", "MATRICULA", "CRACHA"];
+    dataSource: MatTableDataSource<ColaboradorProtheusModel>;
+    checkedColaboradores: ColaboradorProtheusModel[] = [];
 
     blockRequisicao: boolean = false;
     private _unsubscribeAll: Subject<any>;
@@ -51,7 +55,6 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
     selectColaborador: any;
 
     atividadesOptions: CustomOptionsSelect[] = [];
-    colaboradoresOptions: CustomOptionsSelect[] = [];
     perfilOptions: CustomOptionsSelect[] = [];
     equipeOptions: CustomOptionsSelect[] = [];
     OsOptions: CustomOptionsSelect[] = [];
@@ -69,6 +72,7 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
         private route: ActivatedRoute,
         private _fuseProgressBarService: FuseProgressBarService,
     ) {
+        this.dataSource = new MatTableDataSource();
         this.listPerfil = Array.from(new Set(_data._listColaboradores.map(m => m.PERFIL)));
         this.listEquipe = Array.from(new Set(_data._listColaboradores.map(m => m.CODIGO_EQUIPE + ' - ' + m.NOME_EQUIPE)));
         this.listOs = Array.from(new Set(_data._listColaboradores.map(m => m.CODIGO_OS + ' - ' + m.NOME_OS)));
@@ -91,7 +95,6 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
         });
         this.form = new FormGroup({
             ListAtividade: new FormControl([], [Validators.required]),
-            ListColaborador: new FormControl([], [Validators.required]),
         });
         this.titleService.setTitle("Novo - Colaborador - Imetame");
     }
@@ -100,7 +103,6 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
     ngOnInit() {
         this.form = new FormGroup({
             ListAtividade: new FormControl([], [Validators.required]),
-            ListColaborador: new FormControl([], [Validators.required]),
         });
     }
 
@@ -108,7 +110,7 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
 
     relacionarColaboradores() {
         const modelRelacao: ColaboradorxAtividadeModel = this.form.getRawValue();
-
+        modelRelacao.ListColaborador = this.checkedColaboradores;
         this._Colaboradorservice.RelacionarColaboradorxAtividade(modelRelacao).subscribe(
             {
                 next: (response: ColaboradorxAtividadeModel) => {
@@ -185,15 +187,44 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
 
             return matchPerfil && matchEquipe && matchOs && matchFuncao && matchDisciplina;
         });
-
-        // Mapeia os colaboradores filtrados para as opções do select
-        this.colaboradoresOptions = colaboradoresFiltrados.map(item => new CustomOptionsSelect(item, item.NOME)) ?? [];
+        this.dataSource.data = colaboradoresFiltrados;
 
         this._snackbar.open("Filtro aplicado com sucesso", 'X', {
             duration: 2500,
             panelClass: 'snackbar-success',
         })
     }
+
+    colaboradorIsChecked(item: ColaboradorProtheusModel): boolean {
+        if (item != null) {
+            return this.checkedColaboradores.some(x => x.MATRICULA == item.MATRICULA);
+        } else {
+            return false;
+        }
+    }
+
+    checkAll(event: any) {
+        if (event.checked == true) {
+            this.checkedColaboradores = this.dataSource.data.map(colaborador => ({ ...colaborador }));;
+        } else {
+            this.checkedColaboradores = [];
+        }
+    }
+
+    checkChange(item: ColaboradorProtheusModel) {
+        if (item != null) {
+            if (this.checkedColaboradores.some(x => x.MATRICULA == item.MATRICULA)) {
+                const index = this.checkedColaboradores.findIndex(colaborador => colaborador.MATRICULA === item.MATRICULA);
+                if (index !== -1) {
+                    this.checkedColaboradores.splice(index, 1);
+                }
+            } else {
+                this.checkedColaboradores.push(item);
+            }
+        }
+    }
+
+
 
     update(model: Colaborador) {
         this._fuseProgressBarService.setMode("indeterminate");
@@ -225,7 +256,7 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
 
 
     closeDiag(newItem?: ColaboradorxAtividadeModel): void {
-        this._matDialogRef.close(newItem);        
+        this._matDialogRef.close(newItem);
     }
 
     public myError = (

@@ -7,24 +7,24 @@
 
         <Form [formGroup]="formFiltro" class="grid-cols-12 gap-15">
 
-            <custom-search-select [multiple]="true" [options]="perfilOptions" [required]="false" formControlName="Perfil"
-                placeholder="Selecione os perfis" label="Perfil" class="col-span-4">
+            <custom-search-select [multiple]="true" [options]="perfilOptions" [required]="false"
+                formControlName="Perfil" placeholder="Selecione os perfis" label="Perfil" class="col-span-4">
             </custom-search-select>
 
-            <custom-search-select [multiple]="true" [options]="equipeOptions" formControlName="Equipe" [required]="false"
-                placeholder="Selecione as equipe" label="Equipes" class="col-span-4">
+            <custom-search-select [multiple]="true" [options]="equipeOptions" formControlName="Equipe"
+                [required]="false" placeholder="Selecione as equipe" label="Equipes" class="col-span-4">
             </custom-search-select>
 
             <custom-search-select [multiple]="true" [options]="OsOptions" formControlName="Os" [required]="false"
                 placeholder="Selecione as OS" label="OS" class="col-span-4">
             </custom-search-select>
-            
-            <custom-search-select [multiple]="true" [options]="disciplinaOptions" formControlName="Disciplina" [required]="false"
-                placeholder="Selecione a disciplina" label="Disciplina" class="col-span-4">
+
+            <custom-search-select [multiple]="true" [options]="disciplinaOptions" formControlName="Disciplina"
+                [required]="false" placeholder="Selecione a disciplina" label="Disciplina" class="col-span-4">
             </custom-search-select>
 
-            <custom-search-select [multiple]="true" [options]="funcaoOptions" formControlName="Funcao" [required]="false"
-                placeholder="Selecione a função" label="Função" class="col-span-7">
+            <custom-search-select [multiple]="true" [options]="funcaoOptions" formControlName="Funcao"
+                [required]="false" placeholder="Selecione a função" label="Função" class="col-span-7">
             </custom-search-select>
 
             <div class="col-span-1">
@@ -34,15 +34,41 @@
             </div>
         </Form>
         <Form [formGroup]="form" class="grid-cols-12 gap-15">
-            <custom-search-select [multiple]="true" [options]="colaboradoresOptions" [required]="true" formControlName="ListColaborador"
-                placeholder="Selecione os Colaboradores" label="Colaboradores" class="col-span-6">
-            </custom-search-select>
-
-            <custom-search-select [multiple]="true" [options]="atividadesOptions" [required]="true" formControlName="ListAtividade" 
-                placeholder="Selecione as atividades" label="Atividades Específicas" class="col-span-6">
+            <custom-search-select [multiple]="true" [options]="atividadesOptions" [required]="true"
+                formControlName="ListAtividade" placeholder="Selecione as atividades" label="Atividades Específicas"
+                class="col-span-6">
             </custom-search-select>
         </Form>
-       
+        <div class="border border-solid border-2">
+            <mat-table mat-table #table [dataSource]="dataSource">
+                <ng-container matColumnDef="check">
+                    <mat-header-cell *matHeaderCellDef>
+                        <mat-checkbox (change)="checkAll($event)"></mat-checkbox>
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        <mat-checkbox (change)="checkChange(row)" [checked]="colaboradorIsChecked(row)"></mat-checkbox>
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="NOME">
+                    <mat-header-cell *matHeaderCellDef>Nome</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.NOME }}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="MATRICULA">
+                    <mat-header-cell *matHeaderCellDef>Cadastro</mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        {{ row.MATRICULA }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="CRACHA">
+                    <mat-header-cell *matHeaderCellDef>Cracha</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.CRACHA }}</mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+                <mat-row *matRowDef="let item; columns: displayedColumns">
+                </mat-row>
+            </mat-table>
+        </div>
     </div>
 </mat-dialog-content>
 
@@ -51,7 +77,8 @@
 <div class="padding-border">
     <mat-dialog-actions align="end">
         <button mat-button mat-dialog-close style="background-color: rgb(157, 27, 27); color: white">Cancelar</button>
-        <button [disabled]="form.invalid || blockRequisicao" type="submit" (click)="relacionarColaboradores()" mat-raised-button
+        <button [disabled]="form.invalid || blockRequisicao || checkedColaboradores.length==0 " type="submit"
+            (click)="relacionarColaboradores()" mat-raised-button
             style="background-color: rgb(22, 163, 75); color: white">Relacionar Colaboradores</button>
     </mat-dialog-actions>
 </div>
