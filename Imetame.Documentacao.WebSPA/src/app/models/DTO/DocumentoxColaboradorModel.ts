@@ -14,6 +14,7 @@ export class DocumentoxColaboradorModel{
     Vencer: boolean;
     DiasVencer: number;
     SincronizadoDestra: boolean;
+    RelacionadoDestra: boolean;
     ImageSource;
 }
 

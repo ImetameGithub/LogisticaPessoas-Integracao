@@ -29,7 +29,8 @@ import { FusePerfectScrollbarDirective } from "@fuse/directives/fuse-perfect-scr
 import { ShowLogDialogComponent } from "../show-log-dialog/show-log-dialog.component";
 import { DocumentoxColaboradorModel } from "app/models/DTO/DocumentoxColaboradorModel";
 import { DocumentosModalComponent } from "./documentos-modal/documentos-modal.component";
-import { ColaboradorProtheusModel } from "app/models/DTO/ColaboradorModel";
+import { ColaboradorModel, ColaboradorProtheusModel } from "app/models/DTO/ColaboradorModel";
+import { FuseSwitchAlertService } from "@fuse/services/switch-alert";
 
 @Component({
     selector: "colaboradores",
@@ -71,6 +72,7 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
         private titleService: Title,
         private _fuseProgressBarService: FuseProgressBarService,
         public dialog: MatDialog,
+        private _fuseSwitchAlertService: FuseSwitchAlertService,
         private _snackbar: MatSnackBar,
         public snackBar: MatSnackBar
     ) {
@@ -105,7 +107,7 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
             .subscribe((processamento) => {
                 this.isResult = processamento.status === 2 || processamento.status === 3
             });
-        
+
     }
 
     ngOnDestroy(): void {
@@ -118,7 +120,7 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
         item.check = !item.check;
         this.todoMundo = this.service.itens.some(i => i.check);
     }
-    
+
 
     toggleAllSelection(): void {
         this.service.itens.forEach((item) => {
@@ -161,32 +163,38 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
         );
     }
 
-    getDocumentosProtheus(matricula: string){
+    getDocumentosProtheus(colaborador: ColaboradorModel) {
         this._fuseProgressBarService.setMode("indeterminate");
         this._fuseProgressBarService.show();
-        this.service.GetDocumentosProtheus('0'+matricula).subscribe(
+        this.service.GetDocumentosProtheus('0' + colaborador.NumCad).subscribe(
             {
                 next: (response: DocumentoxColaboradorModel[]) => {
                     this._fuseProgressBarService.hide();
-                    this.documentos = response;
+                    if (response.length <= 0) {
+                        this._fuseSwitchAlertService.open({
+                            title: 'Atenção',
+                            message: 'Nenhum documento encontrado no Protheus',
+                            icon: {
+                                show: true,
+                                name: 'error_outline',
+                                color: 'error',
+                            },
+                            dismissible: true,
+                        });
+                        return
+                    }
                     const dialogConfig = new MatDialogConfig();
                     dialogConfig.autoFocus = false;
                     dialogConfig.width = '95%';
                     dialogConfig.height = 'auto';
+                    dialogConfig.data = {
+                        _listDocumentos: response,
+                        _colaborador: colaborador
+                      };
                     const dialogRef = this.dialog.open(DocumentosModalComponent, dialogConfig);
                     dialogRef.afterClosed().subscribe(() => {
-                     this.titleService.setTitle("Cadastro - Imetame");
-                   });
-                    // if(response.length > 0){
-                    // }
-                    // else{
-                    //     this._fuseProgressBarService.hide();
-                    //     this._snackbar.open('Nenhum documento encontrado', 'X', {
-                    //         duration: 2500,
-                    //         panelClass: 'snackbar-error',
-                    //     })
-                    // }
-                  
+                        this.titleService.setTitle("Cadastro - Imetame");
+                    });
                 },
                 error: (error) => {
                     this._fuseProgressBarService.hide();
@@ -201,7 +209,7 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
 
     }
 
-    enviarParaColaboradorDestra(){
+    enviarParaColaboradorDestra() {
         this._fuseProgressBarService.setMode("indeterminate");
         this._fuseProgressBarService.show();
         let colaboradores = this.service.itens.filter(col => col.check);
@@ -218,17 +226,23 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
                 },
                 error: (error) => {
                     this._fuseProgressBarService.hide();
-                    this.blockRequisicao = false;
-                    this._snackbar.open(error.error, 'X', {
-                        duration: 4000,
-                        panelClass: 'snackbar-error',
-                    })
+                    this._fuseSwitchAlertService.open({
+                        title: 'Atenção',
+                        message: error.error,
+                        icon: {
+                            show: true,
+                            name: 'warning',
+                            color: 'warn',
+                        },
+                        dismissible: true,
+                    });
                 }
+
             }
-        )  
+        )
     }
 
-    enviarDocumentosParaDestra(){
+    enviarDocumentosParaDestra() {
         this._fuseProgressBarService.setMode("indeterminate");
         this._fuseProgressBarService.show();
         let colaboradores = this.service.itens.filter(col => col.check);
@@ -244,15 +258,21 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
                     })
                 },
                 error: (error) => {
-                    this._fuseProgressBarService.hide();
                     this.blockRequisicao = false;
-                    this._snackbar.open(error.error, 'X', {
-                        duration: 4000,
-                        panelClass: 'snackbar-error',
-                    })
+                    this._fuseProgressBarService.hide();
+                    this._fuseSwitchAlertService.open({
+                        title: 'Atenção',
+                        message: error.error,
+                        icon: {
+                            show: true,
+                            name: 'warning',
+                            color: 'warn',
+                        },
+                        dismissible: true,
+                    });
                 }
             }
-        )  
+        )
     }
 
     showError(error) {

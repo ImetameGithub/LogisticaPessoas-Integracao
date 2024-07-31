@@ -22,6 +22,7 @@ namespace Imetame.Documentacao.Domain.Models
         public byte[]? Bytes { get; set; }
         public string? Base64 { get; set; }
         public bool SincronizadoDestra { get; set; } = false;
+        public bool RelacionadoDestra { get; set; } = false;
         public string ConcatAtividades { get; set; } = "";
 
 

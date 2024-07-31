@@ -13,18 +13,18 @@ namespace Imetame.Documentacao.Domain.Entities
     {
         public Processamento()
         {
-            Oss = new List<string>();
+            Oss = "";
         }
 
         public Guid IdPedido { get; set; }
         public Pedido Pedido { get; set; }
         public string OssString
         {
-            get { return String.Join(',', Oss); }
-            set { Oss = value == null ? new List<string>() : value.Split(',').ToList(); }
+            get { return Oss; }
+            set { Oss = value == null ? "" : value; }
         }
         [NotMapped]
-        public List<string> Oss { get; set; }
+        public string Oss { get; set; }
 
         public DateTime InicioProcessamento { get; set; }
         public DateTime? FinalProcessamento { get; set; }

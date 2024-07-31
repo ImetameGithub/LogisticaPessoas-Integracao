@@ -26,40 +26,17 @@
                     <mat-tab label="Cadastro">
                         <div class="tab-content" fusePerfectScrollbar fxLayout="row wrap" fxLayoutAlign="center">
 
-                            <mat-form-field fxFlex="51" appearance="outline">
-                                <mat-label>Pedido</mat-label>
-                                <mat-select formControlName="pedido" required>
-                                    <mat-option *ngFor="let pedido of pedidos" [value]="pedido.Id">
-                                        {{pedido.NumPedido}} - {{pedido.Unidade}}
-                                    </mat-option>
-                                </mat-select>
-                            </mat-form-field>
-
-                            <!-- <mat-form-field fxFlex="51" appearance="outline">
-                                <mat-label>Credenciadora</mat-label>
-                                <mat-select formControlName="credenciadora" required>
-                                    <mat-option>--</mat-option>
-                                    <mat-option *ngFor="let c of credenciadoras" [value]="c.id">
-                                        {{c.nome}}
-                                    </mat-option>
-                                </mat-select>
-
-                            </mat-form-field> -->
+                            <div fxFlex="51">
+                                <custom-search-select [options]="pedidosOptions" [required]="false"
+                                    formControlName="pedido" placeholder="Selecione um Pedido" label="Pedido"
+                                    class="col-span-4">
+                                </custom-search-select>
+                            </div>                                                           
 
                             <mat-form-field fxFlex="51" appearance="outline">
                                 <mat-label>Ordem de serviço</mat-label>
-                                <mat-chip-list #chipList aria-label="Ordem de serviço">
-                                    <mat-chip *ngFor="let os of oss" [selectable]="selectable" [removable]="removable"
-                                        (removed)="remove(os)">
-                                        {{os}}
-                                        <mat-icon matChipRemove>cancel</mat-icon>
-                                    </mat-chip>
-                                    <input placeholder="Ordem de serviço" required #osInput [formControl]="osCtrl"
-                                        [matAutocomplete]="auto" [matChipInputFor]="chipList"
-                                        [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                                        (matChipInputTokenEnd)="add($event)">
-                                </mat-chip-list>
-                                <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+                                <input type="text" matInput required #osInput [matAutocomplete]="autoResp" formControlName="oss">
+                                <mat-autocomplete #autoResp="matAutocomplete" [displayWith]="displayFnResp">
                                     <mat-option *ngFor="let os of filteredOss | async" [value]="os">
                                         {{os.numero}} - {{os.descricao}}
                                     </mat-option>
@@ -69,7 +46,7 @@
                             <div fxFlex="51" fxLayout="row wrap" fxLayoutAlign="end">
 
                                 <button class="mr-8" mat-raised-button color="primary"
-                                    [disabled]="filtroForm.invalid || isBusy" (click)="avancar()">Avançar</button>
+                                    [disabled]="filtroForm.invalid" (click)="avancar()">Avançar</button>
                             </div>
 
                         </div>

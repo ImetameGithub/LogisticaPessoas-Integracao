@@ -7,9 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
+using OpenIddict.Validation.AspNetCore;
 
 namespace Imetame.Documentacao.WebApi.Controllers
 {
+    [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class AtividadeEspecificaController : Controller

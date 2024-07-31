@@ -13,7 +13,7 @@ namespace Imetame.Documentacao.Domain.Models
         public Guid? Id { get; set; }
         public Guid IdPedido { get; set; }
         public string OssString { get; set; }
-        public List<string> Oss { get; set; }
+        public string Oss { get; set; }
         public DateTime InicioProcessamento { get; set; }
         public DateTime? FinalProcessamento { get; set; }
         public StatusProcessamento Status { get; set; }

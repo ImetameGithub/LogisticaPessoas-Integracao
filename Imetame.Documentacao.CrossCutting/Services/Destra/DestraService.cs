@@ -15,11 +15,11 @@ public class DestraService : IDestraService
     public DestraService()
     {
         _httpClient = new HttpClient();
-#if DEBUG 
-        _url = "https://api.destra.armata.cloud/homolog/api/v1";
-#else
-        _url = "INSERIR URL DE PRODUCAO";
-#endif
+        #if DEBUG 
+                _url = "https://api.destra.armata.cloud/homolog/api/v1";
+        #else
+                _url = "https://api.destra.armata.cloud/homolog/api/v1";
+        #endif
 
     }
     public async Task<AuthResponse> AuthAsync(AuthDestra authDestra)

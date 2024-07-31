@@ -3,10 +3,10 @@ import { Component, OnInit, Inject, OnDestroy, ViewEncapsulation, ViewChild, Ele
 import { Subject, Observable } from 'rxjs';
 import { fuseAnimations } from '@fuse/animations';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormBuilder, Validators, UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
-import { takeUntil, startWith, debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { takeUntil, startWith, debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 import * as _ from 'lodash';
 
 import { Title } from '@angular/platform-browser';
@@ -17,6 +17,7 @@ import { AutomacaoDeProcessosService } from '../automacao-de-processos.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PedidoService } from 'app/main/pedido/pedido.service';
+import { CustomOptionsSelect } from 'app/shared/components/custom-select/components.types';
 
 @Component({
     selector: 'credenciadora',
@@ -28,7 +29,8 @@ import { PedidoService } from 'app/main/pedido/pedido.service';
 export class CredenciadoraComponent implements OnInit, OnDestroy {
 
     private _unsubscribeAll: Subject<any>;
-    filtroForm: FormGroup;
+    filtroForm: UntypedFormGroup;
+    // filtroForm: FormGroup;
     selectable = false;
     removable = true;
     separatorKeysCodes: number[] = [ENTER, COMMA];
@@ -36,16 +38,19 @@ export class CredenciadoraComponent implements OnInit, OnDestroy {
     filteredOss: Observable<any[]>;
     oss: string[] = [];
     pedidos: any[] = [];
+    ordemservico: any[] = []
     credenciadoras: any[] = []
 
+    pedidosOptions: CustomOptionsSelect[] = [];
+    ordemServicoOptions: CustomOptionsSelect[] = [];
 
     @ViewChild('osInput') osInput: ElementRef<HTMLInputElement>;
     @ViewChild('auto') matAutocomplete: MatAutocomplete;
 
     isBusy: boolean = false;
-
     constructor(
         public service: AutomacaoDeProcessosService,
+        private _formBuilder: UntypedFormBuilder,
         private formBuilder: FormBuilder,
         public servicePedido: PedidoService,
         private titleService: Title,
@@ -57,8 +62,47 @@ export class CredenciadoraComponent implements OnInit, OnDestroy {
     ) {
         this._unsubscribeAll = new Subject();
         this.filteredOss = new Observable();
-        this.filtroForm = this.createForm();
-        this.osCtrl.valueChanges
+        // this.filtroForm = this.createForm();
+
+        this.filtroForm = this._formBuilder.group({
+            oss: [null, [Validators.required]],
+            pedido: [null, [Validators.required]],
+        });
+    }
+
+    createForm(): FormGroup {
+        return this.formBuilder.group({
+            oss: [null, [Validators.required]],
+            pedido: [null, [Validators.required]],
+        });
+    }
+
+    ngOnInit(): void {
+        this.titleService.setTitle("Cadastro - Imetame");
+
+        this.servicePedido.GetAll().subscribe(
+            (pedidos) => {
+                this.pedidos = pedidos;
+                this.pedidosOptions = this.pedidos.map(item => new CustomOptionsSelect(item.Id, item.NumPedido + ' - ' + item.Unidade)) ?? [];
+            },
+            (error) => {
+                console.error('Erro ao buscar pedidos', error);
+            }
+        );
+
+        this.service.getOss('').subscribe(
+            (ordensServicos: any[]) => {
+                this.ordemServicoOptions = ordensServicos.map(item => new CustomOptionsSelect(item.os, item.numero + ' - ' + item.descricao)) ?? [];
+            },
+            (error) => {
+                console.error('Erro ao buscar pedidos', error);
+            }
+        );
+
+ 
+
+        
+        this.filtroForm.controls.oss.valueChanges
             .pipe(
                 takeUntil(this._unsubscribeAll),
                 startWith(''),
@@ -70,36 +114,18 @@ export class CredenciadoraComponent implements OnInit, OnDestroy {
 
                 this.filteredOss = this.service.getOss(q);
             });
+        // this.osCtrl.valueChanges
+        //     .pipe(
+        //         takeUntil(this._unsubscribeAll),
+        //         startWith(''),
+        //         debounceTime<any>(600),
+        //         distinctUntilChanged()
+        //     )
+        //     .subscribe((q: string) => {
+        //         if (_.isObject(q)) return;
 
-    }
-
-    createForm(): FormGroup {
-
-        return this.formBuilder.group({
-            oss: [null, [Validators.required]],
-            pedido: [null, [Validators.required]],
-        });
-    }
-
-    ngOnInit(): void {
-        this.titleService.setTitle("Cadastro - Imetame");
-
-        // this.service.getPedidos().subscribe(
-        //     (pedidos) => {
-        //         this.pedidos = pedidos;
-        //     },
-        //     (error) => {
-        //         console.error('Erro ao buscar pedidos', error);
-        //     }
-        // );
-        this.servicePedido.GetAll().subscribe(
-            (pedidos) => {
-                this.pedidos = pedidos;
-            },
-            (error) => {
-                console.error('Erro ao buscar pedidos', error);
-            }
-        );
+        //         this.filteredOss = this.service.getOss(q);
+        //     });
     }
 
     ngOnDestroy(): void {
@@ -108,18 +134,8 @@ export class CredenciadoraComponent implements OnInit, OnDestroy {
         this._unsubscribeAll.complete();
     }
 
-
-    add(event: MatChipInputEvent): void {
-
-    }
-
-    remove(os: string): void {
-        const index = this.oss.indexOf(os);
-
-        if (index >= 0) {
-            this.oss.splice(index, 1);
-        }
-        this.filtroForm.controls.oss.setValue(this.oss);
+    displayFnResp(user: any): string {
+        return user && user.numero ? user.numero + ' - ' + user.descricao : '';
     }
 
     selected(event: MatAutocompleteSelectedEvent): void {
@@ -130,32 +146,26 @@ export class CredenciadoraComponent implements OnInit, OnDestroy {
     }
 
     avancar(): void {
-        const values = this.filtroForm.getRawValue()
+        const values = this.filtroForm.getRawValue();
         this.service.getProcessoAtivo({ idPedido: values.pedido }).then(
             (processo) => {
                 if (!processo.id) {
-                    this.service.cadastrarProcessamento({IdPedido: values.pedido,Oss: values.oss,OssString: '' }).then(
-                        (processo) => {
-                            this.router.navigate([`${processo.Id}`], { relativeTo: this.route });
+                    this.service.cadastrarProcessamento({ IdPedido: values.pedido, Oss: values.oss.numero, OssString: '' }).then(
+                        (processamento: any) => {
+                            this.router.navigate([`${processamento.Id}`], { relativeTo: this.route });
                         }
-                    )
-                }else{
+                    );
+                } else {
                     this.router.navigate([`${processo.Id}/view`], { relativeTo: this.route });
                 }
             },
             (error) => this.showError(error)
         );
-
     }
 
     showError(error) {
-        this.isBusy = false;
         this._fuseProgressBarService.hide();
         let errorDialogRef = this.dialog.open(ShowErrosDialogComponent);
         errorDialogRef.componentInstance.error = error;
-
-
     }
-    
-
 }

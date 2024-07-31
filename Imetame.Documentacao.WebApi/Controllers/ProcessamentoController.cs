@@ -10,12 +10,14 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using AutoMapper;
 using Imetame.Documentacao.WebAPI.Helpers;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
+using OpenIddict.Validation.AspNetCore;
 
 namespace Imetame.Documentacao.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
     public class ProcessamentoController : Controller
     {
         private readonly IProcessamentoService _service;

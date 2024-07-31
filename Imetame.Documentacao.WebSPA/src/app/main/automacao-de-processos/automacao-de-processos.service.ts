@@ -10,7 +10,7 @@ import { Finalizado } from './finalizados/finalizados.component';
 import { Log } from './logs/logs.component';
 import { environment } from 'environments/environment';
 import { Pedido } from 'app/models/Pedido';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { ColaboradorModel } from 'app/models/DTO/ColaboradorModel';
 import { DocumentoxColaboradorModel, ImagemProtheus } from 'app/models/DTO/DocumentoxColaboradorModel';
 
@@ -124,24 +124,35 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
             }));
     }
 
+    GetOrdemServico(): Observable<any[]> {
+        let param = { 'pageIndex': 0, 'pageSize': 10 };
+        param['query'] = '';
+
+        const params = new HttpParams()
+            .set('pageIndex', 0)
+            .set('pageSize', 0)
+            .set('query', '');
+        return this.dataService.getList(this.extranetApiUrl + 'oss', param)
+    }
+
 
 
 
     cadastrar(item: any): Promise<any> {
-        return this.dataService.post(this.apiUrl + 'Cadastros/', item).toPromise();
+        return  this.dataService.post(this.apiUrl + 'Cadastros/', item).toPromise();
     }
 
 
     GetDocumentosProtheus(matricula: string): Observable<DocumentoxColaboradorModel[]> {
         return this._httpClient.get<DocumentoxColaboradorModel[]>(`${environment.Colaboradores.GetDocumentosProtheus}/${matricula}`)
-            .pipe(
-                tap((documentoxColaboradorRetorno: DocumentoxColaboradorModel[]) => {
-                    this._documentoxColaborador.next(documentoxColaboradorRetorno);
-                }));
+            // .pipe(
+            //     tap((documentoxColaboradorRetorno: DocumentoxColaboradorModel[]) => {
+            //         this._documentoxColaborador.next(documentoxColaboradorRetorno);
+            //     }));
     }
 
     GetImagemProtheus(recno: string): Observable<ImagemProtheus> {
-        return this._httpClient.get<ImagemProtheus>(`${environment.Colaboradores.GetImagemProtheus}/${recno}`)         
+        return this._httpClient.get<ImagemProtheus>(`${environment.Colaboradores.GetImagemProtheus}/${recno}`)
     }
 
     EnviarColaboradorDestra(Colaborador: any): Observable<any> {
@@ -191,8 +202,9 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
         });
     }
 
+
     cadastrarProcessamento(item: any): Promise<any> {
-        return this.dataService.post(this.apiUrl + 'processamento/', item).toPromise();
+        return this.dataService.post<any>(this.apiUrl + 'processamento/', item).toPromise();
     }
 
     getProcesso(id: any): Promise<any> {

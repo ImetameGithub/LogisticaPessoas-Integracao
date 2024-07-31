@@ -5,7 +5,9 @@ using Imetame.Documentacao.Domain.Models;
 using Imetame.Documentacao.Domain.Repositories;
 using Imetame.Documentacao.Infra.Data.Migrations;
 using Irony.Parsing;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OpenIddict.Validation.AspNetCore;
 using System.Text.Json;
 
 namespace Imetame.Documentacao.WebApi.Controllers
@@ -13,7 +15,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
     
     [Route("api/[controller]/[action]")]
     [ApiController]
-    //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
     public class DestraController : Controller
     {
         private readonly IConfiguration _configuration;
@@ -231,6 +233,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 return NotFound(ex);
             }
         }
+        
         [HttpPost]
         public async Task<HttpResponseMessage> EnviarDocumentoParaApiDoCliente(DocumentoDestra documento, string NomeDoc)
         {
@@ -256,6 +259,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 return result;
             }
         }
+
 
     }
 }

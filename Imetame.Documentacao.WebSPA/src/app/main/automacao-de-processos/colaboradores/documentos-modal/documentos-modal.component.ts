@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, UntypedFormGroup, Validators } from '@angular/forms';
-import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer, Title } from '@angular/platform-browser';
 import { FuseProgressBarService } from '@fuse/components/progress-bar/progress-bar.service';
@@ -9,10 +9,11 @@ import { FilesDataSource } from 'app/utils/files-data-source';
 import { Subject } from 'rxjs';
 import { AutomacaoDeProcessosService } from '../../automacao-de-processos.service';
 
-import { ColaboradorProtheusModel } from 'app/models/DTO/ColaboradorModel';
+import { ColaboradorModel, ColaboradorProtheusModel } from 'app/models/DTO/ColaboradorModel';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { StatusDocumentoObrigatoriosModel } from 'app/models/DTO/StatusDocumentoObrigatoriosModel';
 import { Router } from '@angular/router';
+import { FuseSwitchAlertService } from '@fuse/services/switch-alert/switch-alert.service';
 
 
 @Component({
@@ -35,16 +36,20 @@ export class DocumentosModalComponent implements OnInit {
 
   constructor(
     public service: AutomacaoDeProcessosService,
+    @Inject(MAT_DIALOG_DATA) public _data: { _listDocumentos: DocumentoxColaboradorModel[], _colaborador: ColaboradorModel },
     public dialogRef: MatDialogRef<DocumentosModalComponent>,
     private titleService: Title,
     private _fuseProgressBarService: FuseProgressBarService,
     private _fuseConfirmationService: FuseConfirmationService,
+    private _fuseSwitchAlertService: FuseSwitchAlertService,
     public dialog: MatDialog,
     private router: Router,
     private _snackbar: MatSnackBar,
     private sanitizer: DomSanitizer,
     public snackBar: MatSnackBar
   ) {
+    this.documentos = _data._listDocumentos;
+    this.getDocumentosObrigatorioStatus(_data._listDocumentos);
     this.form = new FormGroup({
       dtVencimento: new FormControl(new Date, [Validators.required]),
       arquivo: new FormControl('', [Validators.required]),
@@ -53,21 +58,11 @@ export class DocumentosModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.titleService.setTitle("Vizualização de Documentos");
-
-    this.service.documentoxColaborador$.subscribe(
-      {
-        next: (response: DocumentoxColaboradorModel[]) => {
-          this.documentos = response;
-          this.getDocumentosObrigatorioStatus(this.documentos);
-        },
-        error: (error) => { console.log(error.error) }
-      });
-
   }
 
   enviarDocsParaDestra(documento: DocumentoxColaboradorModel, index: any) {
 
-    if(documento.SincronizadoDestra){
+    if (documento.SincronizadoDestra) {
       this._snackbar.open("O documento já foi enviado para Destra", 'X', {
         duration: 2500,
         panelClass: 'snackbar-error',
@@ -75,7 +70,7 @@ export class DocumentosModalComponent implements OnInit {
       return
     }
 
-    if(documento.Vencer || documento.Vencido){
+    if (documento.Vencer || documento.Vencido) {
       this._snackbar.open("Atualize a data de vencimento e tente novamente", 'X', {
         duration: 2500,
         panelClass: 'snackbar-error',
@@ -88,8 +83,8 @@ export class DocumentosModalComponent implements OnInit {
         next: (response: DocumentoxColaboradorModel) => {
           this._fuseProgressBarService.hide();
           this.blockRequisicao = false;
-          this.documentos[index] = { ...response};
-          
+          this.documentos[index] = { ...response };
+
           this._snackbar.open("Item enviado para com sucesso", 'X', {
             duration: 2500,
             panelClass: 'snackbar-success',
@@ -97,11 +92,21 @@ export class DocumentosModalComponent implements OnInit {
         },
         error: (error) => {
           this._fuseProgressBarService.hide();
+          this._fuseSwitchAlertService.open({
+            title: 'Atenção',
+            message: error.error,
+            icon: {
+              show: true,
+              name: 'warning',
+              color: 'warn',
+            },
+            dismissible: true,
+          });
           this.blockRequisicao = false;
-          this._snackbar.open(error.error, 'X', {
-            duration: 4000,
-            panelClass: 'snackbar-error',
-          })
+          // this._snackbar.open(error.error, 'X', {
+          //   duration: 4000,
+          //   panelClass: 'snackbar-error',
+          // })
         }
       }
     )
@@ -129,7 +134,7 @@ export class DocumentosModalComponent implements OnInit {
         }
       }
     );
-   
+
   }
 
   closeModal() {
@@ -146,9 +151,16 @@ export class DocumentosModalComponent implements OnInit {
 
         },
         error: (error) => {
-          this._snackbar.open(error.error, 'X', {
-            duration: 4000,
-            panelClass: 'snackbar-error',
+          this._fuseProgressBarService.hide();
+          this._fuseSwitchAlertService.open({
+            title: 'Atenção',
+            message: error.error,
+            icon: {
+              show: true,
+              name: 'warning',
+              color: 'warn',
+            },
+            dismissible: true,
           });
         }
       }
@@ -206,9 +218,45 @@ export class DocumentosModalComponent implements OnInit {
     });
   }
 
+  
+  enviarDocumentosParaDestra() {
+    this._fuseProgressBarService.setMode("indeterminate");
+    this._fuseProgressBarService.show();
+    let colaboradores: ColaboradorModel[] = [];
+    colaboradores.push(this._data._colaborador)
 
 
- public openAbaAtividadeEspecifica(): void {
+    this.service.EnviarDocsArrayDestra(colaboradores).subscribe(
+        {
+            next: (response: ColaboradorProtheusModel) => {
+                this._fuseProgressBarService.hide();
+                this.blockRequisicao = false;
+                this._snackbar.open("Item enviado para com sucesso", 'X', {
+                    duration: 2500,
+                    panelClass: 'snackbar-success',
+                })
+            },
+            error: (error) => {
+                this.blockRequisicao = false;
+                this._fuseProgressBarService.hide();
+                this._fuseSwitchAlertService.open({
+                    title: 'Atenção',
+                    message: error.error,
+                    icon: {
+                        show: true,
+                        name: 'warning',
+                        color: 'warn',
+                    },
+                    dismissible: true,
+                });
+            }
+        }
+    )
+}
+
+
+
+  public openAbaAtividadeEspecifica(): void {
     // Gera a URL completa usando a rota do Angular
     const url = this.router.serializeUrl(
       this.router.createUrlTree(['colaboradores'])

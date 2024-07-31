@@ -71,19 +71,22 @@
                             <button matTooltip="{{doc.DescArquivo}}" mat-button mat-raised-button
                                 (click)="docDetalhes(doc)" 
                                 [ngClass]="{
-                                    'vencidoXVencer': doc.Vencido || doc.Vencer,            
+                                    'vencidoXVencer': doc.Vencido || doc.Vencer || !doc.RelacionadoDestra,            
                                     'sincronizado-destra': doc.SincronizadoDestra
                                 }">
                                 {{ doc.DescArquivo }}
-                                <h4 *ngIf="!doc.Vencido && !doc.Vencer && doc.DtVencimentoFormatada != '0001-01-01T00:00:00'">
+                                <h5 *ngIf="!doc.Vencido && !doc.Vencer && doc.DtVencimentoFormatada != '0001-01-01T00:00:00'">
                                     Vencimento - {{ doc.DtVencimentoFormatada | date:'dd/MM/yyyy' }} <br> {{doc.DiasVencer}} Dias
-                                </h4>
-                                <h4 class="btnH4" *ngIf="doc.Vencido">
+                                </h5>
+                                <h5 class="btnH4" *ngIf="doc.Vencido">
                                     Vencido - {{ doc.DtVencimentoFormatada | date:'dd/MM/yyyy' }}
-                                </h4>
-                                <h4 class="btnH4" *ngIf="doc.Vencer">
+                                </h5>
+                                <h5 class="btnH4" *ngIf="doc.Vencer">
                                     A vencer - {{ doc.DtVencimentoFormatada | date:'dd/MM/yyyy' }} <br> {{doc.DiasVencer}} Dias
-                                </h4>
+                                </h5>
+                                <h5 class="btnH4" *ngIf="!doc.RelacionadoDestra && !doc.Vencido && !doc.Vencer && doc.DtVencimentoFormatada == '0001-01-01T00:00:00'">
+                                    Documento não relacionado a Destra
+                                </h5>
                             </button>
                         </div>
                     </div>
@@ -95,4 +98,5 @@
 
 <mat-dialog-actions align="end" class="padding-border">
     <button class="btn-fechar" mat-button mat-dialog-close>Fechar</button>
+    <button class="btn-submit" (click)="enviarDocumentosParaDestra()" mat-button mat-dialog-close>Enviar todos documentos</button>
 </mat-dialog-actions>

@@ -1,0 +1,30 @@
+<div class="div-principal">
+
+    <ng-container *ngIf="data.title || data.message || data.icon.show">
+        <div fxLayout="column" fxLayoutAlign="center center">
+
+            <ng-container *ngIf="data.icon.show">
+                <mat-icon [ngClass]="
+                {
+                    'icon-warn': data.icon.color === 'warn',
+                    'icon-danger': data.icon.color === 'error',
+                    'icon-success': data.icon.color === 'success'
+                }">
+                    {{data.icon.name}}
+                </mat-icon>
+            </ng-container>
+
+            <!-- Title -->
+            <ng-container *ngIf="data.title">
+                <div class="font-title" [innerHTML]="data.title"></div>
+            </ng-container>
+
+            <!-- Message -->
+            <ng-container *ngIf="data.message">
+                <div style="font-size: medium;" [innerHTML]="data.message"></div>
+            </ng-container>
+        </div>
+    </ng-container>
+
+
+</div>

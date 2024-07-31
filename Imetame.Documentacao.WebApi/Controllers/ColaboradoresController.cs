@@ -6,18 +6,20 @@ using Imetame.Documentacao.Domain.Models;
 using Imetame.Documentacao.Domain.Repositories;
 using Imetame.Documentacao.WebAPI.Helpers;
 using Imetame.Documentacao.WebAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using OpenIddict.Validation.AspNetCore;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
 
 namespace Imetame.Documentacao.WebApi.Controllers
 {
-    //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class ColaboradoresController : ControllerBase
@@ -156,7 +158,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
         {
             try
             {
-                var resp = await _repository.ListaAsync(idProcessamento, cancellationToken);
+                //var resp = await _repository.ListaAsync(idProcessamento, cancellationToken);
 
                 Domain.Entities.Processamento? processamento = await _repProcessamento.SelectContext().Where(m => m.Id == idProcessamento).FirstOrDefaultAsync();
 
@@ -195,7 +197,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                   join DADOSADV_LUC..ZNB010 (nolock) ZNB ON ZNB.ZNB_MATRIC = COLAB.[numcad] AND ZNB.D_E_L_E_T_='' AND ZNB.ZNB_DTFIM>GETDATE()-30
 
-                  WHERE ZNB_OS in @Oss
+                  WHERE ZNB_OS = @Oss
                 order by Nome";
                 #endregion CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
 
@@ -433,6 +435,26 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 List<DocumentoxColaboradorModel> documentos = (await conn.QueryAsync<DocumentoxColaboradorModel>(sql, new { Matricula = matricula })).ToList();
 
+                foreach (DocumentoxColaboradorModel item in documentos.Where(m => m.Vencido || m.Vencer != true))
+                {
+                    bool docRelacao = await _repDocxColaborador.SelectContext().AsNoTracking()
+                        .Include(m => m.Colaborador)
+                        .Where(m => m.DXC_CODPROTHEUS == item.Codigo && m.Colaborador.Matricula == matricula.Remove(0, 1)).AnyAsync();
+
+                    if (docRelacao)
+                    {
+                        item.SincronizadoDestra = true;
+                    }
+
+                    bool relacionadoDestra = await _repDocumento.SelectContext().AsNoTracking().Where(m => m.IdProtheus == item.Codigo).AnyAsync();
+
+                    if (relacionadoDestra)
+                    {
+                        item.RelacionadoDestra = true;
+                    }
+
+                }
+
                 return documentos;
             }
             catch (Exception ex)
@@ -463,7 +485,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 }
 
 
-     
+
                 DateTime dataAtual = DateTime.Now;
 
                 foreach (DocumentoxColaboradorModel vencidos in documentos.Where(m => m.DtVencimento.Trim() != ""))
@@ -483,19 +505,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                     {
                         vencidos.Vencido = true;
                     }
-                }
-
-                foreach (DocumentoxColaboradorModel item in documentos.Where(m => m.Vencido || m.Vencer != true))
-                {
-                    bool docRelacao = await _repDocxColaborador.SelectContext().AsNoTracking()
-                        .Include(m => m.Colaborador)
-                        .Where(m => m.DXC_CODPROTHEUS == item.Codigo && m.Colaborador.Matricula == matricula.Remove(0, 1)).AnyAsync();
-
-                    if (docRelacao)
-                    {
-                        item.SincronizadoDestra = true;
-                    }
-                }
+                }               
 
                 return Ok(documentos);
             }
@@ -634,8 +644,6 @@ namespace Imetame.Documentacao.WebApi.Controllers
                     throw new Exception("Falha ao Salvar Dados.\n" + erro);
                 }
 
-                List<Colaborador> colaboradores = new List<Colaborador>();
-
                 // Carregar todos os itens de colaboradores cadastrados no sistema - Matheus Monfreides
                 List<Colaborador> itensCadastrados = _repColaborador.SelectContext()
                     .AsNoTracking()
@@ -662,10 +670,14 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 List<string> colaboradoresComDocsVencidos = new List<string>();
                 List<string> docsSemRelacao = new List<string>();
+                DateTime dataAtual = DateTime.Now;
+
 
                 foreach (ColaboradorModel item in listColaboradores)
                 {
                     List<DocumentoxColaboradorModel> docsColaborador = await ConsultaDocsProtheus("0" + item.NumCad, true);
+
+                    //docsColaborador = docsColaborador.Where(m => m.SincronizadoDestra == false).ToList();
 
                     var validDocs = docsColaborador
                         .Where(m => !string.IsNullOrWhiteSpace(m.DtVencimento))
@@ -676,7 +688,6 @@ namespace Imetame.Documentacao.WebApi.Controllers
                         doc.DtVencimentoFormatada = DateTime.ParseExact(doc.DtVencimento, "yyyyMMdd", CultureInfo.InvariantCulture);
                     }
 
-                    DateTime dataAtual = DateTime.Now;
 
                     List<DocumentoxColaboradorModel> docsVencidos = validDocs
                         .Where(m => m.DtVencimentoFormatada <= dataAtual.AddDays(10) && m.DtVencimentoFormatada > dataAtual || m.DtVencimentoFormatada <= dataAtual)
@@ -686,9 +697,9 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                     foreach (var doc in docsColaborador)
                     {
-                        Documento? docRelacao = await _repDocumento.SelectContext().AsNoTracking().Where(m => m.IdProtheus == doc.Codigo).FirstOrDefaultAsync();
+                        bool docRelacao = await _repDocumento.SelectContext().AsNoTracking().Where(m => m.IdProtheus == doc.Codigo).AnyAsync();
 
-                        if (docRelacao is null)
+                        if (docRelacao)
                         {
                             docsSemRelacao.Add(doc.DescArquivo);
                         }
@@ -961,13 +972,24 @@ namespace Imetame.Documentacao.WebApi.Controllers
                         }
                       );
                     }
-                }
+                    else
+                    {
+                        StatusDocumentoObrigatoriosDTO.Add(
+                          new StatusDocumentoObrigatoriosModel
+                          {
+                              DocDestra = docRelacao.DescricaoDestra,
+                              DocProtheus = docRelacao.DescricaoProtheus,
+                              Status = "Ok"
+                          });
 
-                return Ok(StatusDocumentoObrigatoriosDTO);
+                    }
+
+                }
+                    return Ok(StatusDocumentoObrigatoriosDTO);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Ocorreu um erro: " + ex.Message);
+                return StatusCode(500, ex.Message);
             }
         }
 

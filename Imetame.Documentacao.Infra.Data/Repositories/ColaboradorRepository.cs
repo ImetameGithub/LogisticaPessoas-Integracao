@@ -91,7 +91,7 @@ namespace Imetame.Documentacao.Infra.Data.Repositories
 
   join DADOSADV_LUC..ZNB010 (nolock) ZNB ON ZNB.ZNB_MATRIC = COLAB.[numcad] AND ZNB.D_E_L_E_T_='' AND ZNB.ZNB_DTFIM>GETDATE()-30
 
-  WHERE ZNB_OS in @Oss
+  WHERE ZNB_OS = @Oss
 order by Nome";
             //WHERE ZNB_OS in ('001701001')";
             var lista = (await this.conn.QueryAsync<ColaboradorModel>(sql, new {Oss= processamento.Oss }));

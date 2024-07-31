@@ -1,14 +1,16 @@
 using System.Text.Json;
 using Imetame.Documentacao.CrossCutting.Services.Protheus;
 using Imetame.Documentacao.CrossCutting.Services.Protheus.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OpenIddict.Validation.AspNetCore;
 
 namespace Imetame.Documentacao.WebApi.Controllers
 {
 
     [Route("api/[controller]/[action]")]
     [ApiController]
-    //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
     public class ProtheusController : Controller
     {
         private readonly IProtheusService _protheusService;
