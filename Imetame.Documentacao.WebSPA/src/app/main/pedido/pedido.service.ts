@@ -9,6 +9,7 @@ import { DataService } from "app/services/data.service";
 import { API_URL } from "app/config/tokens";
 import { map, tap } from "rxjs/operators";
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from "@angular/router";
+import { Credenciadora } from "app/models/Crendenciadora";
 
 @Injectable()
 export class PedidoService implements Resolve<Pedido> {
@@ -86,6 +87,10 @@ export class PedidoService implements Resolve<Pedido> {
         return this._httpClient.delete<Pedido>(`${environment.Pedido.Delete}/${id}`)
     }
     //#endregion
+
+    GetAllCredenciadoras(): Observable<Credenciadora[]> {
+        return this._httpClient.get<Credenciadora[]>(environment.Credenciadora.GetAll);
+    }
 
     getCredenciadoras(): Observable<any> {
         return this.dataService.getList(`${this.apiUrl}CredenciadoraDePara?pageIndex=0&pageSize=100`).pipe(

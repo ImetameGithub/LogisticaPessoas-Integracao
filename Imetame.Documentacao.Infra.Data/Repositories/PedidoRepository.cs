@@ -31,7 +31,7 @@ namespace Imetame.Documentacao.Infra.Data.Repositories
                         select new PedidoList()
                         {
                             Id = c.Id,
-                            Credenciadora = c.Credenciadora,
+                            Credenciadora = c.IdCredenciadora,
                             NumPedido = c.NumPedido,
                             Unidade = c.Unidade
                         };
@@ -39,7 +39,7 @@ namespace Imetame.Documentacao.Infra.Data.Repositories
 
             if (!string.IsNullOrEmpty(texto))
             {
-                query = query.Where(q => q.Credenciadora.Contains(texto) || q.Unidade.Contains(texto) || q.NumPedido.Contains(texto));
+                query = query.Where(q => q.Unidade.Contains(texto) || q.NumPedido.Contains(texto));
             }
 
 
@@ -53,7 +53,5 @@ namespace Imetame.Documentacao.Infra.Data.Repositories
 
             return (count, entities);
         }
-
-
     }
 }

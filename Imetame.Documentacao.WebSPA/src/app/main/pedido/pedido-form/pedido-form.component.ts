@@ -35,6 +35,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { PedidoService } from "../pedido.service";
 import { DatePipe } from "@angular/common";
 import { Pedido } from "app/models/Pedido";
+import { Credenciadora } from "app/models/Crendenciadora";
 
 
 @Component({
@@ -54,7 +55,7 @@ export class PedidoFormComponent implements OnInit {
     pageType: string;
 
     confirmDialogRef: MatDialogRef<ConfirmDialogComponent>;
-    credenciadoras: any[] = []
+    credenciadoras: Credenciadora[] = []
 
     form: UntypedFormGroup;
 
@@ -73,9 +74,9 @@ export class PedidoFormComponent implements OnInit {
         private _fuseProgressBarService: FuseProgressBarService,
     ) {
         this.form = new FormGroup({
-            credenciadora: new FormControl('', [Validators.required]),
-            numPedido: new FormControl('', [Validators.required]),
-            unidade: new FormControl('', [Validators.required]),
+            IdCredenciadora: new FormControl('', [Validators.required]),
+            NumPedido: new FormControl('', [Validators.required]),
+            Unidade: new FormControl('', [Validators.required]),
         });
         this.titleService.setTitle("Novo - Pedido - Imetame");
     }
@@ -104,17 +105,31 @@ export class PedidoFormComponent implements OnInit {
             }
         );
         
-
-
-        this._Pedidoservice.getCredenciadoras().subscribe(
-            (credenciadoras) => {
-                console.log(credenciadoras)
-                this.credenciadoras = credenciadoras;
-            },
-            (error) => {
-                console.error('Erro ao buscar credenciadoras', error);
+        this._Pedidoservice.GetAllCredenciadoras().subscribe(
+            {
+                next: (response: Credenciadora[]) => {
+                    this.credenciadoras = response;
+                },
+                error: (error) => {
+                    this._fuseProgressBarService.hide();
+                    this.blockRequisicao = false;
+                    this._snackbar.open(error.error, 'X', {
+                        duration: 2500,
+                        panelClass: 'snackbar-error',
+                    })
+                }
             }
-        );
+        )
+
+        // this._Pedidoservice.getCredenciadoras().subscribe(
+        //     (credenciadoras) => {
+        //         console.log(credenciadoras)
+        //         this.credenciadoras = credenciadoras;
+        //     },
+        //     (error) => {
+        //         console.error('Erro ao buscar credenciadoras', error);
+        //     }
+        // );
     }
 
 

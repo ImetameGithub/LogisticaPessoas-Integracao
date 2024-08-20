@@ -4,6 +4,7 @@ using Imetame.Documentacao.Infra.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Imetame.Documentacao.Infra.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240801133525_AddTableColaboradorxPedido")]
+    partial class AddTableColaboradorxPedido
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -159,7 +161,7 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
                     b.Property<DateTime>("CXP_DTINCLUSAO")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 8, 19, 17, 26, 17, 363, DateTimeKind.Local).AddTicks(9680));
+                        .HasDefaultValue(new DateTime(2024, 8, 1, 10, 35, 25, 497, DateTimeKind.Local).AddTicks(5079));
 
                     b.Property<Guid?>("CXP_IDCOLABORADOR")
                         .HasColumnType("uniqueidentifier");
@@ -292,7 +294,7 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
                     b.Property<DateTime>("DXC_DTENVIO")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 8, 19, 17, 26, 17, 363, DateTimeKind.Local).AddTicks(6374));
+                        .HasDefaultValue(new DateTime(2024, 8, 1, 10, 35, 25, 497, DateTimeKind.Local).AddTicks(1427));
 
                     b.Property<Guid>("DXC_IDCOLABORADOR")
                         .HasColumnType("uniqueidentifier");
@@ -334,8 +336,10 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("IdCredenciadora")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Credenciadora")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("NumPedido")
                         .IsRequired()
@@ -348,8 +352,6 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("IdCredenciadora");
 
                     b.ToTable("Pedido", (string)null);
                 });
@@ -484,17 +486,6 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
                     b.Navigation("Processamento");
                 });
 
-            modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.Pedido", b =>
-                {
-                    b.HasOne("Imetame.Documentacao.Domain.Entities.Credenciadora", "Credenciadora")
-                        .WithMany("Pedidos")
-                        .HasForeignKey("IdCredenciadora")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Credenciadora");
-                });
-
             modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.Processamento", b =>
                 {
                     b.HasOne("Imetame.Documentacao.Domain.Entities.Pedido", "Pedido")
@@ -524,11 +515,6 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
                     b.Navigation("ColaboradorxPedido");
 
                     b.Navigation("DocumentosxColaborador");
-                });
-
-            modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.Credenciadora", b =>
-                {
-                    b.Navigation("Pedidos");
                 });
 
             modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.Pedido", b =>

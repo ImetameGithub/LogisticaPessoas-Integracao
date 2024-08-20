@@ -82,6 +82,13 @@
                     [@animate]="{ value: '*', params: { y: '100%' } }">
                 </mat-row>
             </mat-table>
+            <div class="text-center mt-4" *ngIf="totalCount === 0">
+                <p *ngIf="totalCount === 0 && !nenhumDadoEncontrado" class="text-accent font-medium ">Nenhum dado
+                    cadastrado ainda.</p>
+                <p *ngIf="totalCount === 0 && nenhumDadoEncontrado" class="text-warn font-medium ">Nenhuma
+                    informação encontrada com os filtros fornecidos</p>
+
+            </div>
         </div>
         <mat-paginator [length]="totalCount" [pageIndex]="page - 1" [pageSize]="pageSize"
             [pageSizeOptions]="[5,10,20,50]" (page)="onPageChange($event)">

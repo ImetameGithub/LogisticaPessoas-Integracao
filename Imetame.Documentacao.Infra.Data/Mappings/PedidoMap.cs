@@ -17,7 +17,12 @@ namespace Imetame.Documentacao.Infra.Data.Mappings
 
             builder.Property(c => c.NumPedido).HasColumnType("varchar(50)").HasMaxLength(50).IsRequired();
             builder.Property(c => c.Unidade).HasColumnType("varchar(255)").HasMaxLength(255).IsRequired();
-            builder.Property(c => c.Credenciadora).HasColumnType("varchar(255)").HasMaxLength(255).IsRequired();
+            //builder.Property(c => c.Credenciadora).HasColumnType("varchar(255)").HasMaxLength(255).IsRequired();
+
+            builder.HasOne(x => x.Credenciadora)
+               .WithMany(m => m.Pedidos)
+               .HasForeignKey(x => x.IdCredenciadora)
+               .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

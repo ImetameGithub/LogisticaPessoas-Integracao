@@ -53,29 +53,29 @@
                             fxLayoutAlign="space-between">
                             <mat-form-field fxFlex="100" appearance="outline">
                                 <mat-label>Pedido</mat-label>
-                                <input matInput name="numPedido" formControlName="numPedido" placeholder="Pedido" />
-                                <mat-hint class="text-red-500" *ngIf="myError('numPedido', 'required', form)">
+                                <input matInput name="NumPedido" formControlName="NumPedido" placeholder="Pedido" />
+                                <mat-hint class="text-red-500" *ngIf="myError('NumPedido', 'required', form)">
                                     Campo <strong>Obrigatorio</strong>
                                 </mat-hint>
                             </mat-form-field>
 
                             <mat-form-field fxFlex="100" appearance="outline">
                                 <mat-label>Credenciadora</mat-label>
-                                <mat-select formControlName="credenciadora">
+                                <mat-select formControlName="IdCredenciadora">
                                     <mat-option>--</mat-option>
-                                    <mat-option *ngFor="let c of credenciadoras" [value]="c.Credenciadora">
-                                        {{c.Credenciadora}}
+                                    <mat-option *ngFor="let c of credenciadoras" [value]="c.Id">
+                                        {{c.Descricao}}
                                     </mat-option>
                                 </mat-select>
-                                <mat-hint class="text-red-500" *ngIf="myError('credenciadora', 'required', form)">
+                                <mat-hint class="text-red-500" *ngIf="myError('IdCredenciadora', 'required', form)">
                                     Campo <strong>Obrigatorio</strong>
                                 </mat-hint>
                             </mat-form-field>
 
                             <mat-form-field fxFlex="100" appearance="outline">
                                 <mat-label>Unidade</mat-label>
-                                <input matInput name="unidade" formControlName="unidade" placeholder="Unidade" required />
-                                <mat-hint class="text-red-500" *ngIf="myError('unidade', 'required', form)">
+                                <input matInput name="Unidade" formControlName="Unidade" placeholder="Unidade" required />
+                                <mat-hint class="text-red-500" *ngIf="myError('Unidade', 'required', form)">
                                     Campo <strong>Obrigatorio</strong>
                                 </mat-hint>
                             </mat-form-field>

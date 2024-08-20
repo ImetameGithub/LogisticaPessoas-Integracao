@@ -1,7 +1,7 @@
 const baseUrl = 'https://localhost:7030/api';
 export const environment = {
     production: true,
-    urlApi: 'https://localhost:7030/api',
+    urlApi: 'https://jaguare.imetame.com.br:5012/api',
     hmr: false,
     // URL PARA API - MATHEUS MONFREIDES - FARTEC SISTEMAS
     //#region PEDIDO

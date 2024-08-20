@@ -36,7 +36,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 IQueryable<Pedido> query = _repPedido.SelectContext()
                                                              .OrderBy(x => x.NumPedido);
                 if (!string.IsNullOrEmpty(texto))
-                    query = query.Where(q => q.Credenciadora.Contains(texto) || q.Unidade.Contains(texto) || q.NumPedido.Contains(texto));
+                    query = query.Where(q => q.Unidade.Contains(texto) || q.NumPedido.Contains(texto));
 
                 int totalCount = await query.CountAsync();
 

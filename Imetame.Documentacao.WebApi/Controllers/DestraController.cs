@@ -15,7 +15,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
     
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
+    //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
     public class DestraController : Controller
     {
         private readonly IConfiguration _configuration;
@@ -260,6 +260,67 @@ namespace Imetame.Documentacao.WebApi.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> IncluirColaboradorPedido([FromBody] IncluirColaboradorPedido documento)
+        {
+            try
+            {
+                AuthResponse response = await Login();
+
+                if (!response.Erro)
+                {
+                    string endPoint = $"/pedido/atualizar";
+                    string json = JsonSerializer.Serialize(documento);
+
+                    var result = await _destraService.PostAsync(endPoint, json, response.Token);
+                    if (result.IsSuccessStatusCode)
+                    {
+                        return Ok(await result.Content.ReadAsStringAsync());
+                    }
+
+                    return StatusCode((int)result.StatusCode, await result.Content.ReadAsStringAsync());
+                }
+                else
+                {
+                    return BadRequest(response.MensagemErro);
+                }
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> IncluirDiretaPedido([FromBody] IncluirDiretaPedido documento)
+        {
+            try
+            {
+                AuthResponse response = await Login();
+
+                if (!response.Erro)
+                {
+                    string endPoint = $"/pedido/incluir";
+                    string json = JsonSerializer.Serialize(documento);
+
+                    var result = await _destraService.PostAsync(endPoint, json, response.Token);
+                    if (result.IsSuccessStatusCode)
+                    {
+                        return Ok(await result.Content.ReadAsStringAsync());
+                    }
+
+                    return StatusCode((int)result.StatusCode, await result.Content.ReadAsStringAsync());
+                }
+                else
+                {
+                    return BadRequest(response.MensagemErro);
+                }
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex);
+            }
+        }
 
     }
 }

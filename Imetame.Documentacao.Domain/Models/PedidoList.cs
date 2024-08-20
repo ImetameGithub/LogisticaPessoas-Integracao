@@ -11,6 +11,6 @@ namespace Imetame.Documentacao.Domain.Models
         public Guid Id { get; set; }
         public string NumPedido { get; set; }
         public string Unidade { get; set; }
-        public string Credenciadora { get; set; }
+        public Guid Credenciadora { get; set; }
     }
 }

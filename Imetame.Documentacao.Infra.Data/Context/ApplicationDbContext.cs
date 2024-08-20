@@ -26,6 +26,7 @@ namespace Imetame.Documentacao.Infra.Data.Context
         public DbSet<Domain.Entities.Colaborador> Colaborador { get; set; }
         public DbSet<Domain.Entities.ColaboradorxAtividade> ColaboradorxAtividade { get; set; }
         public DbSet<Domain.Entities.DocumentoxColaborador> DocumentoxColaborador { get; set; }
+        public DbSet<Domain.Entities.ColaboradorxPedido> ColaboradorxPedido { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -67,6 +68,7 @@ namespace Imetame.Documentacao.Infra.Data.Context
             modelBuilder.Entity<Domain.Entities.Colaborador>(new ColaboradorMap().Configure);
             modelBuilder.Entity<Domain.Entities.ColaboradorxAtividade>(new ColaboradorxAtividadeMap().Configure);
             modelBuilder.Entity<Domain.Entities.DocumentoxColaborador>(new DocumentoxColaboradorMap().Configure);
+            modelBuilder.Entity<Domain.Entities.ColaboradorxPedido>(new ColaboradorxPedidoMap().Configure);
 
 
 
