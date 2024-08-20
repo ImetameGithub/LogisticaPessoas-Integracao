@@ -16,7 +16,7 @@ namespace Imetame.Documentacao.Domain.Entities
 
         [ForeignKey("Colaborador")]
         public Guid IdCredenciadora { get; set; }
-        public virtual Credenciadora Credenciadora { get; set; } = null;
+        public virtual Credenciadora Credenciadora { get; set; }
 
         [NotMapped]
         public List<ColaboradorxPedido> ColaboradorxPedido { get; set; }

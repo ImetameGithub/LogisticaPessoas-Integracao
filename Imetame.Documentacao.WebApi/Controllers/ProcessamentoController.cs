@@ -15,7 +15,7 @@ using OpenIddict.Validation.AspNetCore;
 
 namespace Imetame.Documentacao.WebApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]")] 
     [ApiController]
     [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
     public class ProcessamentoController : Controller

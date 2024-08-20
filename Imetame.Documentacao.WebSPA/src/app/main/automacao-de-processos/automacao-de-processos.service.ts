@@ -159,6 +159,7 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
         const headers = new HttpHeaders().set('Content-Type', 'application/json');
         return this._httpClient.post<any>(environment.Colaboradores.EnviarColaboradorDestra, Colaborador, { headers });
     }
+
     EnviarDocsArrayDestra(Colaborador: any): Observable<any> {
         const headers = new HttpHeaders().set('Content-Type', 'application/json');
         return this._httpClient.post<any>(environment.Colaboradores.EnviarDocsArrayDestra, Colaborador, { headers });
@@ -206,6 +207,12 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
     cadastrarProcessamento(item: any): Promise<any> {
         return this.dataService.post<any>(this.apiUrl + 'processamento/', item).toPromise();
     }
+
+    // cadastrarProcessamento(item: any): Observable<any> {
+    //     const headers = new HttpHeaders().set('Content-Type', 'application/json');
+    //     return this._httpClient.post<any>(environment.Processamento.Criar , item, { headers });
+    // }
+
 
     getProcesso(id: any): Promise<any> {
         return new Promise((resolve, reject) => {

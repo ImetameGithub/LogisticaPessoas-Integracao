@@ -16,7 +16,7 @@ export const environment = {
     //#endregion
     //#region CREDENCIADORA
     Credenciadora: {
-        GetItem: `${baseUrl}/Credenciadora/GetItem`,   
+        GetItem: `${baseUrl}/Credenciadora/GetItem`,
         Add: `${baseUrl}/Credenciadora/Add`,
         Update: `${baseUrl}/Credenciadora/Update`,
         Delete: `${baseUrl}/Credenciadora/Delete`,
@@ -31,7 +31,7 @@ export const environment = {
         Add: `${baseUrl}/Documento/Add`,
         Update: `${baseUrl}/Documento/Update`,
         Delete: `${baseUrl}/Documento/Delete`,
-        GetAll: `${baseUrl}/Documento/GetAll`,        
+        GetAll: `${baseUrl}/Documento/GetAll`,
         GetAllPaginated: `${baseUrl}/Documento/GetAllPaginated`,
         GetDocumentosDestra: `${baseUrl}/Documento/GetDocumentosDestra`,
         GetDocumentosProtheus: `${baseUrl}/Documento/GetDocumentosProtheus`,
@@ -49,7 +49,7 @@ export const environment = {
         GetDocumentosObrigatorios: `${baseUrl}/Colaboradores/GetDocumentosObrigatorios`,
         RelacionarColaboradorxAtividade: `${baseUrl}/Colaboradores/RelacionarColaboradorxAtividade`,
         GetImagemProtheus: `${baseUrl}/Colaboradores/GetImagemProtheus`,
-        GetItem: `${baseUrl}/Colaboradores/GetItem`,   
+        GetItem: `${baseUrl}/Colaboradores/GetItem`,
         Add: `${baseUrl}/Colaboradores/Add`,
         Update: `${baseUrl}/Colaboradores/Update`,
         Delete: `${baseUrl}/Colaboradores/Delete`,
@@ -70,14 +70,20 @@ export const environment = {
     },
     //#endregion
 
+    //#region PROCESSAMENTO
+    Processamento: {
+        Criar: `${baseUrl}/ProcessamentoFartec/Criar`,
+    },
+    //#endregion
+
     //#region PROTHEUS
     Protheus: {
         GetOs: `${baseUrl}/Protheus/GetOs`,
     },
     //#endregion
 
-      //#region DESTRA
-      Destra: {
+    //#region DESTRA
+    Destra: {
         GetDocumentosDestra: `${baseUrl}/Destra/GetDocumentos`,
     },
     //#endregion

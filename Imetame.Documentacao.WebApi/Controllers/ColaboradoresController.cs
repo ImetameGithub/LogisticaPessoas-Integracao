@@ -164,6 +164,40 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 #region CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
                 conn.Open();
+                //MUDEI AQUI
+                //var sql = @"SELECT distinct [empresa] as Empresa
+                //      ,[numcad] as NumCad
+                //      ,[numcracha] as NumCracha
+                //      ,[status] as Status
+                //      ,[nomefuncionario] as Nome
+                //      ,[cpf] as Cpf
+                //      ,[funcaoatual] as FuncaoAtual
+                //      ,[funcaoinicial] as FuncaoInicial
+                //      ,[dataafastamento] as DataAfastamento
+                //      ,[dataadmissao] as DataAdmissao
+                //      ,[datanascimento] as DataNascimento
+                //      ,[equipe] as Equipe
+                //      ,[perfil] as Perfil
+                //      ,[endereco] as Endereco
+                //      ,[numero] as Numero
+                //      ,[bairro] as Bairro
+                //      ,[cidade] as Cidade
+                //      ,[cep] as Cep
+                //      ,[ddd] as Ddd
+                //      ,[numtel] as NumTel
+                //      ,[ddd2] as Ddd2
+                //      ,[numtel2] as NumTel2
+                //      ,[estado] as Estado
+                //      ,[tempoempresaanos] as TempoEmpresaAnos
+                //      ,[tempoempresaanosint] as TempoEmpresaAnosInt
+                //      ,[tempoempresamesesint] as TempoEmpresaMesesInt
+                //      ,[tempoempresatexto] as TempoEmpresaTeexto
+                //  FROM [DW_IMETAME_NOVA_OS].[dbo].VW_FUSION_GP_COLABORADOR (nolock)  COLAB
+                //  join DADOSADV_LUC..ZNB010 (nolock) ZNB ON ZNB.ZNB_MATRIC = COLAB.[numcad] AND ZNB.D_E_L_E_T_='' AND ZNB.ZNB_DTFIM>GETDATE()-30
+                //  WHERE ZNB_OS = @Oss
+                //order by Nome";
+                #endregion CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
+
                 var sql = @"SELECT distinct [empresa] as Empresa
                       ,[numcad] as NumCad
                       ,[numcracha] as NumCracha
@@ -191,15 +225,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
                       ,[tempoempresaanosint] as TempoEmpresaAnosInt
                       ,[tempoempresamesesint] as TempoEmpresaMesesInt
                       ,[tempoempresatexto] as TempoEmpresaTeexto
-	 
-
-                  FROM [DW_IMETAME_NOVA_OS].[dbo].VW_FUSION_GP_COLABORADOR (nolock)  COLAB
-
-                  join DADOSADV_LUC..ZNB010 (nolock) ZNB ON ZNB.ZNB_MATRIC = COLAB.[numcad] AND ZNB.D_E_L_E_T_='' AND ZNB.ZNB_DTFIM>GETDATE()-30
-
+                  FROM SRVDBHOMOLOGAZEUS..VW_FUSION_GP_COLABORADOR (nolock)  COLAB
+                  join SRVDBHOMOLOGAZEUS..ZNB010 (nolock) ZNB ON ZNB.ZNB_MATRIC = COLAB.[numcad] AND ZNB.D_E_L_E_T_='' AND ZNB.ZNB_DTFIM>GETDATE()-30
                   WHERE ZNB_OS = @Oss
                 order by Nome";
-                #endregion CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
 
                 var lista = (await this.conn.QueryAsync<ColaboradorModel>(sql, new { Oss = processamento.Oss }));
 
@@ -419,11 +448,11 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 sql += @"
                           FROM SRA010 SRA
-                          INNER JOIN DADOSADV_LUC..UZJ010 UZJ 
+                          INNER JOIN SRVDBHOMOLOGAZEUS..UZJ010 UZJ 
                                   ON  UZJ.UZJ_FILIAL = SRA.RA_FILIAL
                                   AND UZJ.UZJ_MAT = SRA.RA_MAT
                                   AND UZJ.D_E_L_E_T_ = ''
-                          INNER JOIN DADOSADV_LUC..UZI010 UZI 
+                          INNER JOIN SRVDBHOMOLOGAZEUS..UZI010 UZI 
                                   ON UZI.UZI_FILIAL = UZJ.UZJ_FILIAL 
                                   AND UZI.UZI_CODIGO = UZJ.UZJ_CODTDO           
                                   AND UZI.D_E_L_E_T_ = ''
@@ -431,6 +460,20 @@ namespace Imetame.Documentacao.WebApi.Controllers
                           WHERE RA_FILIAL = '' 
                               AND RA_MAT = @Matricula
                               AND SRA.D_E_L_E_T_  = ''";
+                //sql += @"
+                //          FROM SRA010 SRA
+                //          INNER JOIN DADOSADV_LUC..UZJ010 UZJ 
+                //                  ON  UZJ.UZJ_FILIAL = SRA.RA_FILIAL
+                //                  AND UZJ.UZJ_MAT = SRA.RA_MAT
+                //                  AND UZJ.D_E_L_E_T_ = ''
+                //          INNER JOIN DADOSADV_LUC..UZI010 UZI 
+                //                  ON UZI.UZI_FILIAL = UZJ.UZJ_FILIAL 
+                //                  AND UZI.UZI_CODIGO = UZJ.UZJ_CODTDO           
+                //                  AND UZI.D_E_L_E_T_ = ''
+                //                  AND UZJ.UZJ_CODTDO <> '01'  
+                //          WHERE RA_FILIAL = '' 
+                //              AND RA_MAT = @Matricula
+                //              AND SRA.D_E_L_E_T_  = ''";
 
 
                 List<DocumentoxColaboradorModel> documentos = (await conn.QueryAsync<DocumentoxColaboradorModel>(sql, new { Matricula = matricula })).ToList();

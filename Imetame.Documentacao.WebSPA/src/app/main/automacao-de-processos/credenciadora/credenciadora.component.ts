@@ -146,6 +146,7 @@ export class CredenciadoraComponent implements OnInit, OnDestroy {
     }
 
     avancar(): void {
+        this._fuseProgressBarService.show();
         const values = this.filtroForm.getRawValue();
         this.service.getProcessoAtivo({ idPedido: values.pedido }).then(
             (processo) => {
@@ -153,8 +154,9 @@ export class CredenciadoraComponent implements OnInit, OnDestroy {
                     this.service.cadastrarProcessamento({ IdPedido: values.pedido, Oss: values.oss.numero, OssString: '' }).then(
                         (processamento: any) => {
                             this.router.navigate([`${processamento.Id}`], { relativeTo: this.route });
+                            this._fuseProgressBarService.hide();
                         }
-                    );
+                    );              
                 } else {
                     this.router.navigate([`${processo.Id}/view`], { relativeTo: this.route });
                 }
