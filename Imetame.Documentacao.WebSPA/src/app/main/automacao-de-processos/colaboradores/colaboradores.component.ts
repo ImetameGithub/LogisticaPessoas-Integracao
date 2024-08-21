@@ -107,7 +107,7 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
             .subscribe((processamento) => {
                 this.isResult = processamento.status === 2 || processamento.status === 3
             });
-
+            this._fuseProgressBarService.hide();
     }
 
     ngOnDestroy(): void {
@@ -214,7 +214,7 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
         this._fuseProgressBarService.show();
         let colaboradores = this.service.itens.filter(col => col.check);
 
-        this.service.EnviarColaboradorDestra(colaboradores,this.service.routeParams.idPedido ).subscribe(
+        this.service.EnviarColaboradorDestra(colaboradores,this.service.routeParams.idPedido,this.service.routeParams.ordemServico ).subscribe(
             {
                 next: (response: ColaboradorProtheusModel) => {
                     this._fuseProgressBarService.hide();

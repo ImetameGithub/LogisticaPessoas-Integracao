@@ -77,6 +77,7 @@ export class PedidoService implements Resolve<Pedido> {
     }
     Add(model: Pedido): Observable<Pedido> {
         const headers = new HttpHeaders().set('Content-Type', 'application/json');
+        model.Credenciadora = null;
         return this._httpClient.post<Pedido>(environment.Pedido.Add, model, { headers });
     }
     Update(model: Pedido): Observable<Pedido> {

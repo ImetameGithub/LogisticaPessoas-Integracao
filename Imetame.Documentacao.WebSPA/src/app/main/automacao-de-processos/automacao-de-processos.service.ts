@@ -13,6 +13,7 @@ import { Pedido } from 'app/models/Pedido';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { ColaboradorModel } from 'app/models/DTO/ColaboradorModel';
 import { DocumentoxColaboradorModel, ImagemProtheus } from 'app/models/DTO/DocumentoxColaboradorModel';
+import { OAuthService } from 'angular-oauth2-oidc';
 
 
 
@@ -35,6 +36,7 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
     logsFinalizados$ = this._logsFinalizado.asObservable();
 
     routeParams: any;
+    user: any;
 
     onProcessamentoChanged: BehaviorSubject<any>;
     onItensChanged: BehaviorSubject<any>;
@@ -50,6 +52,7 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
         @Inject(API_URL) private apiUrl: string,
         private dataService: DataService,
         private _httpClient: HttpClient,
+        private oauthService: OAuthService,
 
 
     ) {
@@ -63,6 +66,8 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
 
             this.onItensChanged.next(this.itens.filter((col) => col.nome.toUpperCase().includes(this.searchText)));
         });
+
+        this.user = this.oauthService.getIdentityClaims();
 
     }
 
@@ -155,14 +160,20 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
         return this._httpClient.get<ImagemProtheus>(`${environment.Colaboradores.GetImagemProtheus}/${recno}`)
     }
 
-    EnviarColaboradorDestra(Colaborador: any, IdPedido: String): Observable<any> {
-        const headers = new HttpHeaders().set('Content-Type', 'application/json');        
-        // const params = new HttpParams()
-        //         .set('page', page.toString())
-        //         .set('pageSize', pageSize.toString())
-        //         .set('idAssinante', this.usuarioLogado.Assinante.Id)
-        //         .set('filtro', filtro);
-        return this._httpClient.post<any>(environment.Colaboradores.EnviarColaboradorDestra, Colaborador, { headers });
+    // EnviarColaboradorDestra(Colaborador: any, IdPedido: string): Observable<any> {
+    //     const headers = new HttpHeaders().set('Content-Type', 'application/json');        
+    //     return this._httpClient.post<any>(environment.Colaboradores.EnviarColaboradorDestra, Colaborador, { headers });
+    // }
+
+    EnviarColaboradorDestra(Colaborador: any, IdPedido: string,ordemServico: string): Observable<any> {
+        const headers = new HttpHeaders().set('Content-Type', 'application/json');
+        const body = {
+            listColaboradores: Colaborador,
+            IdPedido: IdPedido,
+            OrdemServico: ordemServico,
+            MatriculaUsuario: this.user["numcad"]
+        };
+        return this._httpClient.post<any>(environment.Colaboradores.EnviarColaboradorDestra, body, { headers });
     }
 
     EnviarDocsArrayDestra(Colaborador: any): Observable<any> {

@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using DocumentFormat.OpenXml.Drawing;
 using Imetame.Documentacao.CrossCutting.Services.Destra.Models;
+using Imetame.Documentacao.Domain.Dto;
 using Imetame.Documentacao.Domain.Entities;
 using Imetame.Documentacao.Domain.Models;
 using Imetame.Documentacao.Domain.Repositories;
@@ -30,6 +31,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
         private readonly IBaseRepository<Domain.Entities.Documento> _repDocumento;
         private readonly IBaseRepository<Domain.Entities.Colaborador> _repColaborador;
         private readonly IBaseRepository<ColaboradorxAtividade> _repColaboradorxAtividade;
+        private readonly IBaseRepository<ColaboradorxPedido> _repColaboradorxPedido;
         private readonly DestraController _destraController;
         protected readonly SqlConnection conn;
         private readonly IConfiguration _configuration;
@@ -37,7 +39,8 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
         public ColaboradoresController(IColaboradorRepository repository, IBaseRepository<Domain.Entities.Processamento> repProcessamento,
             IConfiguration configuration, IBaseRepository<Domain.Entities.Colaborador> repColaborador,
-            IBaseRepository<ColaboradorxAtividade> repColaboradorxAtividade, DestraController destraController, IBaseRepository<Documento> repDocumento, IBaseRepository<DocumentoxColaborador> repDocxColaborador)
+            IBaseRepository<ColaboradorxAtividade> repColaboradorxAtividade, DestraController destraController, IBaseRepository<Documento> repDocumento, 
+            IBaseRepository<DocumentoxColaborador> repDocxColaborador, IBaseRepository<ColaboradorxPedido> repColaboradorxPedido)
         {
             _repository = repository;
             _configuration = configuration;
@@ -48,6 +51,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
             _destraController = destraController;
             _repDocumento = repDocumento;
             _repDocxColaborador = repDocxColaborador;
+            _repColaboradorxPedido = repColaboradorxPedido;
         }
 
         #region FUNÇÕES DE APOIO 
@@ -191,7 +195,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                       ,[tempoempresaanosint] as TempoEmpresaAnosInt
                       ,[tempoempresamesesint] as TempoEmpresaMesesInt
                       ,[tempoempresatexto] as TempoEmpresaTeexto
-                  FROM [DW_IMETAME_NOVA_OS].[dbo].VW_FUSION_GP_COLABORADOR (nolock)  COLAB
+                  FROM VW_FUSION_GP_COLABORADOR (nolock)  COLAB
                   join DADOSADV_LUC..ZNB010 (nolock) ZNB ON ZNB.ZNB_MATRIC = COLAB.[numcad] AND ZNB.D_E_L_E_T_='' AND ZNB.ZNB_DTFIM>GETDATE()-30
                   WHERE ZNB_OS = @Oss
                 order by Nome";
@@ -546,7 +550,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
         #region FUNÇÕE DE ENVIO PARA DESTRA
         [HttpPost]
-        public async Task<IActionResult> EnviarColaboradorDestra([FromBody] List<ColaboradorModel> listColaboradores)
+        public async Task<IActionResult> EnviarColaboradorDestra([FromBody] EnviarColaboradorDestraDto dto)
         {
             try
             {
@@ -565,7 +569,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                     .ToList();
 
                 // Buscar colaboradores que foi selecionado mas não possuem relação com atividade, ocasionando em não ter na tabela colaborador - Matheus Monfreides
-                List<ColaboradorModel> colaboradoresSemAtividade = listColaboradores
+                List<ColaboradorModel> colaboradoresSemAtividade = dto.ListColaboradores
                    .Where(ei => !itensCadastrados.Any(m => m.Matricula == ei.NumCad))
                    .ToList();
 
@@ -585,7 +589,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 // Buscar os registro que foram selecionados da lista protheus dentro do nosso cadastro Colaborador 
                 List<Colaborador> listProtheusXlistColaborador = itensCadastrados
-                    .Where(m => listColaboradores.Any(ei => ei.NumCad == m.Matricula))
+                    .Where(m => dto.ListColaboradores.Any(ei => ei.NumCad == m.Matricula))
                     .ToList();
 
                 foreach (Colaborador model in listProtheusXlistColaborador)
@@ -618,12 +622,16 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                     var jsonResponse = await _destraController.AddColaborador(colaboradorDestra) as OkObjectResult;
 
-                    //ColaboradorxPedido colabPedido = new ColaboradorxPedido()
-                    //{
-                    //  CXP_DTINCLUSAO = DateTime.Now,
-                    //  CXP_IDCOLABORADOR = model.Id,
-                    //  CXP_IDPEDIDO = model.
-                    //}
+                    ColaboradorxPedido colabPedido = new ColaboradorxPedido()
+                    {
+                        CXP_DTINCLUSAO = DateTime.Now,
+                        CXP_IDCOLABORADOR = model.Id,
+                        CXP_IDPEDIDO = dto.IdPedido,
+                        CXP_NUMEROOS = dto.OrdemServico,
+                        CXP_USUARIOINCLUSAO = dto.MatriculaUsuario
+                    };
+                    await _repColaboradorxPedido.SaveAsync(colabPedido);
+
                 }
 
 

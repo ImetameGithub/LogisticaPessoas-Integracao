@@ -14,7 +14,7 @@ const routes: Routes = [
         
     },
     {
-        path: 'cadastro-de-colaboradores/:processamento/:idPedido',
+        path: 'cadastro-de-colaboradores/:processamento/:idPedido/:ordemServico',
         component: ColaboradoresComponent,
         resolve: { data: AutomacaoDeProcessosService }
 

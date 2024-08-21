@@ -85,18 +85,18 @@ export class PedidoFormComponent implements OnInit {
     ngOnInit() {
 
         this._Pedidoservice._selectPedido$.subscribe(
-            (data: any) => {
+            (data: Pedido) => {
                 if (data != null) {
                     
                     this.selectPedido = data;
                     
                     this.form = this._formBuilder.group({
-                        credenciadora: [data?.Credenciadora, [Validators.required]],
-                        numPedido: [data?.NumPedido, [Validators.required]],
-                        unidade: [data?.Unidade, [Validators.required]],
+                        IdCredenciadora: [data?.IdCredenciadora, [Validators.required]],
+                        NumPedido: [data?.NumPedido, [Validators.required]],
+                        Unidade: [data?.Unidade, [Validators.required]],
                     });
                     this.titleService.setTitle(
-                        data.Credenciadora + " - Pedido - Imetame"
+                        data.Credenciadora.Descricao + " - Pedido - Imetame"
                     );
                 }
             },
