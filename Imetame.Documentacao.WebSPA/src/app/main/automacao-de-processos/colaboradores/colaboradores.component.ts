@@ -214,7 +214,7 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
         this._fuseProgressBarService.show();
         let colaboradores = this.service.itens.filter(col => col.check);
 
-        this.service.EnviarColaboradorDestra(colaboradores).subscribe(
+        this.service.EnviarColaboradorDestra(colaboradores,this.service.routeParams.idPedido ).subscribe(
             {
                 next: (response: ColaboradorProtheusModel) => {
                     this._fuseProgressBarService.hide();

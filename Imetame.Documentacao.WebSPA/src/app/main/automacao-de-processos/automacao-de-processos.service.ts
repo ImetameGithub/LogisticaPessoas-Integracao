@@ -155,8 +155,13 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
         return this._httpClient.get<ImagemProtheus>(`${environment.Colaboradores.GetImagemProtheus}/${recno}`)
     }
 
-    EnviarColaboradorDestra(Colaborador: any): Observable<any> {
-        const headers = new HttpHeaders().set('Content-Type', 'application/json');
+    EnviarColaboradorDestra(Colaborador: any, IdPedido: String): Observable<any> {
+        const headers = new HttpHeaders().set('Content-Type', 'application/json');        
+        // const params = new HttpParams()
+        //         .set('page', page.toString())
+        //         .set('pageSize', pageSize.toString())
+        //         .set('idAssinante', this.usuarioLogado.Assinante.Id)
+        //         .set('filtro', filtro);
         return this._httpClient.post<any>(environment.Colaboradores.EnviarColaboradorDestra, Colaborador, { headers });
     }
 
