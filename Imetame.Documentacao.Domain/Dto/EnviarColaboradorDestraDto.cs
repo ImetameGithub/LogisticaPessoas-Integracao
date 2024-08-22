@@ -11,7 +11,7 @@ namespace Imetame.Documentacao.Domain.Dto
     {
         public List<ColaboradorModel> ListColaboradores { get; set; }
         public Guid IdPedido { get; set; }
-        public string? OrdemServico { get; set; }
+        public string OrdemServico { get; set; }
         public string? MatriculaUsuario { get; set; }
     }
 }
