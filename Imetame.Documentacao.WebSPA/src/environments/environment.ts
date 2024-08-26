@@ -55,6 +55,7 @@ export const environment = {
         Delete: `${baseUrl}/Colaboradores/Delete`,
         GetAll: `${baseUrl}/Colaboradores/GetAll`,
         GetAllPaginated: `${baseUrl}/Colaboradores/GetAllPaginated`,
+        GetProgress: `${baseUrl}/Colaboradores/GetProgress`,
     },
     //#endregion
 

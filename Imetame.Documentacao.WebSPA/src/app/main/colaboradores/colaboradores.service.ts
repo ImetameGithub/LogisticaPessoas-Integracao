@@ -28,16 +28,17 @@ export class ColaboradorService {
     const params = new HttpParams()     
       .set('page', page.toString())
       .set('pageSize', pageSize.toString())
-      .set('filtro', filtro);
+      .set('texto', filtro);
     return this._httpClient.get<PaginatedResponse<Colaborador>>(environment.Colaboradores.GetAllPaginated, { params });
   }
   GetColaboradores(page: number = 1, pageSize: number = 10, filtro: string = ''): Observable<PaginatedResponse<ColaboradorProtheusModel>> {
     const params = new HttpParams()     
       .set('page', page.toString())
       .set('pageSize', pageSize.toString())
-      .set('filtro', filtro);
+      .set('texto', filtro);
     return this._httpClient.get<PaginatedResponse<ColaboradorProtheusModel>>(environment.Colaboradores.GetColaboradores, { params });
   }
+
 
   Add(Colaborador: Colaborador): Observable<Colaborador> {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');

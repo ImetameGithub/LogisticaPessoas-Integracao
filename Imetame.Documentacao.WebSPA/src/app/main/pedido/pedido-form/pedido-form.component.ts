@@ -54,6 +54,7 @@ export class PedidoFormComponent implements OnInit {
     errorDialogRef: MatDialogRef<ShowErrosDialogComponent>;
     pageType: string;
 
+
     confirmDialogRef: MatDialogRef<ConfirmDialogComponent>;
     credenciadoras: Credenciadora[] = []
 

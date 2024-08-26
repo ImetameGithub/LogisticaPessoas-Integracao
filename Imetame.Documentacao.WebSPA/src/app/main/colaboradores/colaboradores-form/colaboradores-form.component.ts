@@ -63,7 +63,7 @@ export class ColaboradoresFormComponent implements OnInit {
 
 
     ngOnInit() {
-        const Projetos: ColaboradorModel[] = this.route.snapshot.data['data'];
+        const Projetos: ColaboradorModel[] = this.route.snapshot.data['dataDetails'];
         this.colaboradoresOptions = Projetos.map(estrutura => new CustomOptionsSelect(estrutura.Id, estrutura.Nome)) ?? [];
     }
     

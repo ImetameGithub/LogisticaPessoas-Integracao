@@ -1,3 +1,25 @@
+.overlay-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(51, 49, 49, 0.507);
+  /* Fundo transparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .chamada {
   width: 100%;
   background-color: #00984a;
@@ -6,7 +28,7 @@
   display: flex;
 }
 
-.myDialog .mat-dialog-container  {
+.myDialog .mat-dialog-container {
   padding: 0;
   border-radius: 20px;
 }
@@ -17,14 +39,15 @@
   font-weight: bold;
 }
 
-.padding-border{
-  padding:20px!important;
+.padding-border {
+  padding: 20px !important;
 }
 
 
 .mat-checkbox-checked .mat-checkbox-background {
   background-color: #00984a !important;
 }
+
 .textColorRed {
   color: red !important;
 }
@@ -38,6 +61,33 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+
+.tipoDocumentoFiltro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: end !important;
+  width: 45%;
+  gap: 0px !important;
+  padding-top: 10px !important;
+  padding-bottom: 0px !important;
+  margin-bottom: 0px !important;
+  padding-right: 10px !important;
+}
+
+.tipoDocumentoFiltroExpanded {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: end !important;
+  width: 100%;
+  gap: 0px !important;
+  padding-top: 10px !important;
+  padding-bottom: 0px !important;
+  margin-bottom: 0px !important;
+  padding-right: 10% !important;
+  padding-left: 10% !important;
 }
 
 .document-grid {
@@ -55,7 +105,8 @@
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: center;
-  white-space: normal; /* Permitir quebras de linha */
+  white-space: normal;
+  /* Permitir quebras de linha */
   padding: 10px;
   box-sizing: border-box;
   display: flex;
@@ -67,7 +118,8 @@
 .btnH4 {
   color: red;
   font-weight: bold;
-  margin: 0; /* Remover margens padrão */
+  margin: 0;
+  /* Remover margens padrão */
 }
 
 .vencidoXVencer {
@@ -88,18 +140,23 @@
   text-align: end;
   padding: 10px;
 }
-.overflow-custom{
+
+.overflow-custom {
   overflow: hidden;
   overflow-y: auto;
 }
-.h-full{
+
+.h-full {
   height: 100%;
 }
-.img{
+
+.img {
   background-color: #fff;
-  object-fit: cover; /* Garante que a imagem cubra toda a área, sem distorção */
+  object-fit: cover;
+  /* Garante que a imagem cubra toda a área, sem distorção */
 }
-.wh-full{
+
+.wh-full {
   width: 100% !important;
   height: 100% !important;
   padding: 10px;
@@ -109,13 +166,14 @@
   background-color: firebrick !important;
   color: white !important;
 }
+
 .btn-submit {
   background-color: #00984a !important;
   color: white !important;
 }
 
-.itemClose{
-  width: 100%; 
+.itemClose {
+  width: 100%;
 }
 
 .closeImg {
@@ -126,7 +184,7 @@
   font-weight: bold;
 }
 
-.btnClose{
+.btnClose {
   display: flex;
   width: 100% !important;
   padding: 10px !important;
@@ -135,7 +193,7 @@
   padding: 0 10px;
 }
 
-.dflex{
+.dflex {
   display: flex;
 }
 
@@ -171,8 +229,3 @@
   font-weight: bold;
   border: 1px solid green;
 }
-
-
-
-
-

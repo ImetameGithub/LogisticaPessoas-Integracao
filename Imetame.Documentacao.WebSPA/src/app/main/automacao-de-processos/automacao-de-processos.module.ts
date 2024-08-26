@@ -19,6 +19,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { CustomSearchSelectComponent } from 'app/shared/components/custom-select/custom-select.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 
 
@@ -36,6 +37,7 @@ import { CustomSearchSelectComponent } from 'app/shared/components/custom-select
       MatGridListModule,
       MatButtonModule,
       MatTableModule,
+      MatProgressSpinnerModule
   ],
     providers: [AutomacaoDeProcessosService,PedidoService],
     entryComponents: [ShowLogDialogComponent]

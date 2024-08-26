@@ -18,7 +18,9 @@ const routes: Routes = [
     // {
     //     path: ":id",
     //     component: ColaboradoresFormComponent,
-    //     resolve: { data: ColaboradorService },
+    //     resolve: {
+    //         detail: ColaboradorService,
+    //     },
     // },
     // {
     //     path: "novo",
@@ -26,7 +28,7 @@ const routes: Routes = [
     //     resolve: {
     //         itens: listAllcolaboradorResolver,
     //     },
-        
+
     // },
 ];
 
@@ -34,4 +36,4 @@ const routes: Routes = [
     imports: [RouterModule.forChild(routes)],
     exports: [RouterModule],
 })
-export class ColaboradorRoutingModule {}
+export class ColaboradorRoutingModule { }

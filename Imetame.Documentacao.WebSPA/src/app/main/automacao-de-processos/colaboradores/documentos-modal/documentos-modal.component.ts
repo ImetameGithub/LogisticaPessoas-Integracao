@@ -6,7 +6,7 @@ import { DomSanitizer, Title } from '@angular/platform-browser';
 import { FuseProgressBarService } from '@fuse/components/progress-bar/progress-bar.service';
 import { DocumentoxColaboradorModel, ImagemProtheus } from 'app/models/DTO/DocumentoxColaboradorModel';
 import { FilesDataSource } from 'app/utils/files-data-source';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject, interval } from 'rxjs';
 import { AutomacaoDeProcessosService } from '../../automacao-de-processos.service';
 
 import { ColaboradorModel, ColaboradorProtheusModel } from 'app/models/DTO/ColaboradorModel';
@@ -14,25 +14,46 @@ import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { StatusDocumentoObrigatoriosModel } from 'app/models/DTO/StatusDocumentoObrigatoriosModel';
 import { Router } from '@angular/router';
 import { FuseSwitchAlertService } from '@fuse/services/switch-alert/switch-alert.service';
-
+import { debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
+import { MatProgressSpinner, MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Console } from 'console';
+import { HttpEvent, HttpEventType } from '@angular/common/http';
+import { CustomOptionsSelect } from 'app/shared/components/custom-select/components.types';
 
 @Component({
   selector: 'documentos-modal',
   templateUrl: './documentos-modal.component.html',
-  styleUrls: ['./documentos-modal.component.scss']
+  styleUrls: ['./documentos-modal.component.scss'],
 })
 export class DocumentosModalComponent implements OnInit {
+
+  private _unsubscribeAll: Subject<any>;
+
+  formFiltro: UntypedFormGroup;
   imageSource;
   form: UntypedFormGroup;
-  documentos: DocumentoxColaboradorModel[]
+  todosDocumentos: DocumentoxColaboradorModel[];
+  documentos: DocumentoxColaboradorModel[];
   visualizarImagem: boolean = false;
   colspanDocs: number = 6
   rowspan: number = 4
   colspanImg: number = 0
 
+
+
+  searchInputDocumento: FormControl;
+
   blockRequisicao: boolean = false;
 
   StatusDocumentoObrigatoriosModel: StatusDocumentoObrigatoriosModel[] = []
+
+  tipoDocumentos: CustomOptionsSelect[] = [];
+
+  contDoc: number = 1;
+  isLoading: boolean = false;
+
+  nomeColaborador: string = "";
+  listaNomeColaborador: string = "";
 
   constructor(
     public service: AutomacaoDeProcessosService,
@@ -46,18 +67,61 @@ export class DocumentosModalComponent implements OnInit {
     private router: Router,
     private _snackbar: MatSnackBar,
     private sanitizer: DomSanitizer,
-    public snackBar: MatSnackBar
+    public snackBar: MatSnackBar,
   ) {
+    this.todosDocumentos = _data._listDocumentos; // Guarda todos os documentos filtrados para não precisar fitrar novamente
+    //this.tipoDocumentos = this.todosDocumentos.map(x => new CustomOptionsSelect(x.IdTipoDocumento, x.TipoDocumento));
+
+    // Usando reduce para filtrar duplicatas
+    this.tipoDocumentos = this.todosDocumentos.reduce((acc, x) => {
+      if (!acc.some(item => item.value === x.IdTipoDocumento)) {
+        acc.push(new CustomOptionsSelect(x.IdTipoDocumento, x.TipoDocumento));
+      }
+      return acc;
+    }, [] as CustomOptionsSelect[]);
+
+
     this.documentos = _data._listDocumentos;
+    const partes = this.documentos[0].NomeColaborador.split(" - ");
+
+    this.nomeColaborador = partes[0];
+    this.listaNomeColaborador = partes[1];
+
     this.getDocumentosObrigatorioStatus(_data._listDocumentos);
     this.form = new FormGroup({
       dtVencimento: new FormControl(new Date, [Validators.required]),
       arquivo: new FormControl('', [Validators.required]),
     });
+    this.searchInputDocumento = new FormControl("");
+
   }
 
   ngOnInit(): void {
     this.titleService.setTitle("Vizualização de Documentos");
+
+    this.searchInputDocumento.setValue(this.service.searchText);
+
+    this.searchInputDocumento.valueChanges
+      .pipe(
+        takeUntil(this._unsubscribeAll),
+        debounceTime(600),
+        distinctUntilChanged()
+      )
+      .subscribe((searchText) => {
+        if (searchText == "" || searchText == null) {
+          this.documentos = this.todosDocumentos.map(documento => ({ ...documento }));
+        } else {
+          // GUARDA UMA COPIA DOS REGISTROS FILTRADOS PELO CAMPO DIGITADO
+          this.documentos = this.todosDocumentos.filter(x => x.NomeColaborador.includes(searchText)).map(documento => ({ ...documento }));
+        }
+      });
+  }
+
+  tipoDocumentoSelected(event: any) {
+    if (event == null)
+      this.documentos = this.todosDocumentos.map(documento => ({ ...documento }));
+    else
+      this.documentos = this.todosDocumentos.filter(x => x.IdTipoDocumento.includes(event)).map(documento => ({ ...documento }));
   }
 
   enviarDocsParaDestra(documento: DocumentoxColaboradorModel, index: any) {
@@ -218,41 +282,43 @@ export class DocumentosModalComponent implements OnInit {
     });
   }
 
-  
+
   enviarDocumentosParaDestra() {
-    this._fuseProgressBarService.setMode("indeterminate");
-    this._fuseProgressBarService.show();
+    this.isLoading = true;
+    //this._fuseProgressBarService.setMode("indeterminate");
+    //this._fuseProgressBarService.show();
     let colaboradores: ColaboradorModel[] = [];
     colaboradores.push(this._data._colaborador)
-
-
     this.service.EnviarDocsArrayDestra(colaboradores).subscribe(
-        {
-            next: (response: ColaboradorProtheusModel) => {
-                this._fuseProgressBarService.hide();
-                this.blockRequisicao = false;
-                this._snackbar.open("Item enviado para com sucesso", 'X', {
-                    duration: 2500,
-                    panelClass: 'snackbar-success',
-                })
+      {
+        next: (response: ColaboradorProtheusModel) => {
+          this.isLoading = false;
+          this.blockRequisicao = false;
+          // this._fuseProgressBarService.hide();
+          this._snackbar.open("Item enviado para com sucesso", 'X', {
+            duration: 2500,
+            panelClass: 'snackbar-success',
+          })
+        },
+        error: (error) => {
+          this.isLoading = false;
+          this.blockRequisicao = false;
+          // this._fuseProgressBarService.hide();
+          this._fuseSwitchAlertService.open({
+            title: 'Atenção',
+            message: error.error,
+            icon: {
+              show: true,
+              name: 'warning',
+              color: 'warn',
             },
-            error: (error) => {
-                this.blockRequisicao = false;
-                this._fuseProgressBarService.hide();
-                this._fuseSwitchAlertService.open({
-                    title: 'Atenção',
-                    message: error.error,
-                    icon: {
-                        show: true,
-                        name: 'warning',
-                        color: 'warn',
-                    },
-                    dismissible: true,
-                });
-            }
+            dismissible: true,
+          });
         }
+      }
     )
-}
+  }
+
 
 
 

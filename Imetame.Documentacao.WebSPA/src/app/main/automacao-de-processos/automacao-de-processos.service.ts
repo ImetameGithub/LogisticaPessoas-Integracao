@@ -10,9 +10,10 @@ import { Finalizado } from './finalizados/finalizados.component';
 import { Log } from './logs/logs.component';
 import { environment } from 'environments/environment';
 import { Pedido } from 'app/models/Pedido';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpHeaders, HttpParams } from '@angular/common/http';
 import { ColaboradorModel } from 'app/models/DTO/ColaboradorModel';
 import { DocumentoxColaboradorModel, ImagemProtheus } from 'app/models/DTO/DocumentoxColaboradorModel';
+import { PaginatedResponse } from 'app/models/PaginatedResponse';
 
 
 
@@ -61,7 +62,7 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
         this.onSearchTextChanged.subscribe(searchText => {
             this.searchText = searchText.toUpperCase();
 
-            this.onItensChanged.next(this.itens.filter((col) => col.nome.toUpperCase().includes(this.searchText)));
+            this.onItensChanged.next(this.itens.filter((col) => col.Nome.toUpperCase().includes(this.searchText)));
         });
 
     }
@@ -79,6 +80,11 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
             Promise.all([this.GetColaboradoresPorOs()]).then(() => { resolve(null); }, reject);
         });
     }
+
+    // getColaboradorPorOs(texto: string = ""): {
+    //     //Guid idProcessamento, CancellationToken cancellationToken, string texto = ""
+    //     return this._httpClient.get<ImagemProtheus>(`${environment.Colaboradores.GetImagemProtheus}/${recno}`)
+    // }
 
     limparFinalizados() {
         this._finalizadosSource.next([]);
@@ -139,16 +145,16 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
 
 
     cadastrar(item: any): Promise<any> {
-        return  this.dataService.post(this.apiUrl + 'Cadastros/', item).toPromise();
+        return this.dataService.post(this.apiUrl + 'Cadastros/', item).toPromise();
     }
 
 
     GetDocumentosProtheus(matricula: string): Observable<DocumentoxColaboradorModel[]> {
         return this._httpClient.get<DocumentoxColaboradorModel[]>(`${environment.Colaboradores.GetDocumentosProtheus}/${matricula}`)
-            // .pipe(
-            //     tap((documentoxColaboradorRetorno: DocumentoxColaboradorModel[]) => {
-            //         this._documentoxColaborador.next(documentoxColaboradorRetorno);
-            //     }));
+        // .pipe(
+        //     tap((documentoxColaboradorRetorno: DocumentoxColaboradorModel[]) => {
+        //         this._documentoxColaborador.next(documentoxColaboradorRetorno);
+        //     }));
     }
 
     GetImagemProtheus(recno: string): Observable<ImagemProtheus> {
@@ -156,7 +162,7 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
     }
 
     EnviarColaboradorDestra(Colaborador: any, IdPedido: String): Observable<any> {
-        const headers = new HttpHeaders().set('Content-Type', 'application/json');        
+        const headers = new HttpHeaders().set('Content-Type', 'application/json');
         // const params = new HttpParams()
         //         .set('page', page.toString())
         //         .set('pageSize', pageSize.toString())
@@ -164,6 +170,12 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
         //         .set('filtro', filtro);
         return this._httpClient.post<any>(environment.Colaboradores.EnviarColaboradorDestra, Colaborador, { headers });
     }
+
+    // EnviarDocsArrayDestra(Colaborador: any): Observable<any> {
+    //     const headers = new HttpHeaders().set('Content-Type', 'application/json');
+    //     return this._httpClient.post<any>(environment.Colaboradores.EnviarDocsArrayDestra, Colaborador, { headers });
+    // }
+
 
     EnviarDocsArrayDestra(Colaborador: any): Observable<any> {
         const headers = new HttpHeaders().set('Content-Type', 'application/json');
@@ -180,9 +192,16 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
         return this._httpClient.post<DocumentoxColaboradorModel[]>(environment.Colaboradores.GetDocumentosObrigatorios, Documentos);
     }
 
-    GetColaboradoresPorOs(): Promise<ColaboradorModel> {
+    getProgress(): Observable<any> {
+        return this._httpClient.get(environment.Colaboradores.GetProgress);
+    }
+
+
+    GetColaboradoresPorOs(filtro: string = ''): Promise<ColaboradorModel> {
+        const params = new HttpParams()
+            .set('texto', filtro);
         return new Promise((resolve, reject) => {
-            this.dataService.getList(`${environment.Colaboradores.GetColaboradoresPorOs}/${this.routeParams.processamento}`, {})
+            this.dataService.getList(`${environment.Colaboradores.GetColaboradoresPorOs}/${this.routeParams.processamento}`, { params })
                 .subscribe((response: any) => {
                     this.itens = response;
                     this.onItensChanged.next(this.itens);

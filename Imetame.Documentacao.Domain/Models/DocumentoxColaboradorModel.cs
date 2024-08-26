@@ -2,6 +2,7 @@
 using System.Buffers.Text;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,11 +25,14 @@ namespace Imetame.Documentacao.Domain.Models
         public bool SincronizadoDestra { get; set; } = false;
         public bool RelacionadoDestra { get; set; } = false;
         public string ConcatAtividades { get; set; } = "";
+        
+
+        public string TipoDocumento{ get; set; }
+		public string IdTipoDocumento { get; set; }
 
 
-
-        // REGRAS PARA VALIDAÇÃO DE DOCUMENTOS 
-        public bool Vencido { get; set; } = false;
+		// REGRAS PARA VALIDAÇÃO DE DOCUMENTOS 
+		public bool Vencido { get; set; } = false;
         public bool Vencer { get; set; } = false;
         public int DiasVencer { get; set; }
 

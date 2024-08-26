@@ -1,7 +1,9 @@
 import { BaseEntity } from "./BaseEntity";
 import { ColaboradorxAtividade } from "./ColaboradorxAtividade";
+import { DocumentoxColaboradorModel } from "./DTO/DocumentoxColaboradorModel";
+import { DocumentoxColaborador } from "./DocumentoxColaborador";
 
-export class Colaborador extends BaseEntity{
+export class Colaborador extends BaseEntity {
     Cracha: string;
     Matricula: string;
     Nome: string;
@@ -16,7 +18,8 @@ export class Colaborador extends BaseEntity{
     Perfil: string;
     Codigo_OS: string;
     Nome_OS: string;
-
+    StatusDestra: number = -2;
+    
     ColaboradorxAtividade: ColaboradorxAtividade[];
+    DocumentosxColaborador: DocumentoxColaborador[];
 }
-  

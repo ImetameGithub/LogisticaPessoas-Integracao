@@ -69,6 +69,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 throw new Exception("Parametros necessarios nao informados");
 
             List<Credenciadora> listaCredenciadora = await _repCredenciadora.SelectContext()
+                                                            .AsNoTracking()
                                                             .ToListAsync();
             return Ok(listaCredenciadora);
         }

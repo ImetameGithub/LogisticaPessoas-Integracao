@@ -12,315 +12,315 @@ using System.Text.Json;
 
 namespace Imetame.Documentacao.WebApi.Controllers
 {
-    
-    [Route("api/[controller]/[action]")]
-    [ApiController]
-    //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
-    public class DestraController : Controller
-    {
-        private readonly IConfiguration _configuration;
-        private readonly IDestraService _destraService;
-        private readonly IBaseRepository<Domain.Entities.AtividadeEspecifica> _repAtividadeEspecifica;
 
-        public DestraController(IConfiguration configuration, IDestraService destraService, IBaseRepository<Domain.Entities.AtividadeEspecifica> repAtividadeEspecifica)
-        {
-            _configuration = configuration;
-            _destraService = destraService;
-            _repAtividadeEspecifica = repAtividadeEspecifica;
-        }
+	[Route("api/[controller]/[action]")]
+	[ApiController]
+	//[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
+	public class DestraController : Controller
+	{
+		private readonly IConfiguration _configuration;
+		private readonly IDestraService _destraService;
+		private readonly IBaseRepository<Domain.Entities.AtividadeEspecifica> _repAtividadeEspecifica;
 
-        private async Task<AuthResponse> Login()
-        {
-            try
-            {
-                var authRequest = new AuthDestra
-                {
-                    Login = $"{_configuration["UsrApiDestra"]}",
-                    Pwd = $"{_configuration["PwdApiDestra"]}"
-                };
+		public DestraController(IConfiguration configuration, IDestraService destraService, IBaseRepository<Domain.Entities.AtividadeEspecifica> repAtividadeEspecifica)
+		{
+			_configuration = configuration;
+			_destraService = destraService;
+			_repAtividadeEspecifica = repAtividadeEspecifica;
+		}
 
-                AuthResponse response = await _destraService.AuthAsync(authRequest);
-                
-                return response;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
+		private async Task<AuthResponse> Login()
+		{
+			try
+			{
+				var authRequest = new AuthDestra
+				{
+					Login = $"{_configuration["UsrApiDestra"]}",
+					Pwd = $"{_configuration["PwdApiDestra"]}"
+				};
 
-             
-        [HttpGet("{cpf}")]
-        public async Task<IActionResult> GetColaborador(string cpf)
-        {
-            try
-            {
-                AuthResponse response = await Login();
+				AuthResponse response = await _destraService.AuthAsync(authRequest);
 
-                string endPoint = $"/service/funcionario?cpf={cpf}";
+				return response;
+			}
+			catch (Exception ex)
+			{
+				throw new Exception(ex.Message);
+			}
+		}
 
-                if (!response.Erro)
-                {
-                    var result = await _destraService.GetAsync(endPoint, response.Token);
-                    if (result.IsSuccessStatusCode)
-                    {
-                        return Ok(await result.Content.ReadAsStringAsync());
-                    }
 
-                    return StatusCode((int)result.StatusCode, await result.Content.ReadAsStringAsync());                    
-                }
-                else
-                {
-                    return BadRequest(response.MensagemErro);
-                }
-            }
-            catch (Exception ex)
-            {
-                return NotFound(ex);
-            }
-        }
-        
-        [HttpPost]
-        public async Task<IActionResult> AddColaborador([FromBody] ColaboradorDestra colaborador)
-        {
-            try
-            {
-                AuthResponse response = await Login();
+		[HttpGet("{cpf}")]
+		public async Task<string> GetColaborador(string cpf)
+		{
+			try
+			{
+				AuthResponse response = await Login();
 
-                if (!response.Erro)
-                {
-                    string endPoint = $"/service/funcionario";
-                    string json = JsonSerializer.Serialize(colaborador);
+				string endPoint = $"/service/funcionario?cpf={cpf}";
 
-                    var result = await _destraService.PostAsync(endPoint, json, response.Token);
-                    if (result.IsSuccessStatusCode)
-                    {
-                        var content = await result.Content.ReadAsStringAsync();
-                        return Ok(content);
-                        //return Ok(await result.Content.ReadAsStringAsync());
-                    }
+				if (!response.Erro)
+				{
+					var result = await _destraService.GetAsync(endPoint, response.Token);
+					if (result.IsSuccessStatusCode)
+					{
+						return await result.Content.ReadAsStringAsync();
+					}
 
-                    return StatusCode((int)result.StatusCode, await result.Content.ReadAsStringAsync());
-                }
-                else
-                {
-                    return BadRequest(response.MensagemErro);
-                }                
-            }
-            catch (Exception ex)
-            {
-                return NotFound(ex);
-            }
-        }
+					throw new Exception(await result.Content.ReadAsStringAsync());
+				}
+				else
+				{
+					throw new Exception(response.MensagemErro);
+				}
+			}
+			catch (Exception ex)
+			{
+				throw new Exception("Erro ao obter dados do colaborador Destra:",ex);
+			}
+		}
 
-        [HttpGet]
-        public async Task<string> GetDocumentos()
-        {
-            try
-            {
-                AuthResponse response = await Login();
+		[HttpPost]
+		public async Task<IActionResult> AddColaborador([FromBody] ColaboradorDestra colaborador)
+		{
+			try
+			{
+				AuthResponse response = await Login();
 
-                string endPoint = $"/service/docto/funcionario/lista?=";
+				if (!response.Erro)
+				{
+					string endPoint = $"/service/funcionario";
+					string json = JsonSerializer.Serialize(colaborador);
 
-                if (!response.Erro)
-                {
-                    var result = await _destraService.GetAsync(endPoint,response.Token);
-                    if (result.IsSuccessStatusCode)
-                    {
-                        return await result.Content.ReadAsStringAsync();
-                    }
+					var result = await _destraService.PostAsync(endPoint, json, response.Token);
+					if (result.IsSuccessStatusCode)
+					{
+						var content = await result.Content.ReadAsStringAsync();
+						return Ok(content);
+						//return Ok(await result.Content.ReadAsStringAsync());
+					}
 
-                    throw new Exception(await result.Content.ReadAsStringAsync());
-                }
-                else
-                {
-                    throw new Exception(response.MensagemErro);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Erro ao obter documentos", ex);
-            }
-        }
-        
-        [HttpGet]
-        public async Task<string> GetAtividades()
-        {
-            try
-            {
-                AuthResponse response = await Login();
+					return StatusCode((int)result.StatusCode, await result.Content.ReadAsStringAsync());
+				}
+				else
+				{
+					return BadRequest(response.MensagemErro);
+				}
+			}
+			catch (Exception ex)
+			{
+				return NotFound(ex);
+			}
+		}
 
-                string endPoint = $"/ativesp/lista";
+		[HttpGet]
+		public async Task<string> GetDocumentos()
+		{
+			try
+			{
+				AuthResponse response = await Login();
 
-                if (!response.Erro)
-                {
-                    var result = await _destraService.GetAsync(endPoint, response.Token);
-                    if (result.IsSuccessStatusCode)
-                    {
-                        return await result.Content.ReadAsStringAsync();
-                    }
+				string endPoint = $"/service/docto/funcionario/lista?=";
 
-                    throw new Exception(await result.Content.ReadAsStringAsync());
-                }
-                else
-                {
-                    throw new Exception(response.MensagemErro);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Erro ao obter atividades", ex);
-            }
-        }
-        
-        [HttpGet("{Id}")]
-        public async Task<string> GetDocumentosRequeridos(string Id)
-        {
-            try
-            {
-                AuthResponse response = await Login();
+				if (!response.Erro)
+				{
+					var result = await _destraService.GetAsync(endPoint, response.Token);
+					if (result.IsSuccessStatusCode)
+					{
+						return await result.Content.ReadAsStringAsync();
+					}
 
-                string endPoint = $"/service/docto/funcionario/lista?atividadeEspecifica=" + Id;
+					throw new Exception(await result.Content.ReadAsStringAsync());
+				}
+				else
+				{
+					throw new Exception(response.MensagemErro);
+				}
+			}
+			catch (Exception ex)
+			{
+				throw new Exception("Erro ao obter documentos", ex);
+			}
+		}
 
-                if (!response.Erro)
-                {
-                    var result = await _destraService.GetAsync(endPoint, response.Token);
-                    if (result.IsSuccessStatusCode)
-                    {
-                        return await result.Content.ReadAsStringAsync();
-                    }
+		[HttpGet]
+		public async Task<string> GetAtividades()
+		{
+			try
+			{
+				AuthResponse response = await Login();
 
-                    throw new Exception(await result.Content.ReadAsStringAsync());
-                }
-                else
-                {
-                    throw new Exception(response.MensagemErro);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Erro ao obter documentos da atividade atividades", ex);
-            }
-        }
+				string endPoint = $"/ativesp/lista";
 
-        [HttpPost]
-        public async Task<IActionResult> AddDocumento([FromBody] DocumentoDestra documento)
-        {
-            try
-            {
-                AuthResponse response = await Login();
+				if (!response.Erro)
+				{
+					var result = await _destraService.GetAsync(endPoint, response.Token);
+					if (result.IsSuccessStatusCode)
+					{
+						return await result.Content.ReadAsStringAsync();
+					}
 
-                if (!response.Erro)
-                {
-                    string endPoint = $"/service/docto/funcionario?=";
-                    string json = JsonSerializer.Serialize(documento);
+					throw new Exception(await result.Content.ReadAsStringAsync());
+				}
+				else
+				{
+					throw new Exception(response.MensagemErro);
+				}
+			}
+			catch (Exception ex)
+			{
+				throw new Exception("Erro ao obter atividades", ex);
+			}
+		}
 
-                    var result = await _destraService.PostAsync(endPoint, json, response.Token);
-                    if (result.IsSuccessStatusCode)
-                    {
-                        return Ok(await result.Content.ReadAsStringAsync());
-                    }
+		[HttpGet("{Id}")]
+		public async Task<string> GetDocumentosRequeridos(string Id)
+		{
+			try
+			{
+				AuthResponse response = await Login();
 
-                    return StatusCode((int)result.StatusCode, await result.Content.ReadAsStringAsync());
-                }
-                else
-                {
-                    return BadRequest(response.MensagemErro);
-                }                
-            }
-            catch (Exception ex)
-            {
-                return NotFound(ex);
-            }
-        }
-        
-        [HttpPost]
-        public async Task<HttpResponseMessage> EnviarDocumentoParaApiDoCliente(DocumentoDestra documento, string NomeDoc)
-        {
-            using (var client = new HttpClient())
-            {
-                string endPoint = $"https://api.destra.armata.cloud/homolog/api/v1/service/docto/funcionario?=";
-                var form = new MultipartFormDataContent();
+				string endPoint = $"/service/docto/funcionario/lista?atividadeEspecifica=" + Id;
 
-                AuthResponse response = await Login();
+				if (!response.Erro)
+				{
+					var result = await _destraService.GetAsync(endPoint, response.Token);
+					if (result.IsSuccessStatusCode)
+					{
+						return await result.Content.ReadAsStringAsync();
+					}
 
-                form.Add(new StringContent(documento.cpf), "cpf");
-                form.Add(new StringContent(documento.idDocto.ToString()), "idDocto");
-                form.Add(new StringContent(documento.validade), "validade");
+					throw new Exception(await result.Content.ReadAsStringAsync());
+				}
+				else
+				{
+					throw new Exception(response.MensagemErro);
+				}
+			}
+			catch (Exception ex)
+			{
+				throw new Exception("Erro ao obter documentos da atividade atividades", ex);
+			}
+		}
 
-                var arquivoContent = new ByteArrayContent(documento.arquivo);
-                arquivoContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
-                form.Add(arquivoContent, "arquivo", NomeDoc);
+		[HttpPost]
+		public async Task<IActionResult> AddDocumento([FromBody] DocumentoDestra documento)
+		{
+			try
+			{
+				AuthResponse response = await Login();
 
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer",response.Token);
+				if (!response.Erro)
+				{
+					string endPoint = $"/service/docto/funcionario?=";
+					string json = JsonSerializer.Serialize(documento);
 
-                var result = await client.PostAsync(endPoint, form);
+					var result = await _destraService.PostAsync(endPoint, json, response.Token);
+					if (result.IsSuccessStatusCode)
+					{
+						return Ok(await result.Content.ReadAsStringAsync());
+					}
 
-                return result;
-            }
-        }
+					return StatusCode((int)result.StatusCode, await result.Content.ReadAsStringAsync());
+				}
+				else
+				{
+					return BadRequest(response.MensagemErro);
+				}
+			}
+			catch (Exception ex)
+			{
+				return NotFound(ex);
+			}
+		}
 
-        [HttpPost]
-        public async Task<IActionResult> IncluirColaboradorPedido([FromBody] IncluirColaboradorPedido documento)
-        {
-            try
-            {
-                AuthResponse response = await Login();
+		[HttpPost]
+		public async Task<HttpResponseMessage> EnviarDocumentoParaApiDoCliente(DocumentoDestra documento, string NomeDoc)
+		{
+			using (var client = new HttpClient())
+			{
+				string endPoint = $"https://api.destra.armata.cloud/homolog/api/v1/service/docto/funcionario?=";
+				var form = new MultipartFormDataContent();
 
-                if (!response.Erro)
-                {
-                    string endPoint = $"/pedido/atualizar";
-                    string json = JsonSerializer.Serialize(documento);
+				AuthResponse response = await Login();
 
-                    var result = await _destraService.PostAsync(endPoint, json, response.Token);
-                    if (result.IsSuccessStatusCode)
-                    {
-                        return Ok(await result.Content.ReadAsStringAsync());
-                    }
+				form.Add(new StringContent(documento.cpf), "cpf");
+				form.Add(new StringContent(documento.idDocto.ToString()), "idDocto");
+				form.Add(new StringContent(documento.validade), "validade");
 
-                    return StatusCode((int)result.StatusCode, await result.Content.ReadAsStringAsync());
-                }
-                else
-                {
-                    return BadRequest(response.MensagemErro);
-                }
-            }
-            catch (Exception ex)
-            {
-                return NotFound(ex);
-            }
-        }
+				var arquivoContent = new ByteArrayContent(documento.arquivo);
+				arquivoContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+				form.Add(arquivoContent, "arquivo", NomeDoc);
 
-        [HttpPost]
-        public async Task<IActionResult> IncluirDiretaPedido([FromBody] IncluirDiretaPedido documento)
-        {
-            try
-            {
-                AuthResponse response = await Login();
+				client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", response.Token);
 
-                if (!response.Erro)
-                {
-                    string endPoint = $"/pedido/incluir";
-                    string json = JsonSerializer.Serialize(documento);
+				var result = await client.PostAsync(endPoint, form);
 
-                    var result = await _destraService.PostAsync(endPoint, json, response.Token);
-                    if (result.IsSuccessStatusCode)
-                    {
-                        return Ok(await result.Content.ReadAsStringAsync());
-                    }
+				return result;
+			}
+		}
 
-                    return StatusCode((int)result.StatusCode, await result.Content.ReadAsStringAsync());
-                }
-                else
-                {
-                    return BadRequest(response.MensagemErro);
-                }
-            }
-            catch (Exception ex)
-            {
-                return NotFound(ex);
-            }
-        }
+		[HttpPost]
+		public async Task<IActionResult> IncluirColaboradorPedido([FromBody] IncluirColaboradorPedido documento)
+		{
+			try
+			{
+				AuthResponse response = await Login();
 
-    }
+				if (!response.Erro)
+				{
+					string endPoint = $"/pedido/atualizar";
+					string json = JsonSerializer.Serialize(documento);
+
+					var result = await _destraService.PostAsync(endPoint, json, response.Token);
+					if (result.IsSuccessStatusCode)
+					{
+						return Ok(await result.Content.ReadAsStringAsync());
+					}
+
+					return StatusCode((int)result.StatusCode, await result.Content.ReadAsStringAsync());
+				}
+				else
+				{
+					return BadRequest(response.MensagemErro);
+				}
+			}
+			catch (Exception ex)
+			{
+				return NotFound(ex);
+			}
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> IncluirDiretaPedido([FromBody] IncluirDiretaPedido documento)
+		{
+			try
+			{
+				AuthResponse response = await Login();
+
+				if (!response.Erro)
+				{
+					string endPoint = $"/pedido/incluir";
+					string json = JsonSerializer.Serialize(documento);
+
+					var result = await _destraService.PostAsync(endPoint, json, response.Token);
+					if (result.IsSuccessStatusCode)
+					{
+						return Ok(await result.Content.ReadAsStringAsync());
+					}
+
+					return StatusCode((int)result.StatusCode, await result.Content.ReadAsStringAsync());
+				}
+				else
+				{
+					return BadRequest(response.MensagemErro);
+				}
+			}
+			catch (Exception ex)
+			{
+				return NotFound(ex);
+			}
+		}
+
+	}
 }

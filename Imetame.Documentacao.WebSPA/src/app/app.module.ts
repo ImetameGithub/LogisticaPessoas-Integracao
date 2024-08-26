@@ -87,7 +87,6 @@ const maskConfig: Partial<IConfig> = {
         FuseProgressBarModule,
         FuseSharedModule,
         FuseSidebarModule,
-        
         //Auth module
         OAuthModule.forRoot({
             resourceServer: {

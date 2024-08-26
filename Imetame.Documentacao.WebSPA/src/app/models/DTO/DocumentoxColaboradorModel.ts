@@ -1,4 +1,4 @@
-export class DocumentoxColaboradorModel{
+export class DocumentoxColaboradorModel {
     // Id: string;
     Codigo: string;
     DescArquivo: string;
@@ -16,9 +16,11 @@ export class DocumentoxColaboradorModel{
     SincronizadoDestra: boolean;
     RelacionadoDestra: boolean;
     ImageSource;
+    TipoDocumento: string;
+    IdTipoDocumento: string;
 }
 
-export class ImagemProtheus{
+export class ImagemProtheus {
     Bytes: string;
     Base64: string;
 }

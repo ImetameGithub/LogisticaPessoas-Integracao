@@ -32,28 +32,26 @@
                     </div>
                 </div>
             </div>
-            <div fxFlex="10" fxLayoutGap="15" >
+            <div fxFlex="10" fxLayoutGap="15">
                 <!-- Botão enviar documentos dos colaboradores -->
                 <div fxFlex="50">
-                     <button class="add-file-button-respo" matTooltip="Enviar documentos para Destra" mat-fab color="accent"
-                    (click)="enviarDocumentosParaDestra()" aria-label="Novo"
-                    [@animate]="{
+                    <button class="add-file-button-respo" matTooltip="Enviar documentos para Destra" mat-fab
+                        color="accent" (click)="enviarDocumentosParaDestra()" aria-label="Novo" [@animate]="{
                                 value: '*',
                                 params: { delay: '300ms', scale: '0.2' }
                             }">
-                    <mat-icon>unarchive</mat-icon>
-                </button>
+                        <mat-icon>unarchive</mat-icon>
+                    </button>
                 </div>
                 <!-- Botão para enviar colaboradores para Destra -->
                 <div fxFlex="50">
-                    <button class="add-file-button-respo" matTooltip="Enviar colaboradores para Destra" mat-fab color="accent"
-                    (click)="enviarParaColaboradorDestra()" aria-label="Novo"
-                    [@animate]="{
+                    <button class="add-file-button-respo" matTooltip="Enviar colaboradores para Destra" mat-fab
+                        color="accent" (click)="enviarParaColaboradorDestra()" aria-label="Novo" [@animate]="{
                                 value: '*',
                                 params: { delay: '300ms', scale: '0.2' }
                             }">
-                    <mat-icon>person_add</mat-icon>
-                </button>
+                        <mat-icon>person_add</mat-icon>
+                    </button>
                 </div>
             </div>
         </div>
@@ -71,6 +69,8 @@
                         </mat-checkbox>
                     </mat-cell>
                 </ng-container>
+
+                
 
                 <ng-container matColumnDef="numCad">
                     <mat-header-cell *matHeaderCellDef class="w-100">NumCad</mat-header-cell>
@@ -105,10 +105,20 @@
                     <mat-cell *matCellDef="let row">{{row.SincronizadoDestra == true ? "Sim" :
                         "Não"}}</mat-cell>
                 </ng-container>
+                
+                <ng-container matColumnDef="quantidadeDocumentos">
+                    <mat-header-cell *matHeaderCellDef class="w-100">Quantidade Documentos</mat-header-cell>
+                    <mat-cell *matCellDef="let row" class="w-100">{{row.CountDocumento}}</mat-cell>
+                </ng-container>
 
-                <ng-container matColumnDef="status">
+                <!-- <ng-container matColumnDef="status">
                     <mat-header-cell *matHeaderCellDef>Status Documento</mat-header-cell>
                     <mat-cell *matCellDef="let row"></mat-cell>
+                </ng-container> -->
+
+                <ng-container matColumnDef="statusDestra">
+                    <mat-header-cell *matHeaderCellDef>Status Destra</mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{getStatusDestra(row.StatusDestra)}}</mat-cell>
                 </ng-container>
 
                 <ng-container matColumnDef="documento">
@@ -125,8 +135,8 @@
                 </ng-container>
 
                 <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
-                <mat-row *matRowDef="let item; columns: displayedColumns" matRipple
-                    (click)="toggleSelection(item)" [@animate]="{ value: '*', params: { y: '100%' } }">
+                <mat-row *matRowDef="let item; columns: displayedColumns" matRipple (click)="toggleSelection(item)"
+                    [@animate]="{ value: '*', params: { y: '100%' } }">
                 </mat-row>
             </mat-table>
         </div>

@@ -47,7 +47,7 @@ export class ColaboradoresListComponent implements OnInit {
   //#endregion
 
   //#region DATA SOURCE E FORMULARIO
-  displayedColumns = ["cadastro", "cracha", "nome", "empresa","sincronizadoDestra", "mudaFuncao", "atividadeEspecifica", "buttons"];
+  displayedColumns = ["cadastro", "cracha", "nome", "empresa", "sincronizadoDestra", "mudaFuncao", "atividadeEspecifica", "buttons"];
   dataSource: MatTableDataSource<Colaborador>;
   form: UntypedFormGroup;
   //#endregion
@@ -101,7 +101,6 @@ export class ColaboradoresListComponent implements OnInit {
       .map(cxa => cxa.AtividadeEspecifica.Codigo)
       .join(', ');
   }
-
   //#region FUNÇÃO DELETE - MATHEUS MONFREIDES - FARTEC SISTEMAS 
 
   deleteItem(ItemDelete: string, index: number) {
@@ -151,7 +150,7 @@ export class ColaboradoresListComponent implements OnInit {
 
   //#region FUNÇÕES ABRIR MODAL DE CADASTRO/EDITAR DO FERIADO - MATHEUS MONFREIDES 23/03/2024
   abrir(item) {
-    this.router.navigate([item.id], { relativeTo: this.route });
+    //this.router.navigate([item.Id], { relativeTo: this.route });
   }
 
   abrirModal() {

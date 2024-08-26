@@ -31,6 +31,7 @@ import { DocumentoxColaboradorModel } from "app/models/DTO/DocumentoxColaborador
 import { DocumentosModalComponent } from "./documentos-modal/documentos-modal.component";
 import { ColaboradorModel, ColaboradorProtheusModel } from "app/models/DTO/ColaboradorModel";
 import { FuseSwitchAlertService } from "@fuse/services/switch-alert";
+import { ColaboradorStatusDestra } from "app/models/Enums/DestraEnums";
 
 @Component({
     selector: "colaboradores",
@@ -43,13 +44,14 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
     private _unsubscribeAll: Subject<any>;
     displayedColumns = [
         "check",
+        "quantidadeDocumentos",
         "numCad",
         "nome",
         "funcao",
         "cracha",
         "equipe",
         "sincronizadoDestra",
-        "status",
+        "statusDestra",
         "documento",
     ];
     dataSource: FilesDataSource<any>;
@@ -66,6 +68,8 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
 
     documentos: DocumentoxColaboradorModel[]
 
+
+    listStatus: ColaboradorStatusDestra[] = ColaboradorStatusDestra.values;
     constructor(
         public service: AutomacaoDeProcessosService,
 
@@ -74,7 +78,6 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
         public dialog: MatDialog,
         private _fuseSwitchAlertService: FuseSwitchAlertService,
         private _snackbar: MatSnackBar,
-        public snackBar: MatSnackBar
     ) {
         this._unsubscribeAll = new Subject();
         this.dataSource = new FilesDataSource<any>(this.service);
@@ -107,7 +110,6 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
             .subscribe((processamento) => {
                 this.isResult = processamento.status === 2 || processamento.status === 3
             });
-
     }
 
     ngOnDestroy(): void {
@@ -121,7 +123,9 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
         this.todoMundo = this.service.itens.some(i => i.check);
     }
 
-
+    getStatusDestra(statusNum: number): string {
+        return ColaboradorStatusDestra.getNameEnum(statusNum);
+    }
     toggleAllSelection(): void {
         this.service.itens.forEach((item) => {
             item.check = this.todoMundo;
@@ -149,7 +153,7 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
 
                 // this.service.adicionarFinalizados(finalizados);
 
-                this.snackBar.open("Finalizado", "OK", {
+                this._snackbar.open("Finalizado", "OK", {
                     verticalPosition: "top",
                     duration: 2000,
                 });
@@ -190,7 +194,7 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
                     dialogConfig.data = {
                         _listDocumentos: response,
                         _colaborador: colaborador
-                      };
+                    };
                     const dialogRef = this.dialog.open(DocumentosModalComponent, dialogConfig);
                     dialogRef.afterClosed().subscribe(() => {
                         this.titleService.setTitle("Cadastro - Imetame");
@@ -210,11 +214,17 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
     }
 
     enviarParaColaboradorDestra() {
+        let colaboradores = this.service.itens.filter(col => col.check);
+        if (colaboradores.length == 0) {
+            this._snackbar.open("Não há colaboradores selecionados.", 'X', {
+                duration: 2500,
+                panelClass: 'snackbar-success',
+            });
+            return;
+        }
         this._fuseProgressBarService.setMode("indeterminate");
         this._fuseProgressBarService.show();
-        let colaboradores = this.service.itens.filter(col => col.check);
-
-        this.service.EnviarColaboradorDestra(colaboradores,this.service.routeParams.idPedido ).subscribe(
+        this.service.EnviarColaboradorDestra(colaboradores, this.service.routeParams.idPedido).subscribe(
             {
                 next: (response: ColaboradorProtheusModel) => {
                     this._fuseProgressBarService.hide();
@@ -243,10 +253,16 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
     }
 
     enviarDocumentosParaDestra() {
+        let colaboradores = this.service.itens.filter(col => col.check);
+        if (colaboradores.length == 0) {
+            this._snackbar.open("Não há colaboradores selecionados.", 'X', {
+                duration: 2500,
+                panelClass: 'snackbar-success',
+            });
+            return;
+        }
         this._fuseProgressBarService.setMode("indeterminate");
         this._fuseProgressBarService.show();
-        let colaboradores = this.service.itens.filter(col => col.check);
-
         this.service.EnviarDocsArrayDestra(colaboradores).subscribe(
             {
                 next: (response: ColaboradorProtheusModel) => {

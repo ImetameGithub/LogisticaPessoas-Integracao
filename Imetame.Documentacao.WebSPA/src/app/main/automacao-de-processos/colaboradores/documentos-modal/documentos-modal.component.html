@@ -1,12 +1,33 @@
-<div class="chamada">
-    <div fxFlex="75" fxLayout="row" fxLayoutAlign="start center">
-        <span>{{documentos[0].NomeColaborador}}</span>
-
-        <div style="color: white;" (click)="openAbaAtividadeEspecifica()"  matTooltip="Relacionar colaborador com atividade"
-            class="docs-obrigatorios" fxLayout="row" fxLayoutAlign="end center">
-            <div class="docs-obrigatorios-icon">
-                <mat-icon>update</mat-icon>
+<div class="overlay-container" *ngIf="isLoading">
+    <div class="overlay">
+        <div fxLayout="column" fxLayoutAlign="center center"
+            style="width: 35%; height: 260px; background-color: white;">
+            <div style="width: 200px;">
+                <img src="assets/images/logo.png">
             </div>
+            <div>
+                <mat-spinner [diameter]="40"></mat-spinner>
+            </div>
+            <div fxLayout="row" fxLayoutAlign="center end">
+                <span style="font-size: medium;margin-top: 5px;" fxLayout="row"
+                    fxLayoutAlign="center end"><strong>Enviando Documentos...</strong></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="chamada" fxLayout="row" fxLayoutAlign="space-between start">
+    <div style="padding-top: 15px;" fxFlex="75" fxLayout="row">
+        <div div fxLayout="column" fxLayoutAlign="center start">
+            <div fxLayout="row" fxLayoutAlign="start center">
+                <span style="margin-right: 2;margin-bottom: 5px;">{{nomeColaborador}}</span>
+                <span>
+                    <mat-icon style="margin-left: 5px;margin-bottom: 2px;padding-left: 0; padding-bottom: 3;"
+                        matTooltip="Relacionar colaborador com atividade" class="docs-obrigatorios"
+                        (click)="openAbaAtividadeEspecifica()">update</mat-icon>
+                </span>
+            </div>
+            <span>{{listaNomeColaborador}}</span>
         </div>
     </div>
 
@@ -16,15 +37,8 @@
             <div class="docs-obrigatorios-icon">
                 <mat-icon>warning</mat-icon>
             </div>
-            <span class="docs-obrigatorios-text">Documentos Obrigatórios</span>
+            <span class="docs-obrigatorios-text">Documentos<br>Obrigatórios</span>
         </div>
-
-        <!-- <div *ngIf="StatusDocumentoObrigatoriosModel.length == 0" fxLayout="row" fxLayoutAlign="start center">
-            <div style="padding: 15px 5px;">
-                <mat-icon>done_outline</mat-icon>
-            </div>
-            <h3><strong>Todos os documentos estão relacionados</strong></h3>
-        </div> -->
     </div>
 
 </div>
@@ -57,8 +71,15 @@
     </div>
     <div fxFlex="100">
         <div class="modal">
+            <div style="width: 100%;" class="tipoDocumentoFiltro" fxLayout="row">
+                <custom-search-select (selectionChange)="tipoDocumentoSelected($event)" [options]="tipoDocumentos"
+                    [multiple]="false" [ngClass]="{ 'tipoDocumentoFiltro': !visualizarImagem, 'tipoDocumentoFiltroExpanded': visualizarImagem }" placeholder="Selecione o Tipo de Documento"
+                    label="Tipo de Documento">
+                </custom-search-select>
+            </div>
             <div class="modal-content">
                 <div class="document-grid">
+
                     <div *ngFor="let doc of documentos, let i = index">
                         <div class="document-btn-envio-destra">
                             <button (click)="enviarDocsParaDestra(doc,i)" mat-icon-button [ngStyle]="{
@@ -69,22 +90,25 @@
                         </div>
                         <div class="document-box">
                             <button matTooltip="{{doc.DescArquivo}}" mat-button mat-raised-button
-                                (click)="docDetalhes(doc)" 
-                                [ngClass]="{
+                                (click)="docDetalhes(doc)" [ngClass]="{
                                     'vencidoXVencer': doc.Vencido || doc.Vencer || !doc.RelacionadoDestra,            
                                     'sincronizado-destra': doc.SincronizadoDestra
                                 }">
                                 {{ doc.DescArquivo }}
-                                <h5 *ngIf="!doc.Vencido && !doc.Vencer && doc.DtVencimentoFormatada != '0001-01-01T00:00:00'">
-                                    Vencimento - {{ doc.DtVencimentoFormatada | date:'dd/MM/yyyy' }} <br> {{doc.DiasVencer}} Dias
+                                <h5
+                                    *ngIf="!doc.Vencido && !doc.Vencer && doc.DtVencimentoFormatada != '0001-01-01T00:00:00'">
+                                    Vencimento - {{ doc.DtVencimentoFormatada | date:'dd/MM/yyyy' }} <br>
+                                    {{doc.DiasVencer}} Dias
                                 </h5>
                                 <h5 class="btnH4" *ngIf="doc.Vencido">
                                     Vencido - {{ doc.DtVencimentoFormatada | date:'dd/MM/yyyy' }}
                                 </h5>
                                 <h5 class="btnH4" *ngIf="doc.Vencer">
-                                    A vencer - {{ doc.DtVencimentoFormatada | date:'dd/MM/yyyy' }} <br> {{doc.DiasVencer}} Dias
+                                    A vencer - {{ doc.DtVencimentoFormatada | date:'dd/MM/yyyy' }} <br>
+                                    {{doc.DiasVencer}} Dias
                                 </h5>
-                                <h5 class="btnH4" *ngIf="!doc.RelacionadoDestra && !doc.Vencido && !doc.Vencer && doc.DtVencimentoFormatada == '0001-01-01T00:00:00'">
+                                <h5 class="btnH4"
+                                    *ngIf="!doc.RelacionadoDestra && !doc.Vencido && !doc.Vencer && doc.DtVencimentoFormatada == '0001-01-01T00:00:00'">
                                     Documento não relacionado a Destra
                                 </h5>
                             </button>
@@ -98,5 +122,6 @@
 
 <mat-dialog-actions align="end" class="padding-border">
     <button class="btn-fechar" mat-button mat-dialog-close>Fechar</button>
-    <button class="btn-submit" (click)="enviarDocumentosParaDestra()" mat-button mat-dialog-close>Enviar todos documentos</button>
+    <button class="btn-submit" (click)="enviarDocumentosParaDestra()" mat-button>Enviar todos
+        documentos</button>
 </mat-dialog-actions>

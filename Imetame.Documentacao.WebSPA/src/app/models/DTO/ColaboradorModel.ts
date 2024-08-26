@@ -24,6 +24,7 @@ export class ColaboradorModel extends BaseEntity {
     Estado: string;
     TempoEmpresaAnos: string;
     TempoEmpresaAnosInt: string;
+    CountDocumento: number;
 }
 
 export class ColaboradorProtheusModel extends BaseEntity {

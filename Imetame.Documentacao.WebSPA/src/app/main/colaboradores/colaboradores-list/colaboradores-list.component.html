@@ -88,6 +88,13 @@
                     <mat-cell *matCellDef="let row">{{row.MudaFuncao == 'N' ? "Não" : "Sim"}}</mat-cell>
                 </ng-container>
 
+                <!-- <ng-container matColumnDef="qtdDocumentos">
+                    <mat-header-cell *matHeaderCellDef>QTD Documentos</mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        {{ getCountDocumentos(row) }}
+                    </mat-cell>
+                </ng-container> -->
+
                 <ng-container matColumnDef="atividadeEspecifica">
                     <mat-header-cell *matHeaderCellDef>Atividades Específicas</mat-header-cell>
                     <mat-cell *matCellDef="let row">
