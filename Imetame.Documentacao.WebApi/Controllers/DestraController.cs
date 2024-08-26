@@ -188,39 +188,6 @@ namespace Imetame.Documentacao.WebApi.Controllers
 			{
 				AuthResponse response = await Login();
 
-				if (!response.Erro)
-				{
-					string endPoint = $"/service/funcionario";
-					string json = JsonSerializer.Serialize(colaborador);
-
-					var result = await _destraService.PostAsync(endPoint, json, response.Token);
-					if (result.IsSuccessStatusCode)
-					{
-						var content = await result.Content.ReadAsStringAsync();
-						return Ok(content);
-						//return Ok(await result.Content.ReadAsStringAsync());
-					}
-
-					return StatusCode((int)result.StatusCode, await result.Content.ReadAsStringAsync());
-				}
-				else
-				{
-					return BadRequest(response.MensagemErro);
-				}
-			}
-			catch (Exception ex)
-			{
-				return NotFound(ex);
-			}
-		}
-
-		[HttpGet]
-		public async Task<string> GetDocumentos()
-		{
-			try
-			{
-				AuthResponse response = await Login();
-
 				string endPoint = $"/service/docto/funcionario/lista?=";
 
 				if (!response.Erro)
@@ -394,7 +361,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> IncluirDiretaPedido([FromBody] IncluirDiretaPedido documento)
+		public async Task<IActionResult> IncluirDiretaPedido([FromBody] IncluirPedidoxDireta documento)
 		{
 			try
 			{

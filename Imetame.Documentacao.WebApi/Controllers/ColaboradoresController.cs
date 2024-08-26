@@ -176,164 +176,101 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 #region CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
                 conn.Open();
-                var sql = @"SELECT distinct [empresa] as Empresa
-                      ,[numcad] as NumCad
-                      ,[numcracha] as NumCracha
-                      ,[status] as Status
-                      ,[nomefuncionario] as Nome
-                      ,[cpf] as Cpf
-                      ,[funcaoatual] as FuncaoAtual
-                      ,[funcaoinicial] as FuncaoInicial
-                      ,[dataafastamento] as DataAfastamento
-                      ,[dataadmissao] as DataAdmissao
-                      ,[datanascimento] as DataNascimento
-                      ,[equipe] as Equipe
-                      ,[perfil] as Perfil
-                      ,[endereco] as Endereco
-                      ,[numero] as Numero
-                      ,[bairro] as Bairro
-                      ,[cidade] as Cidade
-                      ,[cep] as Cep
-                      ,[ddd] as Ddd
-                      ,[numtel] as NumTel
-                      ,[ddd2] as Ddd2
-                      ,[numtel2] as NumTel2
-                      ,[estado] as Estado
-                      ,[tempoempresaanos] as TempoEmpresaAnos
-                      ,[tempoempresaanosint] as TempoEmpresaAnosInt
-                      ,[tempoempresamesesint] as TempoEmpresaMesesInt
-                      ,[tempoempresatexto] as TempoEmpresaTeexto
-                  FROM VW_FUSION_GP_COLABORADOR (nolock)  COLAB
-                  join DADOSADV_LUC..ZNB010 (nolock) ZNB ON ZNB.ZNB_MATRIC = COLAB.[numcad] AND ZNB.D_E_L_E_T_='' AND ZNB.ZNB_DTFIM>GETDATE()-30
-                  WHERE ZNB_OS = @Oss
-                order by Nome";
-                #endregion CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
+				//var sql = @"SELECT distinct [empresa] as Empresa
+				//      ,[numcad] as NumCad
+				//      ,[numcracha] as NumCracha
+				//      ,[status] as Status
+				//      ,[nomefuncionario] as Nome
+				//      ,[cpf] as Cpf
+				//      ,[funcaoatual] as FuncaoAtual
+				//      ,[funcaoinicial] as FuncaoInicial
+				//      ,[dataafastamento] as DataAfastamento
+				//      ,[dataadmissao] as DataAdmissao
+				//      ,[datanascimento] as DataNascimento
+				//      ,[equipe] as Equipe
+				//      ,[perfil] as Perfil
+				//      ,[endereco] as Endereco
+				//      ,[numero] as Numero
+				//      ,[bairro] as Bairro
+				//      ,[cidade] as Cidade
+				//      ,[cep] as Cep
+				//      ,[ddd] as Ddd
+				//      ,[numtel] as NumTel
+				//      ,[ddd2] as Ddd2
+				//      ,[numtel2] as NumTel2
+				//      ,[estado] as Estado
+				//      ,[tempoempresaanos] as TempoEmpresaAnos
+				//      ,[tempoempresaanosint] as TempoEmpresaAnosInt
+				//      ,[tempoempresamesesint] as TempoEmpresaMesesInt
+				//      ,[tempoempresatexto] as TempoEmpresaTeexto
+				//  FROM VW_FUSION_GP_COLABORADOR (nolock)  COLAB
+				//  join DADOSADV_LUC..ZNB010 (nolock) ZNB ON ZNB.ZNB_MATRIC = COLAB.[numcad] AND ZNB.D_E_L_E_T_='' AND ZNB.ZNB_DTFIM>GETDATE()-30
+				//  WHERE ZNB_OS = @Oss
+				//order by Nome";
+				#endregion CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
 
 
 				var sql = @"WITH CountDocumentos as
-(	SELECT
-    	SUBSTRING(SRA.RA_MAT,2,5) RA_MAT,
-    	COUNT(*) as contagem
-	FROM
-		SRA010 SRA
-	INNER JOIN DADOSADV_LUC..UZJ010 UZJ 
-        ON
-		UZJ.UZJ_FILIAL = SRA.RA_FILIAL
-		AND UZJ.UZJ_MAT = SRA.RA_MAT
-		AND UZJ.D_E_L_E_T_ = ''
-	INNER JOIN DADOSADV_LUC..UZI010 UZI 
-        ON
-		UZI.UZI_FILIAL = UZJ.UZJ_FILIAL
-		AND UZI.UZI_CODIGO = UZJ.UZJ_CODTDO
-		AND UZI.D_E_L_E_T_ = ''
-		AND UZJ.UZJ_CODTDO <> '01'
-	WHERE
-		RA_FILIAL = ''
-		--AND RA_MAT = '043734'
-		AND SRA.D_E_L_E_T_ = ''
-	GROUP BY SRA.RA_MAT)
-SELECT
-	distinct [empresa] as Empresa
-                      ,
-	CD.contagem AS CountDocumento
-					  ,
-	[numcad] as NumCad
-                      ,
-	[numcracha] as NumCracha
-                      ,
-	[status] as Status
-                      ,
-	[nomefuncionario] as Nome
-                      ,
-	[cpf] as Cpf
-                      ,
-	[funcaoatual] as FuncaoAtual
-                      ,
-	[funcaoinicial] as FuncaoInicial
-                      ,
-	[dataafastamento] as DataAfastamento
-                      ,
-	[dataadmissao] as DataAdmissao
-                      ,
-	[datanascimento] as DataNascimento
-                      ,
-	[equipe] as Equipe
-                      ,
-	[perfil] as Perfil
-                      ,
-	[endereco] as Endereco
-                      ,
-	[numero] as Numero
-                      ,
-	[bairro] as Bairro
-                      ,
-	[cidade] as Cidade
-                      ,
-	[cep] as Cep
-                      ,
-	[ddd] as Ddd
-                      ,
-	[numtel] as NumTel
-                      ,
-	[ddd2] as Ddd2
-                      ,
-	[numtel2] as NumTel2
-                      ,
-	[estado] as Estado
-                      ,
-	[tempoempresaanos] as TempoEmpresaAnos
-                      ,
-	[tempoempresaanosint] as TempoEmpresaAnosInt
-                      ,
-	[tempoempresamesesint] as TempoEmpresaMesesInt
-                      ,
-	[tempoempresatexto] as TempoEmpresaTeexto
-FROM
-	[DADOSADV_LUC].[dbo].VW_FUSION_GP_COLABORADOR (nolock) COLAB
-join [DADOSADV_LUC].[dbo].ZNB010 (nolock) ZNB ON
-	ZNB.ZNB_MATRIC = COLAB.[numcad]
-	AND ZNB.D_E_L_E_T_ = ''
-	AND ZNB.ZNB_DTFIM>GETDATE()-30
-JOIN CountDocumentos CD ON CD.RA_MAT = [numcad]
-WHERE
-	ZNB_OS = '001701001'
-order by
-	Nome";
-
-
-				//AND[nomeFuncionario] LIKE '%cle%'
-
-				//var sql = @"SELECT distinct [empresa] as Empresa
-				//                  ,[numcad] as NumCad
-				//                  ,[numcracha] as NumCracha
-				//                  ,[status] as Status
-				//                  ,[nomefuncionario] as Nome
-				//                  ,[cpf] as Cpf
-				//                  ,[funcaoatual] as FuncaoAtual
-				//                  ,[funcaoinicial] as FuncaoInicial
-				//                  ,[dataafastamento] as DataAfastamento
-				//                  ,[dataadmissao] as DataAdmissao
-				//                  ,[datanascimento] as DataNascimento
-				//                  ,[equipe] as Equipe
-				//                  ,[perfil] as Perfil
-				//                  ,[endereco] as Endereco
-				//                  ,[numero] as Numero
-				//                  ,[bairro] as Bairro
-				//                  ,[cidade] as Cidade
-				//                  ,[cep] as Cep
-				//                  ,[ddd] as Ddd
-				//                  ,[numtel] as NumTel
-				//                  ,[ddd2] as Ddd2
-				//                  ,[numtel2] as NumTel2
-				//                  ,[estado] as Estado
-				//                  ,[tempoempresaanos] as TempoEmpresaAnos
-				//                  ,[tempoempresaanosint] as TempoEmpresaAnosInt
-				//                  ,[tempoempresamesesint] as TempoEmpresaMesesInt
-				//                  ,[tempoempresatexto] as TempoEmpresaTeexto
-				//              FROM [DADOSADV_LUC].[dbo].VW_FUSION_GP_COLABORADOR (nolock)  COLAB
-				//              join [DADOSADV_LUC].[dbo].ZNB010 (nolock) ZNB ON ZNB.ZNB_MATRIC = COLAB.[numcad] AND ZNB.D_E_L_E_T_='' AND ZNB.ZNB_DTFIM>GETDATE()-30
-				//              WHERE ZNB_OS = @Oss
-				//            order by Nome";
+							(	SELECT
+							    	SUBSTRING(SRA.RA_MAT,2,5) RA_MAT,
+							    	COUNT(*) as contagem
+								FROM
+									SRA010 SRA
+								INNER JOIN DADOSADV_LUC..UZJ010 UZJ 
+							        ON
+									UZJ.UZJ_FILIAL = SRA.RA_FILIAL
+									AND UZJ.UZJ_MAT = SRA.RA_MAT
+									AND UZJ.D_E_L_E_T_ = ''
+								INNER JOIN DADOSADV_LUC..UZI010 UZI 
+							        ON
+									UZI.UZI_FILIAL = UZJ.UZJ_FILIAL
+									AND UZI.UZI_CODIGO = UZJ.UZJ_CODTDO
+									AND UZI.D_E_L_E_T_ = ''
+									AND UZJ.UZJ_CODTDO <> '01'
+								WHERE
+									RA_FILIAL = ''
+									AND SRA.D_E_L_E_T_ = ''
+								GROUP BY SRA.RA_MAT)
+							SELECT
+								distinct [empresa] as Empresa,
+								CD.contagem AS CountDocumento,
+								[numcad] as NumCad,
+								[numcracha] as NumCracha,
+								[status] as Status,
+								[nomefuncionario] as Nome,
+								[cpf] as Cpf,
+								[funcaoatual] as FuncaoAtual,
+								[funcaoinicial] as FuncaoInicial,
+								[dataafastamento] as DataAfastamento,
+								[dataadmissao] as DataAdmissao,
+								[datanascimento] as DataNascimento,
+								[equipe] as Equipe,
+								[perfil] as Perfil,
+								[endereco] as Endereco,
+								[numero] as Numero,
+								[bairro] as Bairro,
+								[cidade] as Cidade,
+								[cep] as Cep,
+								[ddd] as Ddd,
+								[numtel] as NumTel,
+								[ddd2] as Ddd2,
+								[numtel2] as NumTel2,
+								[estado] as Estado,
+								[tempoempresaanos] as TempoEmpresaAnos,
+								[tempoempresaanosint] as TempoEmpresaAnosInt,
+								[tempoempresamesesint] as TempoEmpresaMesesInt,
+								[tempoempresatexto] as TempoEmpresaTeexto
+							FROM
+								[DADOSADV_LUC].[dbo].VW_FUSION_GP_COLABORADOR (nolock) COLAB
+							join [DADOSADV_LUC].[dbo].ZNB010 (nolock) ZNB ON
+								ZNB.ZNB_MATRIC = COLAB.[numcad]
+								AND ZNB.D_E_L_E_T_ = ''
+								AND ZNB.ZNB_DTFIM>GETDATE()-30
+							JOIN CountDocumentos CD ON CD.RA_MAT = [numcad]
+							WHERE
+								ZNB_OS = '001701001'
+							order by
+								Nome";
 
 				#endregion CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
 
@@ -706,7 +643,6 @@ order by
 
 		#endregion
 
-		#endregion
 
 
 	 #region FUNÇÕE DE ENVIO PARA DESTRA
