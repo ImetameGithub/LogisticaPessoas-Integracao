@@ -12,7 +12,7 @@ namespace Imetame.Documentacao.Domain.Entities
     public class ColaboradorxPedido : Entity
     {
         public string CXP_NUMEROOS {  get; set; }
-        public string  CXP_USUARIOINCLUSAO {  get; set; }
+        public string?  CXP_USUARIOINCLUSAO {  get; set; }
         public DateTime  CXP_DTINCLUSAO {  get; set; }
         
         [ForeignKey("Colaborador")]

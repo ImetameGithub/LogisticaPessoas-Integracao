@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Imetame.Documentacao.CrossCutting.Services.Destra.Models
 {
-    public class IncluirDiretaPedido
+    public class IncluirPedidoxDireta
     {
         public string cnpj { get; set; }
         public string numeroOS { get; set; }
@@ -30,6 +30,8 @@ namespace Imetame.Documentacao.CrossCutting.Services.Destra.Models
 
     public class Equipe
     {
+        public string cnpj { get; set; }
+        public string numeroOS { get; set; }
         public string cpf { get; set; }
         public List<int> atividadeespecifica { get; set; }
     }

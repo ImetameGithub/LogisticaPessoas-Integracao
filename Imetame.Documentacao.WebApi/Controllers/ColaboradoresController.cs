@@ -3,6 +3,7 @@ using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.Drawing.Diagrams;
 using Imetame.Documentacao.CrossCutting.Services.Destra.Models;
+using Imetame.Documentacao.Domain.Dto;
 using Imetame.Documentacao.Domain.Entities;
 using Imetame.Documentacao.Domain.Models;
 using Imetame.Documentacao.Domain.Repositories;
@@ -21,39 +22,45 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using Pedido = Imetame.Documentacao.Domain.Entities.Pedido;
 
 namespace Imetame.Documentacao.WebApi.Controllers
 {
-	[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
-	[Route("api/[controller]/[action]")]
-	[ApiController]
-	public class ColaboradoresController : ControllerBase
-	{
-		private readonly IColaboradorRepository _repository;
-		private readonly IBaseRepository<Domain.Entities.Processamento> _repProcessamento;
-		private readonly IBaseRepository<Domain.Entities.DocumentoxColaborador> _repDocxColaborador;
-		private readonly IBaseRepository<Domain.Entities.Documento> _repDocumento;
-		private readonly IBaseRepository<Domain.Entities.Colaborador> _repColaborador;
-		private readonly IBaseRepository<ColaboradorxAtividade> _repColaboradorxAtividade;
-		private readonly DestraController _destraController;
-		protected readonly SqlConnection conn;
-		private readonly IConfiguration _configuration;
+    [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
+    [Route("api/[controller]/[action]")]
+    [ApiController]
+    public class ColaboradoresController : ControllerBase
+    {
+        private readonly IColaboradorRepository _repository;
+        private readonly IBaseRepository<Domain.Entities.Processamento> _repProcessamento;
+        private readonly IBaseRepository<Domain.Entities.DocumentoxColaborador> _repDocxColaborador;
+        private readonly IBaseRepository<Domain.Entities.Documento> _repDocumento;
+        private readonly IBaseRepository<Domain.Entities.Colaborador> _repColaborador;
+        private readonly IBaseRepository<ColaboradorxAtividade> _repColaboradorxAtividade;
+        private readonly IBaseRepository<ColaboradorxPedido> _repColaboradorxPedido;
+        private readonly IBaseRepository<Pedido> _repPedido;
+        private readonly DestraController _destraController;
+        protected readonly SqlConnection conn;
+        private readonly IConfiguration _configuration;
 
 
-		public ColaboradoresController(IColaboradorRepository repository, IBaseRepository<Domain.Entities.Processamento> repProcessamento,
-			IConfiguration configuration, IBaseRepository<Domain.Entities.Colaborador> repColaborador,
-			IBaseRepository<ColaboradorxAtividade> repColaboradorxAtividade, DestraController destraController, IBaseRepository<Documento> repDocumento, IBaseRepository<DocumentoxColaborador> repDocxColaborador)
-		{
-			_repository = repository;
-			_configuration = configuration;
-			_repProcessamento = repProcessamento;
-			conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-			_repColaborador = repColaborador;
-			_repColaboradorxAtividade = repColaboradorxAtividade;
-			_destraController = destraController;
-			_repDocumento = repDocumento;
-			_repDocxColaborador = repDocxColaborador;
-		}
+        public ColaboradoresController(IColaboradorRepository repository, IBaseRepository<Domain.Entities.Processamento> repProcessamento,
+            IConfiguration configuration, IBaseRepository<Domain.Entities.Colaborador> repColaborador,
+            IBaseRepository<ColaboradorxAtividade> repColaboradorxAtividade, DestraController destraController, IBaseRepository<Documento> repDocumento,
+            IBaseRepository<DocumentoxColaborador> repDocxColaborador, IBaseRepository<ColaboradorxPedido> repColaboradorxPedido, IBaseRepository<Pedido> repPedido)
+        {
+            _repository = repository;
+            _configuration = configuration;
+            _repProcessamento = repProcessamento;
+            conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            _repColaborador = repColaborador;
+            _repColaboradorxAtividade = repColaboradorxAtividade;
+            _destraController = destraController;
+            _repDocumento = repDocumento;
+            _repDocxColaborador = repDocxColaborador;
+            _repColaboradorxPedido = repColaboradorxPedido;
+            _repPedido = repPedido;
+        }
 
 		#region FUNÇÕES DE APOIO 
 
@@ -167,8 +174,40 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
 				Domain.Entities.Processamento? processamento = await _repProcessamento.SelectContext().Where(m => m.Id == idProcessamento).FirstOrDefaultAsync();
 
-				#region CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
-				conn.Open();
+                #region CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
+                conn.Open();
+                var sql = @"SELECT distinct [empresa] as Empresa
+                      ,[numcad] as NumCad
+                      ,[numcracha] as NumCracha
+                      ,[status] as Status
+                      ,[nomefuncionario] as Nome
+                      ,[cpf] as Cpf
+                      ,[funcaoatual] as FuncaoAtual
+                      ,[funcaoinicial] as FuncaoInicial
+                      ,[dataafastamento] as DataAfastamento
+                      ,[dataadmissao] as DataAdmissao
+                      ,[datanascimento] as DataNascimento
+                      ,[equipe] as Equipe
+                      ,[perfil] as Perfil
+                      ,[endereco] as Endereco
+                      ,[numero] as Numero
+                      ,[bairro] as Bairro
+                      ,[cidade] as Cidade
+                      ,[cep] as Cep
+                      ,[ddd] as Ddd
+                      ,[numtel] as NumTel
+                      ,[ddd2] as Ddd2
+                      ,[numtel2] as NumTel2
+                      ,[estado] as Estado
+                      ,[tempoempresaanos] as TempoEmpresaAnos
+                      ,[tempoempresaanosint] as TempoEmpresaAnosInt
+                      ,[tempoempresamesesint] as TempoEmpresaMesesInt
+                      ,[tempoempresatexto] as TempoEmpresaTeexto
+                  FROM VW_FUSION_GP_COLABORADOR (nolock)  COLAB
+                  join DADOSADV_LUC..ZNB010 (nolock) ZNB ON ZNB.ZNB_MATRIC = COLAB.[numcad] AND ZNB.D_E_L_E_T_='' AND ZNB.ZNB_DTFIM>GETDATE()-30
+                  WHERE ZNB_OS = @Oss
+                order by Nome";
+                #endregion CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
 
 
 				var sql = @"WITH CountDocumentos as
@@ -555,7 +594,6 @@ order by
                               AND RA_MAT = @Matricula
                               AND SRA.D_E_L_E_T_  = ''";
 
-
 				List<DocumentoxColaboradorModel> documentos = (await conn.QueryAsync<DocumentoxColaboradorModel>(sql, new { Matricula = matricula })).ToList();
 
 				foreach (DocumentoxColaboradorModel item in documentos.Where(m => m.Vencido || m.Vencer != true))
@@ -671,96 +709,190 @@ order by
 		#endregion
 
 
-		#region FUNÇÕE DE ENVIO PARA DESTRA
-		[HttpPost]
-		public async Task<IActionResult> EnviarColaboradorDestra([FromBody] List<ColaboradorModel> listColaboradores)
-		{
-			try
-			{
-				StringBuilder erro = new StringBuilder();
-				if (!ModelState.IsValid)
-				{
-					erro = ErrorHelper.GetErroModelState(ModelState.Values);
-					throw new Exception("Falha ao Salvar Dados.\n" + erro);
-				}
+	 #region FUNÇÕE DE ENVIO PARA DESTRA
+        [HttpPost]
+        public async Task<IActionResult> EnviarColaboradorDestra([FromBody] EnviarColaboradorDestraDto dto)
+        {
+            try
+            {
+                StringBuilder erro = new StringBuilder();
+                if (!ModelState.IsValid)
+                {
+                    erro = ErrorHelper.GetErroModelState(ModelState.Values);
+                    throw new Exception("Falha ao Salvar Dados.\n" + erro);
+                }
 
-				List<Colaborador> colaboradores = new List<Colaborador>();
+                List<Colaborador> colaboradores = new List<Colaborador>();
+                Pedido pedido = await _repPedido.SelectContext().Where(m => m.Id == dto.IdPedido).FirstAsync();
+                List<Equipe> equipeList = new List<Equipe>();
+                List<ColaboradorxPedido> colaboradorxPedidoList = new List<ColaboradorxPedido>();
+                List<string> colaboradoresRelacionados = new List<string>();
 
-				// Carregar todos os itens de colaboradores cadastrados no sistema - Matheus Monfreides
-				List<Colaborador> itensCadastrados = _repColaborador.SelectContext()
-					.AsNoTracking()
-					.ToList();
+                // Carregar todos os itens de colaboradores cadastrados no sistema - Matheus Monfreides
+                List<Colaborador> itensCadastrados = _repColaborador.SelectContext()
+                    .AsNoTracking()
+                    .Include(m => m.ColaboradorxAtividade)
+                        .ThenInclude(m => m.AtividadeEspecifica)                    
+                    .ToList();
 
-				// Buscar colaboradores que foi selecionado mas não possuem relação com atividade, ocasionando em não ter na tabela colaborador - Matheus Monfreides
-				List<ColaboradorModel> colaboradoresSemAtividade = listColaboradores
-				   .Where(ei => !itensCadastrados.Any(m => m.Matricula == ei.NumCad))
-				   .ToList();
+                // Buscar colaboradores que foi selecionado mas não possuem relação com atividade, ocasionando em não ter na tabela colaborador - Matheus Monfreides
+                List<ColaboradorModel> colaboradoresSemAtividade = dto.ListColaboradores
+                   .Where(ei => !itensCadastrados.Any(m => m.Matricula == ei.NumCad))
+                   .ToList();
 
-				if (colaboradoresSemAtividade.Any())
-				{
-					var nomesColaboradores = colaboradoresSemAtividade.Select(colaborador => colaborador.Nome).ToList();
-					string listaDeNomes = string.Join(", ", nomesColaboradores);
-					if (nomesColaboradores.Count() > 1)
-					{
-						throw new Exception("Os colaboradores " + listaDeNomes + " não estão relacionado a nenhuma atividade específica.");
-					}
-					else
-					{
-						throw new Exception("O colaborador " + listaDeNomes + " não está relacionado a nenhuma atividade específica.");
-					}
-				}
+                if (colaboradoresSemAtividade.Any())
+                {
+                    var nomesColaboradores = colaboradoresSemAtividade.Select(colaborador => colaborador.Nome).ToList();
+                    string listaDeNomes = string.Join(", ", nomesColaboradores);
+                    if (nomesColaboradores.Count() > 1)
+                    {
+                        throw new Exception("Os colaboradores " + listaDeNomes + " não estão relacionado a nenhuma atividade específica.");
+                    }
+                    else
+                    {
+                        throw new Exception("O colaborador " + listaDeNomes + " não está relacionado a nenhuma atividade específica.");
+                    }
+                }
 
-				// Buscar os registro que foram selecionados da lista protheus dentro do nosso cadastro Colaborador 
-				List<Colaborador> listProtheusXlistColaborador = itensCadastrados
-					.Where(m => listColaboradores.Any(ei => ei.NumCad == m.Matricula))
-					.ToList();
+                // Buscar os registro que foram selecionados da lista protheus dentro do nosso cadastro Colaborador 
+                List<Colaborador> listProtheusXlistColaborador = itensCadastrados
+                    .Where(m => dto.ListColaboradores.Any(ei => ei.NumCad == m.Matricula))
+                    .ToList();
 
-				foreach (Colaborador model in listProtheusXlistColaborador)
-				{
-					ColaboradorDestra colaboradorDestra = new ColaboradorDestra()
-					{
-						nome = model.Nome,
-						nascto = model.Nascimento,
-						cpf = model.Cpf,
-						rg = model.Rg,
-						passaporte = "",
-						passaporteValidade = "",
-						cnh = "",
-						cnhCategoria = "",
-						CnhValidade = "",
-						crea = "",
-						creaUF = "",
-						idCidade = 2930774,
-						cnpj = "31790710000609",
-						funcao = model.Nome_Funcao,
-						idVinculo = 1,
-						dataAdmissao = model.DataAdmissao,
-						isTemporario = "",
-						contratoDias = 1,
-						contratoFim = "",
-						salarioTipo = "",
-						salarioValor = 1,
+                foreach (Colaborador model in listProtheusXlistColaborador)
+                {
+                    #region ENVIAR CADASTRO DE COLABORADOR PARA DESTRA
+                    ColaboradorDestra colaboradorDestra = new ColaboradorDestra()
+                    {
+                        nome = model.Nome,
+                        nascto = model.Nascimento,
+                        cpf = model.Cpf,
+                        rg = model.Rg,
+                        passaporte = "",
+                        passaporteValidade = "",
+                        cnh = "",
+                        cnhCategoria = "",
+                        CnhValidade = "",
+                        crea = "",
+                        creaUF = "",
+                        idCidade = 2930774,
+                        cnpj = "31790710000609",
+                        funcao = model.Nome_Funcao,
+                        idVinculo = 1,
+                        dataAdmissao = model.DataAdmissao,
+                        isTemporario = "",
+                        contratoDias = 1,
+                        contratoFim = "",
+                        salarioTipo = "",
+                        salarioValor = 1,
 
-					};
+                    };
 
-					var jsonResponse = await _destraController.AddColaborador(colaboradorDestra) as OkObjectResult;
+                    var jsonResponse = await _destraController.AddColaborador(colaboradorDestra) as OkObjectResult;
+                    #endregion
 
-					//ColaboradorxPedido colabPedido = new ColaboradorxPedido()
-					//{
-					//  CXP_DTINCLUSAO = DateTime.Now,
-					//  CXP_IDCOLABORADOR = model.Id,
-					//  CXP_IDPEDIDO = model.
-					//}
-				}
+                    #region VALIDAR SE COLABORADOR JÁ ESTÁ ATRELADO A UM PEDIDO E OS
+                    bool jaAssociado = await _repColaboradorxPedido.SelectContext()
+                                            .AnyAsync(cp => cp.CXP_IDCOLABORADOR == model.Id
+                                                         && cp.CXP_IDPEDIDO == dto.IdPedido
+                                                         && cp.CXP_NUMEROOS == dto.OrdemServico);
 
+                    if (jaAssociado)
+                    {
+                        colaboradoresRelacionados.Add(model.Nome);
+                    }
+                    else
+                    {
+                        List<int> atividadesEspecificas = model.ColaboradorxAtividade
+                                    .Select(ca => ca.AtividadeEspecifica.IdDestra)
+                                    .ToList();
 
-				return Ok();
-			}
-			catch (Exception ex)
-			{
-				return BadRequest(ErrorHelper.GetException(ex));
-			}
-		}
+                        Equipe equipe = new Equipe()
+                        {
+                            cnpj = "31790710001834",
+                            numeroOS = dto.OrdemServico,
+                            cpf = model.Cpf,
+                            atividadeespecifica = atividadesEspecificas
+                        };
+
+                        equipeList.Add(equipe);
+
+                        ColaboradorxPedido colabPedido = new ColaboradorxPedido()
+                        {
+                            CXP_DTINCLUSAO = DateTime.Now,
+                            CXP_IDCOLABORADOR = model.Id,
+                            CXP_IDPEDIDO = dto.IdPedido,
+                            CXP_NUMEROOS = dto.OrdemServico,
+                            CXP_USUARIOINCLUSAO = dto.MatriculaUsuario
+                        };
+                        colaboradorxPedidoList.Add(colabPedido);
+                    }
+                    #endregion
+                }
+
+                #region MONTAR ENVIO DE PEDIDO PARA DESTRA 
+                IncluirPedidoxDireta incluirDiretaPedido = new IncluirPedidoxDireta()
+                {
+                    cnpj = "31790710001834",
+                    numeroOS = dto.OrdemServico,
+                    tipoContrato = "DIR",
+                    pedidoCliente = pedido.NumPedido,
+                    observacoes = "",
+                    contatoOS = "Responsavel pela OS",
+                    telefoneOS = "(19)88888-8888",
+
+                    unidades = new List<Unidade>()
+                    {
+                        new Unidade()
+                        {
+                            cnpj = "16.404.287/0156-91",
+                            gestor = "Gestor Limeira",
+                            email = "limeira@suzano.com.br.teste",
+                            telefone = "(19)99999-9900"
+                        }
+                    },
+
+                    equipe = new List<Equipe>()
+                    {
+                        new Equipe()
+                        {                           
+                        }
+                    },
+
+                };
+
+                if (equipeList.Any())
+                {
+                    var jsonResponse = await _destraController.AddPedidoxDireta(incluirDiretaPedido) as OkObjectResult;
+
+                    foreach(var equipe in equipeList)
+                    {
+                        var jsonResponseEquipe = await _destraController.AddColaboradorPedido(equipe) as OkObjectResult;                        
+                    }
+                    await _repColaboradorxPedido.InsertRangeAsync(colaboradorxPedidoList);
+                }
+
+                if (colaboradoresRelacionados.Any())
+                {
+                    string listaDeNomes = string.Join(", ", colaboradoresRelacionados);
+                    if (colaboradoresRelacionados.Count() > 1)
+                    {
+                        throw new Exception("Os colaboradores " + listaDeNomes + " já estão associados ao pedido " + pedido.NumPedido + " e a Ordem de Servico " + dto.OrdemServico);
+                    }
+                    else
+                    {
+                        throw new Exception("O colaborador " + listaDeNomes + " já está associado ao pedido " + pedido.NumPedido + " e a Ordem de Servico " + dto.OrdemServico);
+                    }
+                }
+                #endregion
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ErrorHelper.GetException(ex));
+            }
+        }
 
 		[HttpPost]
 		public async Task<IActionResult> EnviarDocsArrayDestra([FromBody] List<ColaboradorModel> listColaboradores)
@@ -1128,3 +1260,4 @@ order by
 
 	}
 }
+

@@ -33,7 +33,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 int offset = (page - 1) * pageSize;
 
-                IQueryable<Pedido> query = _repPedido.SelectContext()
+                IQueryable<Pedido> query = _repPedido.SelectContext().AsNoTracking().Include(m => m.Credenciadora)
                                                              .OrderBy(x => x.NumPedido);
                 if (!string.IsNullOrEmpty(texto))
                     query = query.Where(q => q.Unidade.Contains(texto) || q.NumPedido.Contains(texto));
@@ -81,7 +81,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
             if (!ModelState.IsValid)
                 throw new Exception("Parametros necessarios nao informados");
 
-            Pedido Pedido = await _repPedido.SelectContext()                                                            
+            Pedido Pedido = await _repPedido.SelectContext().AsNoTracking().Include(m => m.Credenciadora)                                                            
                                                             .Where(e => e.Id.Equals(id))
                                                             .FirstAsync();
             return Ok(Pedido);

@@ -1,5 +1,6 @@
 ﻿using Imetame.Documentacao.CrossCutting.Services.Destra;
 using Imetame.Documentacao.CrossCutting.Services.Destra.Models;
+using Imetame.Documentacao.Domain.Dto;
 using Imetame.Documentacao.Domain.Entities;
 using Imetame.Documentacao.Domain.Models;
 using Imetame.Documentacao.Domain.Repositories;
@@ -76,12 +77,112 @@ namespace Imetame.Documentacao.WebApi.Controllers
 			}
 			catch (Exception ex)
 			{
-				throw new Exception("Erro ao obter dados do colaborador Destra:",ex);
+				throw new Exception("Erro ao obter dados do colaborador Destra:", ex);
+			}
+		}
+
+
+		[HttpPost]
+		public async Task<IActionResult> AddPedidoxDireta([FromBody] IncluirPedidoxDireta pedidoxDireta)
+		{
+			try
+			{
+				AuthResponse response = await Login();
+
+				if (!response.Erro)
+				{
+					string endPoint = $"/pedido/incluir";
+					string json = JsonSerializer.Serialize(pedidoxDireta);
+
+					var result = await _destraService.PostAsync(endPoint, json, response.Token);
+					if (result.IsSuccessStatusCode)
+					{
+						var content = await result.Content.ReadAsStringAsync();
+						return Ok(content);
+						//return Ok(await result.Content.ReadAsStringAsync());
+					}
+
+					return StatusCode((int)result.StatusCode, await result.Content.ReadAsStringAsync());
+				}
+				else
+				{
+					return BadRequest(response.MensagemErro);
+				}
+			}
+			catch (Exception ex)
+			{
+				return NotFound(ex);
 			}
 		}
 
 		[HttpPost]
 		public async Task<IActionResult> AddColaborador([FromBody] ColaboradorDestra colaborador)
+		{
+			try
+			{
+				AuthResponse response = await Login();
+
+				if (!response.Erro)
+				{
+					string endPoint = $"/service/funcionario";
+					string json = JsonSerializer.Serialize(colaborador);
+
+					var result = await _destraService.PostAsync(endPoint, json, response.Token);
+					if (result.IsSuccessStatusCode)
+					{
+						var content = await result.Content.ReadAsStringAsync();
+						return Ok(content);
+						//return Ok(await result.Content.ReadAsStringAsync());
+					}
+
+					return StatusCode((int)result.StatusCode, await result.Content.ReadAsStringAsync());
+				}
+				else
+				{
+					return BadRequest(response.MensagemErro);
+				}
+			}
+			catch (Exception ex)
+			{
+				return NotFound(ex);
+			}
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> AddColaboradorPedido([FromBody] Equipe equipe)
+		{
+			try
+			{
+				AuthResponse response = await Login();
+
+				if (!response.Erro)
+				{
+					string endPoint = $"/pedido/func/incluir";
+					string json = JsonSerializer.Serialize(equipe);
+
+					var result = await _destraService.PostAsync(endPoint, json, response.Token);
+					if (result.IsSuccessStatusCode)
+					{
+						var content = await result.Content.ReadAsStringAsync();
+						return Ok(content);
+						//return Ok(await result.Content.ReadAsStringAsync());
+					}
+
+					return StatusCode((int)result.StatusCode, await result.Content.ReadAsStringAsync());
+				}
+				else
+				{
+					return BadRequest(response.MensagemErro);
+				}
+			}
+			catch (Exception ex)
+			{
+				return NotFound(ex);
+			}
+		}
+
+		[HttpGet]
+		public async Task<string> GetDocumentos()
 		{
 			try
 			{
@@ -253,6 +354,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 				form.Add(arquivoContent, "arquivo", NomeDoc);
 
 				client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", response.Token);
+
 
 				var result = await client.PostAsync(endPoint, form);
 
