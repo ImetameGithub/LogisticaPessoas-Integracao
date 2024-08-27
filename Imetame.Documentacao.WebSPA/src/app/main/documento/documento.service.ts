@@ -69,7 +69,7 @@ export class DocumentoService implements Resolve<Documento> {
         const params = new HttpParams()
             .set('page', page.toString())
             .set('pageSize', pageSize.toString())
-            .set('filtro', filtro);
+            .set('texto', filtro);
         return this._httpClient.get<PaginatedResponse<Documento>>(environment.Documento.GetAllPaginated, { params }).pipe(
             tap((listFeriados: PaginatedResponse<Documento>) => {
                 this._listDocumento.next(listFeriados);

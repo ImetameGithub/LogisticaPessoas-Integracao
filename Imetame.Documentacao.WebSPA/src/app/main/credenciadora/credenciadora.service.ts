@@ -59,7 +59,7 @@ export class CredenciadoraService implements Resolve<Credenciadora> {
         const params = new HttpParams()
             .set('page', page.toString())
             .set('pageSize', pageSize.toString())
-            .set('filtro', filtro);
+            .set('texto', filtro);
         return this._httpClient.get<PaginatedResponse<Credenciadora>>(environment.Credenciadora.GetAllPaginated, { params }).pipe(
             tap((listFeriados: PaginatedResponse<Credenciadora>) => {
                 this._listCredenciadora.next(listFeriados);

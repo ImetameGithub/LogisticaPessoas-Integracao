@@ -70,7 +70,6 @@ export class DocumentosModalComponent implements OnInit {
     public snackBar: MatSnackBar,
   ) {
     this.todosDocumentos = _data._listDocumentos; // Guarda todos os documentos filtrados para não precisar fitrar novamente
-    //this.tipoDocumentos = this.todosDocumentos.map(x => new CustomOptionsSelect(x.IdTipoDocumento, x.TipoDocumento));
 
     // Usando reduce para filtrar duplicatas
     this.tipoDocumentos = this.todosDocumentos.reduce((acc, x) => {

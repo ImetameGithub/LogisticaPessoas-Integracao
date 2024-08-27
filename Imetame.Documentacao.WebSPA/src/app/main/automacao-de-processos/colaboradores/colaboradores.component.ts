@@ -132,7 +132,8 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
     }
     toggleAllSelection(): void {
         this.service.itens.forEach((item) => {
-            item.check = this.todoMundo;
+            if (!item.IsAssociado)
+                item.check = this.todoMundo;
         });
     }
 

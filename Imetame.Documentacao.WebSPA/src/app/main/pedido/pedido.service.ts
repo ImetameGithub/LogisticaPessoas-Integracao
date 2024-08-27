@@ -58,7 +58,7 @@ export class PedidoService implements Resolve<Pedido> {
         const params = new HttpParams()
             .set('page', page.toString())
             .set('pageSize', pageSize.toString())
-            .set('filtro', filtro);
+            .set('texto', filtro);
         return this._httpClient.get<PaginatedResponse<Pedido>>(environment.Pedido.GetAllPaginated, { params }).pipe(
             tap((listFeriados: PaginatedResponse<Pedido>) => {
                 this._listPedido.next(listFeriados);

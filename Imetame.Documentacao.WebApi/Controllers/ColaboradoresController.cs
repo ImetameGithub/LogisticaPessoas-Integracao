@@ -705,7 +705,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 					ColaboradorDestra colaboradorDestra = new ColaboradorDestra()
 					{
 						nome = model.Nome,
-						nascto = model.Nascimento,
+						nascto =$"{model.Nascimento.Substring(0, 4)}-{model.Nascimento.Substring(4, 2)}-{model.Nascimento.Substring(6, 2)}",
 						cpf = model.Cpf,
 						rg = model.Rg,
 						passaporte = "",
@@ -719,14 +719,15 @@ namespace Imetame.Documentacao.WebApi.Controllers
 						cnpj = "31790710000609",
 						funcao = model.Nome_Funcao,
 						idVinculo = 1,
-						dataAdmissao = model.DataAdmissao,
+						dataAdmissao = $"{model.DataAdmissao.Substring(0, 4)}-{model.DataAdmissao.Substring(4, 2)}-{model.DataAdmissao.Substring(6, 2)}",
 						isTemporario = "",
 						contratoDias = 1,
 						contratoFim = "",
-						salarioTipo = "",
+						salarioTipo = "MES",
 						salarioValor = 1,
-
 					};
+
+
 
 					var jsonResponse = await _destraController.AddColaborador(colaboradorDestra) as OkObjectResult;
 					#endregion
@@ -1107,7 +1108,8 @@ namespace Imetame.Documentacao.WebApi.Controllers
 					throw new ArgumentException("A lista de documentos do colaborador está vazia.");
 				}
 
-				Colaborador? colaboradorCadastrado = await _repColaborador.SelectContext().AsNoTracking()
+				Colaborador? colaboradorCadastrado = await _repColaborador.SelectContext()
+					.AsNoTracking()
 					.Where(m => m.Matricula == lista[0].Matricula.Remove(0, 1))
 					.Include(m => m.ColaboradorxAtividade)
 						.ThenInclude(m => m.AtividadeEspecifica)
@@ -1135,6 +1137,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 				foreach (var docDestra in todosOsDocsDestra)
 				{
 					Documento docRelacao = await _repDocumento.SelectContext()
+						.AsNoTracking()
 						.Where(m => m.IdDestra == docDestra.codigo.ToString()) // Ajustado para usar IdDestra
 						.FirstOrDefaultAsync();
 
@@ -1157,8 +1160,6 @@ namespace Imetame.Documentacao.WebApi.Controllers
 						relacaoDestraProtheus.Add(docRelacao);
 					}
 				}
-
-
 
 				// Verifica se o colaborador possui todos os documentos obrigatórios
 				foreach (var docRelacao in relacaoDestraProtheus)
