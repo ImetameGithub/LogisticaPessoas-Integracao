@@ -19,7 +19,8 @@ export class Colaborador extends BaseEntity {
     Codigo_OS: string;
     Nome_OS: string;
     StatusDestra: number = -2;
-    
+    IsAssociado: boolean = false;
+
     ColaboradorxAtividade: ColaboradorxAtividade[];
     DocumentosxColaborador: DocumentoxColaborador[];
 }

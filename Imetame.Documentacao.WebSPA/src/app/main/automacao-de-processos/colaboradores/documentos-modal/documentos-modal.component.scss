@@ -63,14 +63,18 @@
   justify-content: center;
 }
 
+.mat-form-field-wrapper {
+    padding-bottom: 0px !important; 
+}
+
 .tipoDocumentoFiltro {
   display: flex;
   flex-wrap: wrap;
   align-items: end;
-  justify-content: end !important;
+  justify-content: center !important;
   width: 45%;
   gap: 0px !important;
-  padding-top: 10px !important;
+  padding-top: 5px !important;
   padding-bottom: 0px !important;
   margin-bottom: 0px !important;
   padding-right: 10px !important;

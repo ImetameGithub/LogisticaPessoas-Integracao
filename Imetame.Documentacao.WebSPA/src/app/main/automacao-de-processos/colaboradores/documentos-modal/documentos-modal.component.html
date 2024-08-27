@@ -17,7 +17,7 @@
 </div>
 
 <div class="chamada" fxLayout="row" fxLayoutAlign="space-between start">
-    <div style="padding-top: 15px;" fxFlex="75" fxLayout="row">
+    <div fxFlex="65" fxLayout="row">
         <div div fxLayout="column" fxLayoutAlign="center start">
             <div fxLayout="row" fxLayoutAlign="start center">
                 <span style="margin-right: 2;margin-bottom: 5px;">{{nomeColaborador}}</span>
@@ -31,13 +31,14 @@
         </div>
     </div>
 
-    <div fxFlex="25" style="color: white;">
+    <div fxFlex="35" style="color: white;">
         <div *ngIf="StatusDocumentoObrigatoriosModel.length > 0" (click)="openDocsObrigatorio()"
             class="docs-obrigatorios" fxLayout="row" fxLayoutAlign="end center">
             <div class="docs-obrigatorios-icon">
-                <mat-icon>warning</mat-icon>
+                <mat-icon style="padding-top: 4px;">warning</mat-icon>
+                
             </div>
-            <span class="docs-obrigatorios-text">Documentos<br>Obrigatórios</span>
+            <span class="docs-obrigatorios-text">Documentos Obrigatórios</span>
         </div>
     </div>
 

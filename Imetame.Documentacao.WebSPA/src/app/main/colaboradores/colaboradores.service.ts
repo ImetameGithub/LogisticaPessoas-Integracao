@@ -25,14 +25,14 @@ export class ColaboradorService {
     return this._httpClient.get<ColaboradorProtheusModel[]>(environment.Colaboradores.GetAll);
   }
   GetAllPaginated(page: number = 1, pageSize: number = 10, filtro: string = ''): Observable<PaginatedResponse<Colaborador>> {
-    const params = new HttpParams()     
+    const params = new HttpParams()
       .set('page', page.toString())
       .set('pageSize', pageSize.toString())
       .set('texto', filtro);
     return this._httpClient.get<PaginatedResponse<Colaborador>>(environment.Colaboradores.GetAllPaginated, { params });
   }
   GetColaboradores(page: number = 1, pageSize: number = 10, filtro: string = ''): Observable<PaginatedResponse<ColaboradorProtheusModel>> {
-    const params = new HttpParams()     
+    const params = new HttpParams()
       .set('page', page.toString())
       .set('pageSize', pageSize.toString())
       .set('texto', filtro);
@@ -54,7 +54,7 @@ export class ColaboradorService {
   }
   Delete(id: string): Observable<Colaborador> {
     return this._httpClient.delete<Colaborador>(`${environment.Colaboradores.Delete}/${id}`)
-}
+  }
 
   //#endregion
 

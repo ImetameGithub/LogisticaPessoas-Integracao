@@ -66,7 +66,7 @@ export class DocumentoFormComponent implements OnInit {
     isBusy: boolean = false;
 
     selectDocumento: any;
-
+    isObrigatorio: boolean = false;
     constructor(
         private titleService: Title,
         private _Documentoservice: DocumentoService,
@@ -79,7 +79,7 @@ export class DocumentoFormComponent implements OnInit {
         this.form = new FormGroup({
             IdDestra: new FormControl('', [Validators.required]),
             IdProtheus: new FormControl('', [Validators.required]),
-            Descricao: new FormControl('', [Validators.required]),            
+            Descricao: new FormControl('', [Validators.required]),
         });
         this.titleService.setTitle("Novo - Documento - Imetame");
     }
@@ -88,7 +88,7 @@ export class DocumentoFormComponent implements OnInit {
     ngOnInit() {
 
         this._Documentoservice.getDocumentosDestra().subscribe(
-            (documentosdestra:DocumentosDestra[]) => {
+            (documentosdestra: DocumentosDestra[]) => {
                 console.log(documentosdestra)
                 //this.documentosdestra = documentosdestra;
                 this.documentosdestra = documentosdestra.map(x => new CustomOptionsSelect(x.codigo.toString(), x.nome)) ?? [];
@@ -99,7 +99,7 @@ export class DocumentoFormComponent implements OnInit {
         );
 
         this._Documentoservice.getDocumentosProtheus().subscribe(
-            (documentosprotheus:DocumentosProtheus[]) => {
+            (documentosprotheus: DocumentosProtheus[]) => {
                 console.log(documentosprotheus)
                 //this.documentosdestra = documentosdestra;
                 this.documentosprotheus = documentosprotheus.map(x => new CustomOptionsSelect(x.codigo, x.nome)) ?? [];
@@ -112,9 +112,8 @@ export class DocumentoFormComponent implements OnInit {
         this._Documentoservice._selectDocumento$.subscribe(
             (data: any) => {
                 if (data != null) {
-                    
                     this.selectDocumento = data;
-                    
+                    this.isObrigatorio = data.Obrigatorio;
                     this.form = this._formBuilder.group({
                         Descricao: [data?.Descricao, [Validators.required]],
                         IdDestra: [data?.IdDestra, [Validators.required]],
@@ -129,10 +128,10 @@ export class DocumentoFormComponent implements OnInit {
                 console.error('Erro ao buscar credenciadoras', error);
             }
         );
-        
 
 
-       
+
+
     }
 
 
@@ -156,10 +155,15 @@ export class DocumentoFormComponent implements OnInit {
         }
     }
 
+    isObrigatorioChanged(event: any) {
+        this.isObrigatorio = event.value;
+    }
+
     add(model: Documento) {
-        
+
         model.DescricaoDestra = this.documentosdestra.find(m => m.value == model.IdDestra).display
         model.DescricaoProtheus = this.documentosprotheus.find(m => m.value == model.IdProtheus).display
+        model.Obrigatorio = this.isObrigatorio;
         this._fuseProgressBarService.setMode("indeterminate");
         this._fuseProgressBarService.show();
         this.blockRequisicao = true;
@@ -189,6 +193,7 @@ export class DocumentoFormComponent implements OnInit {
     update(model: Documento) {
         model.DescricaoDestra = this.documentosdestra.find(m => m.value == model.IdDestra).display
         model.DescricaoProtheus = this.documentosprotheus.find(m => m.value == model.IdProtheus).display
+        model.Obrigatorio = this.isObrigatorio;
         this._fuseProgressBarService.setMode("indeterminate");
         this._fuseProgressBarService.show();
         this.blockRequisicao = true;

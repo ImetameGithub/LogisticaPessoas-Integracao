@@ -32,6 +32,7 @@ import { DocumentosModalComponent } from "./documentos-modal/documentos-modal.co
 import { ColaboradorModel, ColaboradorProtheusModel } from "app/models/DTO/ColaboradorModel";
 import { FuseSwitchAlertService } from "@fuse/services/switch-alert";
 import { ColaboradorStatusDestra } from "app/models/Enums/DestraEnums";
+import { Colaborador } from "app/models/Colaborador";
 
 @Component({
     selector: "colaboradores",
@@ -110,7 +111,7 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
             .subscribe((processamento) => {
                 this.isResult = processamento.status === 2 || processamento.status === 3
             });
-            this._fuseProgressBarService.hide();
+        this._fuseProgressBarService.hide();
     }
 
     ngOnDestroy(): void {
@@ -120,6 +121,8 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
     }
 
     toggleSelection(item): void {
+        if (this.checkIsDisable(item) == true)
+            return
         item.check = !item.check;
         this.todoMundo = this.service.itens.some(i => i.check);
     }
@@ -166,6 +169,13 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
             },
             error => this.showError(error)
         );
+    }
+
+    checkIsDisable(Colaborador: Colaborador) {
+        if (this.isBusy || this.isResult || Colaborador.IsAssociado)
+            return true;
+        else
+            return false;
     }
 
     getDocumentosProtheus(colaborador: ColaboradorModel) {
@@ -226,7 +236,7 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
         this._fuseProgressBarService.setMode("indeterminate");
         this._fuseProgressBarService.show();
 
-        this.service.EnviarColaboradorDestra(colaboradores,this.service.routeParams.idPedido,this.service.routeParams.ordemServico ).subscribe(
+        this.service.EnviarColaboradorDestra(colaboradores, this.service.routeParams.idPedido, this.service.routeParams.ordemServico).subscribe(
             {
                 next: (response: ColaboradorProtheusModel) => {
                     this._fuseProgressBarService.hide();
@@ -273,7 +283,8 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
                     this._snackbar.open("Item enviado para com sucesso", 'X', {
                         duration: 2500,
                         panelClass: 'snackbar-success',
-                    })
+                    });
+                    this.dataSource = new FilesDataSource<any>(this.service);
                 },
                 error: (error) => {
                     this.blockRequisicao = false;

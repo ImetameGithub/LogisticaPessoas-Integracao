@@ -1,5 +1,5 @@
 export class ColaboradorStatusDestra {
-    static NaoInformado = new ColaboradorStatusDestra(-2, 'Não Informado'); // CRIADO PARA QUANDO NÃO TEM STATUS DESTRA INFORMADO
+    static NaoSincronizado = new ColaboradorStatusDestra(-2, 'Não Sincronizado'); // CRIADO PARA QUANDO NÃO TEM STATUS DESTRA INFORMADO
     static Recebido = new ColaboradorStatusDestra(0, 'Recebido');
     static Processando = new ColaboradorStatusDestra(1, 'Processando');
     static Sucesso = new ColaboradorStatusDestra(10, 'Sucesso');
@@ -7,7 +7,7 @@ export class ColaboradorStatusDestra {
     static Cancelado = new ColaboradorStatusDestra(-190, 'Cancelado');
 
     static values = [
-        ColaboradorStatusDestra.NaoInformado,
+        ColaboradorStatusDestra.NaoSincronizado,
         ColaboradorStatusDestra.Recebido,
         ColaboradorStatusDestra.Processando,
         ColaboradorStatusDestra.Sucesso,

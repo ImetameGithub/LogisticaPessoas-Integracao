@@ -64,13 +64,11 @@
                         </mat-checkbox>
                     </mat-header-cell>
                     <mat-cell *matCellDef="let item" class="w-100">
-                        <mat-checkbox [disabled]="isBusy || isResult" [(ngModel)]="item.check" [color]="Accent"
+                        <mat-checkbox [disabled]="checkIsDisable(item)" [(ngModel)]="item.check" [color]="Accent"
                             (click)="toggleSelection(item)">
                         </mat-checkbox>
                     </mat-cell>
                 </ng-container>
-
-                
 
                 <ng-container matColumnDef="numCad">
                     <mat-header-cell *matHeaderCellDef class="w-100">NumCad</mat-header-cell>
