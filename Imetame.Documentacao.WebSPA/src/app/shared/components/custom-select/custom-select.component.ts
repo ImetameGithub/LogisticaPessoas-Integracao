@@ -4,8 +4,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormControl, ReactiveFormsModu
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
-import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, startWith, takeUntil } from 'rxjs/operators';
 import { CustomOptionsSelect } from './components.types';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -21,7 +21,7 @@ import { MatIconModule } from '@angular/material/icon';
       <mat-label *ngIf="label != null">{{label}}</mat-label>
       <mat-select [formControl]="formControl" [multiple]="multiple" [placeholder]="placeholder" (selectionChange)="onSelectionChange()">
         <mat-option>
-          <ngx-mat-select-search [formControl]="filterControl" [placeholderLabel]="placeholder"></ngx-mat-select-search>
+          <ngx-mat-select-search [noEntriesFoundLabel]="'Nenhuma opção encontrada'" [formControl]="filterControl" [placeholderLabel]="placeholder"></ngx-mat-select-search>
         </mat-option>
         <mat-option *ngIf="multiple == false" [value]="null">
           Nenhum
@@ -62,11 +62,14 @@ export class CustomSearchSelectComponent implements OnInit, OnChanges, ControlVa
   @Input() rounded: boolean = false;
   @Input() icon: string = null;
   @Output() selectionChange = new EventEmitter<any>();
+  @Output() searchChange = new EventEmitter<string>();
   filterControl: FormControl = new FormControl();
   filteredOptions: Observable<CustomOptionsSelect[]>;
 
+
   private onChange = (_: any) => { };
   private onTouched = () => { };
+
 
   ngOnInit() {
     this.filteredOptions = this.filterControl.valueChanges.pipe(
@@ -80,7 +83,14 @@ export class CustomSearchSelectComponent implements OnInit, OnChanges, ControlVa
       this.onChange(value);
       this.selectionChange.emit(value);
     });
+    this.filterControl.valueChanges.pipe(
+      debounceTime(600) 
+    ).subscribe(value => {
+      this.searchChange.emit(value);
+    });
   }
+
+
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.options) {
@@ -117,21 +127,21 @@ export class CustomSearchSelectComponent implements OnInit, OnChanges, ControlVa
     // Verifica se "Nenhum" está selecionado
     const currentSelection = this.formControl.value;
     // Essa validação existe para se caso o select não for multiplo não apareça nenhum erro no console log 
-    if(currentSelection != null){
+    if (currentSelection != null) {
       if (currentSelection.includes(null)) {
         // Se "Nenhum" está selecionado, remove todas as outras seleções e mantém apenas "Nenhum"
         this.formControl.setValue([null]);
       } else if (currentSelection.length > 1 && currentSelection.includes(null)) {
         // Se há múltiplas seleções incluindo "Nenhum", remove "Nenhum"
         this.formControl.setValue(currentSelection.filter(value => value !== null));
-      }    
+      }
     }
-  
+
     this.onChange(this.formControl.value);
     this.onTouched();
     this.selectionChange.emit(this.formControl.value);
   }
-  
+
   private filterOptions(search: string): CustomOptionsSelect[] {
     if (!search) {
       return this.options.slice();

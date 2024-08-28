@@ -15,8 +15,12 @@
                 [required]="false" placeholder="Selecione as equipe" label="Equipes" class="col-span-4">
             </custom-search-select>
 
-            <custom-search-select [multiple]="true" [options]="OsOptions" formControlName="Os" [required]="false"
+            <!-- <custom-search-select [multiple]="true" onchange="teste()" [options]="OsOptions" formControlName="Os" [required]="false"
                 placeholder="Selecione as OS" label="OS" class="col-span-4">
+            </custom-search-select> -->
+
+            <custom-search-select [multiple]="true" [options]="OsOptions"
+                formControlName="Os" [required]="false" placeholder="Selecione as OS" label="OS" class="col-span-4">
             </custom-search-select>
 
             <custom-search-select [multiple]="true" [options]="disciplinaOptions" formControlName="Disciplina"

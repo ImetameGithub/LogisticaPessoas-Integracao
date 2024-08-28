@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -16,6 +16,9 @@ import { AtividadeEspecifica } from 'app/models/AtividadeEspecifica';
 import { CustomOptionsSelect } from 'app/shared/components/custom-select/components.types';
 import { ColaboradorxAtividadeModel } from 'app/models/DTO/ColaboradorxAtividadeModel';
 import { MatTableDataSource } from '@angular/material/table';
+import * as _ from 'lodash';
+import { takeUntil, startWith, debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { AutomacaoDeProcessosService } from 'app/main/automacao-de-processos/automacao-de-processos.service';
 
 @Component({
     selector: 'colaboradores-atividade-modal',
@@ -65,6 +68,7 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
         private titleService: Title,
         @Inject(MAT_DIALOG_DATA) public _data: { _listColaboradores: ColaboradorProtheusModel[], _listAtividades: AtividadeEspecifica[] },
         private _Colaboradorservice: ColaboradorService,
+        private cdr: ChangeDetectorRef,
         private _matDialogRef: MatDialogRef<ColaboradoresAtividadeModalComponent>,
         private _snackbar: MatSnackBar,
         private _formBuilder: UntypedFormBuilder,
@@ -101,10 +105,24 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
 
 
     ngOnInit() {
+        // this.getOs('');S
         this.form = new FormGroup({
             ListAtividade: new FormControl([], [Validators.required]),
         });
     }
+
+
+    // getOs(searchValue) {
+    //     this._Colaboradorservice.getOss(searchValue).subscribe(
+    //         (ordensServicos: any[]) => {
+    //             this.OsOptions = ordensServicos.map(item => new CustomOptionsSelect(item.os, item.numero + ' - ' + item.descricao)) ?? [];
+    //         },
+    //         (error) => {
+    //             console.error('Erro ao buscar pedidos', error);
+    //         }
+    //     );
+    // }
+
 
     //#region FUNÇÕES CRUD MATHEUS MONFREIDES - FARTEC SISTEMAS
 
@@ -133,6 +151,8 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
                 }
             }
         )
+
+
     }
 
     addOrUpdate() {
