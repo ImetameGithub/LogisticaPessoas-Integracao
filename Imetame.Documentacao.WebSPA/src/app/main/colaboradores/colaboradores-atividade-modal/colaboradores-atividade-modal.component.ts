@@ -109,6 +109,7 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
     //#region FUNÇÕES CRUD MATHEUS MONFREIDES - FARTEC SISTEMAS
 
     relacionarColaboradores() {
+        this._fuseProgressBarService.show();
         const modelRelacao: ColaboradorxAtividadeModel = this.form.getRawValue();
         modelRelacao.ListColaborador = this.checkedColaboradores;
         this._Colaboradorservice.RelacionarColaboradorxAtividade(modelRelacao).subscribe(
