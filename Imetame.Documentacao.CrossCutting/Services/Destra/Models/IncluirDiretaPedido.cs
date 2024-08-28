@@ -30,9 +30,14 @@ namespace Imetame.Documentacao.CrossCutting.Services.Destra.Models
 
     public class Equipe
     {
+        public string cpf { get; set; }
+        public List<int> atividadeEspecifica { get; set; }
+    }
+    public class EquipeIndividual
+    {
         public string cnpj { get; set; }
         public string numeroOS { get; set; }
         public string cpf { get; set; }
-        public List<int> atividadeespecifica { get; set; }
+        public List<int> atividadeEspecifica { get; set; }
     }
 }

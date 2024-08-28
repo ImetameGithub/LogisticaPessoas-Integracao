@@ -1,23 +1,24 @@
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { API_URL } from 'app/config/tokens';
+import { API_URL, EXTRANET_API_URL } from 'app/config/tokens';
 import { Colaborador } from 'app/models/Colaborador';
 import { ColaboradorModel, ColaboradorProtheusModel } from 'app/models/DTO/ColaboradorModel';
 import { PaginatedResponse } from 'app/models/PaginatedResponse';
 import { DataService } from 'app/services/data.service';
 import { environment } from 'environments/environment';
-import { tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { ReplaySubject, Observable } from 'rxjs';
 import { AtividadeEspecifica } from 'app/models/AtividadeEspecifica';
 import { ColaboradorxAtividadeModel } from 'app/models/DTO/ColaboradorxAtividadeModel';
+import * as _ from 'lodash';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ColaboradorService {
 
-  constructor(private _httpClient: HttpClient,) {
+  constructor(private _httpClient: HttpClient,   @Inject(EXTRANET_API_URL) private extranetApiUrl: string,private dataService: DataService) {
 
   }
   //#region CRUD
@@ -39,6 +40,19 @@ export class ColaboradorService {
     return this._httpClient.get<PaginatedResponse<ColaboradorProtheusModel>>(environment.Colaboradores.GetColaboradores, { params });
   }
 
+  getOss(searchText: string): Observable<any[]> {
+    let param = { 'pageIndex': 0, 'pageSize': 10 };
+    if (!_.isNull(searchText) && !_.isUndefined(searchText))
+        param['query'] = searchText;
+
+    return this.dataService.getList(this.extranetApiUrl + 'oss', param)
+        .pipe(map((response: any) => {
+            //this._fuseProgressBarService.hide();
+            if (response)
+                return response || [];
+            return [];
+        }));
+}
 
   Add(Colaborador: Colaborador): Observable<Colaborador> {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
