@@ -10,5 +10,5 @@ public class Credenciadora : Entity
     public string Descricao { get; set; }
 
     [NotMapped]    
-    public List<Pedido> Pedidos { get; set; }
+    public List<Pedido>? Pedidos { get; set; }
 }
