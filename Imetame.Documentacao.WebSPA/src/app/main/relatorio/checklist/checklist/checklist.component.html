@@ -1,0 +1,28 @@
+<div class="" fusePerfectScrollbar fxLayout="column" fxLayoutAlign="space-between">
+    <Form [formGroup]="form" class="w-100-p" fxLayout="row wrap" fxLayoutAlign="space-between">
+        <!-- <mat-form-field fxFlex="100" appearance="outline">
+            <mat-label>Credenciadora</mat-label>
+            <mat-select formControlName="Pedidos">
+                <mat-option>--</mat-option>
+            </mat-select>
+        </mat-form-field> -->
+
+        <div style="width: 100%;" class="tipoDocumentoFiltro" fxLayout="row">
+            <custom-search-select formControlName="Pedido" (selectionChange)="tipoDocumentoSelected($event)" [options]="listPedidos"
+                [multiple]="false"
+                placeholder="Selecione o Pedido" label="Pedido">
+            </custom-search-select>
+        </div>
+
+        <mat-form-field fxFlex="100" appearance="outline">
+            <mat-label>Credenciadora</mat-label>
+            <mat-select formControlName="IdCredenciadora">
+                <mat-option>--</mat-option>
+            </mat-select>
+            <!-- <mat-hint class="text-red-500" *ngIf="myError('IdCredenciadora', 'required', form)">
+            Campo <strong>Obrigatorio</strong>
+        </mat-hint> -->
+        </mat-form-field>
+        <button (click)="gerarRelatorio()">GERAR RELATÓRIO</button>
+    </Form>
+</div>

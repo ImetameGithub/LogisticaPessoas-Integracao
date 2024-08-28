@@ -6,19 +6,19 @@ export const navigation: FuseNavigation[] = [
         title: "Automações",
         type: "group",
         icon: "apps",
-        children: [            
+        children: [
             {
                 id: "cad-col",
-                title: "Cadastro",                
-                type: 'collapsable',                
-                icon: "list",  
+                title: "Cadastro",
+                type: 'collapsable',
+                icon: "list",
                 children: [
                     {
                         id: "cad-col",
                         title: "Cadastro de Colaboradores",
                         type: "item",
-                        url: "/automacoes/cadastro-de-colaboradores",                        
-                        icon: "label_important",                
+                        url: "/automacoes/cadastro-de-colaboradores",
+                        icon: "label_important",
                     },
                     {
                         id: "pedido",
@@ -27,13 +27,13 @@ export const navigation: FuseNavigation[] = [
                         url: "/pedido",
                         icon: "label_important",
                     },
-                ]              
+                ]
             },
             {
                 id: "cad-col",
-                title: "Configurações",                
-                type: 'collapsable',                
-                icon: "list",  
+                title: "Configurações",
+                type: 'collapsable',
+                icon: "list",
                 children: [
                     {
                         id: "atividade-especificas",
@@ -41,7 +41,7 @@ export const navigation: FuseNavigation[] = [
                         type: "item",
                         url: "/atividade-especifica",
                         icon: "label_important",
-                    },            
+                    },
                     {
                         id: "colaboradores",
                         title: "Colaboradores",
@@ -77,8 +77,23 @@ export const navigation: FuseNavigation[] = [
                         url: "/processamento",
                         icon: "label_important",
                     },
-                ]              
-            },            
+                ]
+            },
+            {
+                id: "cad-col",
+                title: "Relatórios",
+                type: 'collapsable',
+                icon: "list",
+                children: [
+                    {
+                        id: "checklist",
+                        title: "Checklist",
+                        type: "item",
+                        url: "/checklist",
+                        icon: "label_important",
+                    },
+                ]
+            },
         ],
     },
 ];
