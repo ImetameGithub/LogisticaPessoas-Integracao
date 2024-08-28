@@ -11,11 +11,12 @@ import { ShowErrosDialogComponent } from 'app/shared/components/show-erros-dialo
 import { GenericValidator } from 'app/utils/generic-form-validator';
 import { Subject } from 'rxjs';
 import { CredenciadoraService } from '../credenciadora.service';
+import { NEW_GUIDE } from 'app/shared/constants/consts';
 
 @Component({
-  selector: 'credenciadora-form',
-  templateUrl: './credenciadora-form.component.html',
-  styleUrls: ['./credenciadora-form.component.scss']
+    selector: 'credenciadora-form',
+    templateUrl: './credenciadora-form.component.html',
+    styleUrls: ['./credenciadora-form.component.scss']
 })
 export class CredenciadoraFormComponent implements OnInit {
 
@@ -47,7 +48,7 @@ export class CredenciadoraFormComponent implements OnInit {
         private _fuseProgressBarService: FuseProgressBarService,
     ) {
         this.form = new FormGroup({
-            descricao: new FormControl('', [Validators.required]),            
+            Descricao: new FormControl('', [Validators.required]),
         });
         this.titleService.setTitle("Novo - Credenciadora - Imetame");
     }
@@ -58,11 +59,11 @@ export class CredenciadoraFormComponent implements OnInit {
         this._Credenciadoraservice._selectCredenciadora$.subscribe(
             (data: any) => {
                 if (data != null) {
-                    
+
                     this.selectCredenciadora = data;
-                    
+
                     this.form = this._formBuilder.group({
-                        descricao: [data?.Descricao, [Validators.required]],                        
+                        descricao: [data?.Descricao, [Validators.required]],
                     });
                     this.titleService.setTitle(
                         data.Descricao + " - Credenciadora - Imetame"
@@ -73,7 +74,7 @@ export class CredenciadoraFormComponent implements OnInit {
                 console.error('Erro ao buscar credenciadoras', error);
             }
         );
-        
+
 
 
         // this._Credenciadoraservice.getCredenciadoras().subscribe(
