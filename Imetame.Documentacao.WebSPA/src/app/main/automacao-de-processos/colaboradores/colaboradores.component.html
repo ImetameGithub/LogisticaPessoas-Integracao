@@ -64,7 +64,7 @@
                         </mat-checkbox>
                     </mat-header-cell>
                     <mat-cell *matCellDef="let item" class="w-100">
-                        <mat-checkbox [disabled]="checkIsDisable(item)" [(ngModel)]="item.check" [color]="Accent"
+                        <mat-checkbox [(ngModel)]="item.check" [color]="Accent"
                             (click)="toggleSelection(item)">
                         </mat-checkbox>
                     </mat-cell>
@@ -100,7 +100,7 @@
 
                 <ng-container matColumnDef="sincronizadoDestra">
                     <mat-header-cell *matHeaderCellDef>Sincronizado Destra</mat-header-cell>
-                    <mat-cell *matCellDef="let row">{{row.SincronizadoDestra == true ? "Sim" :
+                    <mat-cell *matCellDef="let row">{{row.IsAssociado == true ? "Sim" :
                         "Não"}}</mat-cell>
                 </ng-container>
                 

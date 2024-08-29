@@ -40,9 +40,10 @@ export class CredenciadoraComponent implements OnInit, OnDestroy {
     pedidos: any[] = [];
     ordemservico: any[] = []
     credenciadoras: any[] = []
-
+    
     pedidosOptions: CustomOptionsSelect[] = [];
-    ordemServicoOptions: CustomOptionsSelect[] = [];
+    OsOptions: CustomOptionsSelect[] = [];
+
 
     @ViewChild('osInput') osInput: ElementRef<HTMLInputElement>;
     @ViewChild('auto') matAutocomplete: MatAutocomplete;
@@ -90,17 +91,7 @@ export class CredenciadoraComponent implements OnInit, OnDestroy {
             }
         );
 
-        this.service.getOss('').subscribe(
-            (ordensServicos: any[]) => {
-                this.ordemServicoOptions = ordensServicos.map(item => new CustomOptionsSelect(item.os, item.numero + ' - ' + item.descricao)) ?? [];
-            },
-            (error) => {
-                console.error('Erro ao buscar pedidos', error);
-            }
-        );
-
- 
-
+        //  this.getOs('')
         
         this.filtroForm.controls.oss.valueChanges
             .pipe(
@@ -114,24 +105,24 @@ export class CredenciadoraComponent implements OnInit, OnDestroy {
 
                 this.filteredOss = this.service.getOss(q);
             });
-        // this.osCtrl.valueChanges
-        //     .pipe(
-        //         takeUntil(this._unsubscribeAll),
-        //         startWith(''),
-        //         debounceTime<any>(600),
-        //         distinctUntilChanged()
-        //     )
-        //     .subscribe((q: string) => {
-        //         if (_.isObject(q)) return;
 
-        //         this.filteredOss = this.service.getOss(q);
-        //     });
     }
 
     ngOnDestroy(): void {
         // Unsubscribe from all subscriptions
         this._unsubscribeAll.next();
         this._unsubscribeAll.complete();
+    }
+
+   getOs(searchValue) {
+        this.service.getOss(searchValue).subscribe(
+            (ordensServicos: any[]) => {
+                this.OsOptions = ordensServicos.map(item => new CustomOptionsSelect(item.numero, item.numero + ' - ' + item.descricao)) ?? [];
+            },
+            (error) => {
+                console.error('Erro ao buscar pedidos', error);
+            }
+        );
     }
 
     displayFnResp(user: any): string {

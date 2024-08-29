@@ -31,7 +31,7 @@
                                     formControlName="pedido" placeholder="Selecione um Pedido" label="Pedido"
                                     class="col-span-4">
                                 </custom-search-select>
-                            </div>                                                           
+                            </div>
 
                             <mat-form-field fxFlex="51" appearance="outline">
                                 <mat-label>Ordem de serviço</mat-label>
@@ -42,11 +42,17 @@
                                     </mat-option>
                                 </mat-autocomplete>
                             </mat-form-field>
+                            <!-- <div fxFlex="51">
+                                <custom-search-select (searchChange)="getOs($event)" [multiple]="false"
+                                    [options]="OsOptions" formControlName="Os" [required]="false"
+                                    placeholder="Selecione as OS" label="OS" class="col-span-4">
+                                </custom-search-select>
+                            </div> -->
 
                             <div fxFlex="51" fxLayout="row wrap" fxLayoutAlign="end">
 
-                                <button class="mr-8" mat-raised-button color="primary"
-                                    [disabled]="filtroForm.invalid" (click)="avancar()">Avançar</button>
+                                <button class="mr-8" mat-raised-button color="primary" [disabled]="filtroForm.invalid"
+                                    (click)="avancar()">Avançar</button>
                             </div>
 
                         </div>

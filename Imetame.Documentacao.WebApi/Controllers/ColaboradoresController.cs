@@ -177,41 +177,6 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 Domain.Entities.Processamento? processamento = await _repProcessamento.SelectContext().Where(m => m.Id == idProcessamento).FirstOrDefaultAsync();
 
-                #region CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
-                conn.Open();
-                //var sql = @"SELECT distinct [empresa] as Empresa
-                //      ,[numcad] as NumCad
-                //      ,[numcracha] as NumCracha
-                //      ,[status] as Status
-                //      ,[nomefuncionario] as Nome
-                //      ,[cpf] as Cpf
-                //      ,[funcaoatual] as FuncaoAtual
-                //      ,[funcaoinicial] as FuncaoInicial
-                //      ,[dataafastamento] as DataAfastamento
-                //      ,[dataadmissao] as DataAdmissao
-                //      ,[datanascimento] as DataNascimento
-                //      ,[equipe] as Equipe
-                //      ,[perfil] as Perfil
-                //      ,[endereco] as Endereco
-                //      ,[numero] as Numero
-                //      ,[bairro] as Bairro
-                //      ,[cidade] as Cidade
-                //      ,[cep] as Cep
-                //      ,[ddd] as Ddd
-                //      ,[numtel] as NumTel
-                //      ,[ddd2] as Ddd2
-                //      ,[numtel2] as NumTel2
-                //      ,[estado] as Estado
-                //      ,[tempoempresaanos] as TempoEmpresaAnos
-                //      ,[tempoempresaanosint] as TempoEmpresaAnosInt
-                //      ,[tempoempresamesesint] as TempoEmpresaMesesInt
-                //      ,[tempoempresatexto] as TempoEmpresaTeexto
-                //  FROM VW_FUSION_GP_COLABORADOR (nolock)  COLAB
-                //  join DADOSADV_LUC..ZNB010 (nolock) ZNB ON ZNB.ZNB_MATRIC = COLAB.[numcad] AND ZNB.D_E_L_E_T_='' AND ZNB.ZNB_DTFIM>GETDATE()-30
-                //  WHERE ZNB_OS = @Oss
-                //order by Nome";
-                #endregion CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
-
 
                 var sql = @"WITH CountDocumentos as
 							(	SELECT
@@ -271,7 +236,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 								AND ZNB.ZNB_DTFIM>GETDATE()-30
 							JOIN CountDocumentos CD ON CD.RA_MAT = [numcad]
 							WHERE
-								ZNB_OS = '001701001'
+								ZNB_OS = @Oss
 							order by
 								Nome";
 
@@ -288,28 +253,16 @@ namespace Imetame.Documentacao.WebApi.Controllers
                              .ThenInclude(m => m.AtividadeEspecifica)
                          .FirstOrDefaultAsync();
 
-                    // TODO verificar se a consulta está retornando corretamente e se DocumentosxColaborador está mapeado
-                    //item.DocumentosxColaborador = await _repColaborador.SelectContext().AsNoTracking()
-                    //	 .Where(m => m.Matricula == item.NumCad)
-                    //	 .Include(m => m.DocumentosxColaborador)
-                    //	 .Select(x => x.DocumentosxColaborador)
-                    //	 .CountAsync();
-
                     item.SincronizadoDestra = false;
                     if (colaboradorCad is not null)
                     {
-                        //var nomeAtividades = colaboradorCad.ColaboradorxAtividade.Select(m => m.AtividadeEspecifica.Descricao).ToList();
-                        //string listaDeNomes = string.Join(", ", nomeAtividades);
-
-                        //item.ConcatAtividades = listaDeNomes;
-
                         // SE O COLABORADOR NÃO FOR SINCRONIZADO PARA DESTRA NÃO TEM COLABORADOR CADASTRO NO SISTEMA
                         item.SincronizadoDestra = true;
                         item.IsAssociado = await _repColaboradorxPedido.SelectContext().AsNoTracking()
                                             .AnyAsync(cp => cp.CXP_IDCOLABORADOR == colaboradorCad.Id);
                     }
 
-                    string json = await _destraController.GetColaborador(item.Cpf);
+                    string json = await _destraController.GetColaborador(item.Cpf.PadLeft(11, '0'));
                     ColaboradorDestraApiModel colaboradorDestra = JsonConvert.DeserializeObject<ColaboradorDestraApiModel>(json);
                     if (colaboradorDestra.DADOS.Count != 0)
                         item.StatusDestra = (Int32)colaboradorDestra.DADOS[0].status;
