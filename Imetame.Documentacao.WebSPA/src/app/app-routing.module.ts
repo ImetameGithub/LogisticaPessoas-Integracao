@@ -66,6 +66,13 @@ const routes: Routes = [
                 (mod) => mod.ProcessamentoModule
             ),
     },
+    {
+        path: "checklist",
+        loadChildren: () =>
+            import("./main/relatorio/relatorio.module").then(
+                (mod) => mod.RelatorioModule
+            ),
+    },
 
     {
         path: "nao-encontrado",

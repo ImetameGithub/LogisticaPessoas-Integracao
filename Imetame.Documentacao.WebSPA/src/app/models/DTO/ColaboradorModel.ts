@@ -1,4 +1,5 @@
 import { BaseEntity } from "../BaseEntity";
+import { ColaboradorxAtividade } from "../ColaboradorxAtividade";
 
 
 export class ColaboradorModel extends BaseEntity {
@@ -25,6 +26,8 @@ export class ColaboradorModel extends BaseEntity {
     TempoEmpresaAnos: string;
     TempoEmpresaAnosInt: string;
     CountDocumento: number;
+
+    ColaboradorxAtividade?: ColaboradorxAtividade[];
 }
 
 export class ColaboradorProtheusModel extends BaseEntity {

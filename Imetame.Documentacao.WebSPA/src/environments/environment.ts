@@ -12,6 +12,7 @@ export const environment = {
         Delete: `${baseUrl}/Pedido/Delete`,
         GetAll: `${baseUrl}/Pedido/GetAll`,
         GetAllPaginated: `${baseUrl}/Pedido/GetAllPaginated`,
+        GetDadosCheckList:`${baseUrl}/Pedido/GetDadosCheckList`,
     },
     //#endregion
     //#region CREDENCIADORA
