@@ -233,19 +233,7 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
 
     enviarParaColaboradorDestra() {
         let colaboradores = this.service.itens.filter(col => col.check);
-        if(colaboradores.find(m => m.IsAssociado == true)){
-            this._fuseSwitchAlertService.open({
-                title: 'Atenção',
-                message: "Alguns colaboradores selecionados já foram sincronizados para a Destra",
-                icon: {
-                    show: true,
-                    name: 'warning',
-                    color: 'warn',
-                },
-                dismissible: true,
-            });
-            return
-        }
+ 
         if (colaboradores.length == 0) {
             this._snackbar.open("Não há colaboradores selecionados.", 'X', {
                 duration: 2500,

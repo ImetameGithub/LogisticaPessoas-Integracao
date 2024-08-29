@@ -259,7 +259,9 @@ namespace Imetame.Documentacao.WebApi.Controllers
                         // SE O COLABORADOR NÃO FOR SINCRONIZADO PARA DESTRA NÃO TEM COLABORADOR CADASTRO NO SISTEMA
                         item.SincronizadoDestra = true;
                         item.IsAssociado = await _repColaboradorxPedido.SelectContext().AsNoTracking()
-                                            .AnyAsync(cp => cp.CXP_IDCOLABORADOR == colaboradorCad.Id);
+                                            .AnyAsync(cp => cp.CXP_IDCOLABORADOR == colaboradorCad.Id
+                                                        && cp.CXP_IDPEDIDO == processamento.IdPedido
+                                                         && cp.CXP_NUMEROOS == processamento.Oss);
                     }
 
                     string json = await _destraController.GetColaborador(item.Cpf.PadLeft(11, '0'));
@@ -623,18 +625,43 @@ namespace Imetame.Documentacao.WebApi.Controllers
                     .Include(m => m.ColaboradorxAtividade)
                         .ThenInclude(m => m.AtividadeEspecifica)
                     .ToList();
-                // Buscar colaboradores que foi selecionado mas não possuem relação com atividade, ocasionando em não ter na tabela colaborador - Matheus Monfreides
+
+                #region VALIDAR SE COLABORADOR ESTÁ ATRELADO A ALGUMA ATIVIDADE
                 List<ColaboradorModel> colaboradoresSemAtividade = dto.ListColaboradores
                    .Where(ei => !itensCadastrados.Any(m => m.Matricula == ei.NumCad))
                    .ToList();
 
-
                 if (colaboradoresSemAtividade.Any())
                 {
-                    var nomesColaboradores = string.Join(", ", colaboradoresSemAtividade.Select(c => c.Nome));
-                    var plural = colaboradoresSemAtividade.Count > 1 ? "s" : "";
-                    return BadRequest($"O colaborador{plural} {nomesColaboradores} não está{plural} relacionado a nenhuma atividade específica.");
+                    var nomesColaboradores = colaboradoresSemAtividade.Select(colaborador => colaborador.Nome).ToList();
+                    string listaDeNomes = string.Join(", ", nomesColaboradores);
+                    if (nomesColaboradores.Count() > 1)
+                    {
+                        throw new Exception("Os colaboradores " + listaDeNomes + " não estão relacionado a nenhuma atividade específica.");
+                    }
+                    else
+                    {
+                        throw new Exception("O colaborador " + listaDeNomes + " não está relacionado a nenhuma atividade específica.");
+                    }
                 }
+                #endregion
+
+                #region VALIDAR SE COLABORADOR JÁ ESTÁ ATRELADO A UM PEDIDO E OS
+                List<ColaboradorModel> colaboradoresAssociadosAoPedido = dto.ListColaboradores
+                 .Where(m => m.IsAssociado)
+                 .ToList();
+                if (colaboradoresAssociadosAoPedido.Any())
+                {
+                    //ANTES ERA CARREGADA UMA MENSAGEM MAS FOI RETIRADA ESSA LOGICA
+                    //List<string> nomesColaboradores = colaboradoresAssociadosAoPedido.Select(colaborador => colaborador.Nome).ToList();
+                    //colaboradoresRelacionados.AddRange(nomesColaboradores);
+
+                    // Filtra os colaboradores que não estão associados para o próximo passo
+                    dto.ListColaboradores = dto.ListColaboradores
+                        .Where(m => !colaboradoresAssociadosAoPedido.Any(ca => ca.NumCad == m.NumCad))
+                        .ToList();
+                }
+                #endregion
 
                 List<Colaborador> listProtheusXlistColaborador = itensCadastrados
                     .Where(m => dto.ListColaboradores.Any(ei => ei.NumCad == m.Matricula))
@@ -671,19 +698,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                     //var jsonResponse = await _destraController.AddColaborador(colaboradorDestra) as OkObjectResult;
                     #endregion
-
-                    #region VALIDAR SE COLABORADOR JÁ ESTÁ ATRELADO A UM PEDIDO E OS
-                    bool jaAssociado = await _repColaboradorxPedido.SelectContext()
-                                            .AnyAsync(cp => cp.CXP_IDCOLABORADOR == model.Id
-                                                         && cp.CXP_IDPEDIDO == dto.IdPedido
-                                                         && cp.CXP_NUMEROOS == dto.OrdemServico);
-
-                    if (jaAssociado)
-                    {
-                        colaboradoresRelacionados.Add(model.Nome);
-                    }
-                    else
-                    {
+                      
                         List<int> atividadesEspecificas = model.ColaboradorxAtividade
                                     .Select(ca => ca.AtividadeEspecifica.IdDestra)
                                     .ToList();
@@ -704,57 +719,61 @@ namespace Imetame.Documentacao.WebApi.Controllers
                             CXP_NUMEROOS = dto.OrdemServico,
                             CXP_USUARIOINCLUSAO = dto.MatriculaUsuario
                         };
-                        colaboradorxPedidoList.Add(colabPedido);
-                    }
-                    #endregion
+                        colaboradorxPedidoList.Add(colabPedido);                                       
                 }
 
                 #region MONTAR ENVIO DE PEDIDO PARA DESTRA 
-                IncluirPedidoxDireta incluirDiretaPedido = new IncluirPedidoxDireta()
+                if (listProtheusXlistColaborador.Any())
                 {
-                    cnpj = "31790710001834",
-                    numeroOS = dto.OrdemServico,
-                    tipoContrato = "DIR",
-                    pedidoCliente = pedido.NumPedido,
-                    observacoes = "",
-                    contatoOS = "Responsavel pela OS",
-                    telefoneOS = "(19)88888-8888",
-
-
-                    unidades = new List<Unidade>()
+                    IncluirPedidoxDireta incluirDiretaPedido = new IncluirPedidoxDireta()
                     {
-                        new Unidade()
+                        cnpj = "31790710001834",
+                        numeroOS = dto.OrdemServico,
+                        tipoContrato = "DIR",
+                        pedidoCliente = pedido.NumPedido,
+                        observacoes = "",
+                        contatoOS = "Responsavel pela OS",
+                        telefoneOS = "(19)88888-8888",
+
+
+                        unidades = new List<Unidade>()
                         {
-                            cnpj = "16.404.287/0156-91",
-                            gestor = "Gestor Limeira",
-                            email = "limeira@suzano.com.br.teste",
-                            telefone = "(19)99999-9900"
-                        }
-                    },
+                            new Unidade()
+                            {
+                                cnpj = "16.404.287/0156-91",
+                                gestor = "Gestor Limeira",
+                                email = "limeira@suzano.com.br.teste",
+                                telefone = "(19)99999-9900"
+                            }
+                        },
 
-                    equipe = equipeList,
+                        equipe = equipeList,
+                    };
 
+                    var jsonResponsePedido = await _destraController.AddPedidoxDireta(incluirDiretaPedido) as OkObjectResult;
 
-                };
-
-                var jsonResponsePedido = await _destraController.AddPedidoxDireta(incluirDiretaPedido) as OkObjectResult;
-
-                await _repColaboradorxPedido.InsertRangeAsync(colaboradorxPedidoList);
-
-
-
-                if (colaboradoresRelacionados.Any())
-                {
-                    string listaDeNomes = string.Join(", ", colaboradoresRelacionados);
-                    if (colaboradoresRelacionados.Count() > 1)
-                    {
-                        throw new Exception("Os colaboradores " + listaDeNomes + " já estão associados ao pedido " + pedido.NumPedido + " e a Ordem de Servico " + dto.OrdemServico);
-                    }
-                    else
-                    {
-                        throw new Exception("O colaborador " + listaDeNomes + " já está associado ao pedido " + pedido.NumPedido + " e a Ordem de Servico " + dto.OrdemServico);
-                    }
+                    await _repColaboradorxPedido.InsertRangeAsync(colaboradorxPedidoList);
                 }
+                else
+                {
+                    throw new Exception("Os colaboradores selecionados já estão associados ao pedido " + pedido.NumPedido + " e a Ordem de Servico " + dto.OrdemServico);
+                }
+
+
+
+                //ANTES ERA CARREGADA UMA MENSAGEM MAS FOI RETIRADA ESSA LOGICA
+                //if (colaboradoresRelacionados.Any())
+                //{
+                //    string listaDeNomes = string.Join(", ", colaboradoresRelacionados);
+                //    if (colaboradoresRelacionados.Count() > 1)
+                //    {
+                //        throw new Exception("Os colaboradores " + listaDeNomes + " já estão associados ao pedido " + pedido.NumPedido + " e a Ordem de Servico " + dto.OrdemServico);
+                //    }
+                //    else
+                //    {
+                //        throw new Exception("O colaborador " + listaDeNomes + " já está associado ao pedido " + pedido.NumPedido + " e a Ordem de Servico " + dto.OrdemServico);
+                //    }
+                //}
                 #endregion
 
                 return Ok();
