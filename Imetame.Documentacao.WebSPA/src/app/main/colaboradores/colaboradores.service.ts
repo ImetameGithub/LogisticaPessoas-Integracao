@@ -18,7 +18,7 @@ import * as _ from 'lodash';
 })
 export class ColaboradorService {
 
-  constructor(private _httpClient: HttpClient,   @Inject(EXTRANET_API_URL) private extranetApiUrl: string,private dataService: DataService) {
+  constructor(private _httpClient: HttpClient, @Inject(EXTRANET_API_URL) private extranetApiUrl: string, private dataService: DataService) {
 
   }
   //#region CRUD
@@ -43,16 +43,16 @@ export class ColaboradorService {
   getOss(searchText: string): Observable<any[]> {
     let param = { 'pageIndex': 0, 'pageSize': 10 };
     if (!_.isNull(searchText) && !_.isUndefined(searchText))
-        param['query'] = searchText;
+      param['query'] = searchText;
 
     return this.dataService.getList(this.extranetApiUrl + 'oss', param)
-        .pipe(map((response: any) => {
-            //this._fuseProgressBarService.hide();
-            if (response)
-                return response || [];
-            return [];
-        }));
-}
+      .pipe(map((response: any) => {
+        //this._fuseProgressBarService.hide();
+        if (response)
+          return response || [];
+        return [];
+      }));
+  }
 
   Add(Colaborador: Colaborador): Observable<Colaborador> {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');

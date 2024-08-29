@@ -164,7 +164,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
 		#region DADOS RELATÓRIO
 		[HttpGet]
-		public async Task<IActionResult> GetDadosCheckList(Guid idPedido)
+		public async Task<IActionResult> GetDadosCheckList(Guid idPedido, string codOs)
 		{
 			try
 			{
@@ -173,7 +173,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
 				IList<ChecklistModel> colaboradores = await _repColaboradorxPedido.SelectContext()
 																		.AsNoTracking()
-																		.Where(x => x.CXP_IDPEDIDO.Equals(idPedido))
+																		.Where(x => x.CXP_IDPEDIDO.Equals(idPedido) && x.CXP_NUMEROOS.Equals(codOs))
 																		.Include(x => x.Colaborador)
 																		.Include(y => y.Colaborador!.ColaboradorxAtividade)
 																			.ThenInclude(x => x.AtividadeEspecifica)

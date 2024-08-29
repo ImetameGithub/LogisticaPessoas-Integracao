@@ -11,6 +11,8 @@ import { MatInputModule } from "@angular/material/input";
 import { MatSelectModule } from "@angular/material/select";
 import { MatOptionModule } from "@angular/material/core";
 import { CustomSearchSelectComponent } from "app/shared/components/custom-select/custom-select.component";
+import { MatGridListModule } from "@angular/material/grid-list";
+import { MatButtonModule } from "@angular/material/button";
 
 @NgModule({
     declarations: [ChecklistComponent],
@@ -25,7 +27,10 @@ import { CustomSearchSelectComponent } from "app/shared/components/custom-select
         MatInputModule,
         MatSelectModule,
         MatOptionModule,
-        CustomSearchSelectComponent
+        CustomSearchSelectComponent,
+        CommonModule,
+        MatGridListModule,
+        MatButtonModule,
     ],
     providers: [RelatorioService],
 })

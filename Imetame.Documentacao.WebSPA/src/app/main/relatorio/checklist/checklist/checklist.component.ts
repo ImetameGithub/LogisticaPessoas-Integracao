@@ -1,6 +1,6 @@
-import { Component, Inject, OnDestroy, OnInit, ViewEncapsulation, } from "@angular/core";
-import { takeUntil, } from "rxjs/operators";
-import { Subject } from "rxjs";
+import { Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild, ViewEncapsulation, } from "@angular/core";
+import { debounceTime, distinctUntilChanged, startWith, takeUntil, } from "rxjs/operators";
+import { Observable, Subject } from "rxjs";
 import { fuseAnimations } from "@fuse/animations";
 import { MatDialogRef, MatDialog, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { ShowErrosDialogComponent } from "app/shared/components/show-erros-dialog/show-erros-dialog.component";
@@ -17,8 +17,10 @@ import { Pedido } from "app/models/Pedido";
 import { CustomOptionsSelect } from "app/shared/components/custom-select/components.types";
 import { Colaborador } from "app/models/Colaborador";
 import * as ExcelJS from 'exceljs'
-import { ColaboradorModel } from "app/models/DTO/ColaboradorModel";
+import { ColaboradorModel, ColaboradorProtheusModel } from "app/models/DTO/ColaboradorModel";
 import { ChecklistModel } from "app/models/DTO/RelatorioModel";
+import * as _ from "lodash";
+import { MatAutocomplete, MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 
 @Component({
   selector: 'checklist',
@@ -27,10 +29,21 @@ import { ChecklistModel } from "app/models/DTO/RelatorioModel";
   encapsulation: ViewEncapsulation.None,
   animations: fuseAnimations,
 })
-export class ChecklistComponent implements OnInit {
+export class ChecklistComponent implements OnInit, OnDestroy {
+  isTravarPesquisa: boolean = false;
+  OsOptions: CustomOptionsSelect[] = [];
+
   listPedidos: CustomOptionsSelect[] = [];
-  form: UntypedFormGroup;
+  ordemServicoOptions: CustomOptionsSelect[] = [];
+  filteredOss: Observable<any[]>;
+  oss: string[] = [];
+  osCtrl = new FormControl();
+
+  filtroForm: UntypedFormGroup;
   private _unsubscribeAll: Subject<any>;
+
+  @ViewChild('osInput') osInput: ElementRef<HTMLInputElement>;
+  @ViewChild('auto') matAutocomplete: MatAutocomplete;
 
   constructor(
     private titleService: Title,
@@ -39,14 +52,20 @@ export class ChecklistComponent implements OnInit {
     private _fuseProgressBarService: FuseProgressBarService,
     private _relatorioService: RelatorioService,
   ) {
-    this.form = new FormGroup({
-      Pedido: new FormControl('', [Validators.required]),
-      OrdemServico: new FormControl('', [Validators.required]),
+    this._unsubscribeAll = new Subject();
+    this.filtroForm = this._formBuilder.group({
+      oss: [null, [Validators.required]],
+      pedido: [null, [Validators.required]],
     });
     this.titleService.setTitle("Checklist");
+
+    this.filteredOss = new Observable();
+
+
   }
 
   ngOnInit(): void {
+    this.getOs('')
     this._relatorioService.listPedido$.subscribe(
       (data: Pedido[]) => {
         if (data != null) {
@@ -57,19 +76,66 @@ export class ChecklistComponent implements OnInit {
         console.error('Erro ao buscar credenciadoras', error);
       }
     );
+    this._relatorioService.getOss('').subscribe(
+      (ordensServicos: any[]) => {
+        this.ordemServicoOptions = ordensServicos.map(item => new CustomOptionsSelect(item.os, item.numero + ' - ' + item.descricao)) ?? [];
+      },
+      (error) => {
+        console.error('Erro ao buscar pedidos', error);
+      }
+    );
   }
 
-  tipoDocumentoSelected(idPedido: string) {
-
+  ngOnDestroy(): void {
+    // Unsubscribe from all subscriptions
+    this._unsubscribeAll.next();
+    this._unsubscribeAll.complete();
   }
 
+  getOs(searchValue) {
+    const codOs = this.filtroForm.get("oss").value;
+    this._relatorioService.getOss(searchValue).subscribe(
+      (ordensServicos: any[]) => {
+        this.OsOptions = ordensServicos.map(item => new CustomOptionsSelect(item.numero, item.numero + ' - ' + item.descricao)) ?? [];
+      },
+      (error) => {
+        console.error('Erro ao buscar pedidos', error);
+      }
+    );
+  }
+
+  searchOs(searchValue) {
+    if (!this.isTravarPesquisa && searchValue != '')
+      this._relatorioService.getOss(searchValue).subscribe(
+        (ordensServicos: any[]) => {
+          this.OsOptions = ordensServicos.map(item => new CustomOptionsSelect(item.numero, item.numero + ' - ' + item.descricao)) ?? [];
+        },
+        (error) => {
+          console.error('Erro ao buscar pedidos', error);
+        }
+      );
+    this.isTravarPesquisa = false;
+  }
+
+  selected(event: MatAutocompleteSelectedEvent): void {
+    this.oss.push(event.option.value.numero);
+    this.osInput.nativeElement.value = '';
+    this.osCtrl.setValue(null);
+    this.filtroForm.controls.oss.setValue(this.oss);
+  }
+
+  displayFnResp(user: any): string {
+    return user && user.numero ? user.numero + ' - ' + user.descricao : '';
+  }
+
+  //#region GERAR EXCEL
   gerarRelatorio() {
-    //TODO DESCOMENTAR A VALIDAÇÃO
-    // if (!this.form.valid) {
-    //   return;
-    // }
-    const idPedido = this.form.get("Pedido").value;
-    this._relatorioService.GetDadosCheckList(idPedido).subscribe({
+    if (!this.filtroForm.valid) {
+      return;
+    }
+    const idPedido = this.filtroForm.get("pedido").value;
+    const codOs = this.filtroForm.get("oss").value;
+    this._relatorioService.GetDadosCheckList(idPedido, codOs).subscribe({
       next: (response: ChecklistModel[]) => {
         const dadosExcel = response;
         const workbook = new ExcelJS.Workbook();
@@ -123,8 +189,8 @@ export class ChecklistComponent implements OnInit {
   formatCPF(cpf: string): string {
     // Remove qualquer caractere que não seja número
     cpf = cpf.replace(/\D/g, '');
-
     // Aplica a máscara
     return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
   }
+  //#endregion
 }

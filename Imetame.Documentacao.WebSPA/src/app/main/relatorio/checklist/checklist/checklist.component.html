@@ -1,28 +1,72 @@
-<div class="" fusePerfectScrollbar fxLayout="column" fxLayoutAlign="space-between">
-    <Form [formGroup]="form" class="w-100-p" fxLayout="row wrap" fxLayoutAlign="space-between">
-        <!-- <mat-form-field fxFlex="100" appearance="outline">
-            <mat-label>Credenciadora</mat-label>
-            <mat-select formControlName="Pedidos">
-                <mat-option>--</mat-option>
-            </mat-select>
-        </mat-form-field> -->
+<div id="credenciadora" class="default-form-page page-layout simple inner-scroll ">
+    <!-- CENTER -->
+    <div class="center" fxFlex>
+        <!-- HEADER -->
+        <div class="header accent-500 p-16 p-sm-24" fxLayout="column" fxLayoutAlign="start" fxLayout.gt-xs="row"
+            fxLayoutAlign.gt-xs="space-between end">
+            <!-- APP TITLE -->
+            <div fxLayout="row" fxLayoutAlign="start center">
+                <div class="logo" fxLayout="row" fxLayoutAlign="start center">
 
-        <div style="width: 100%;" class="tipoDocumentoFiltro" fxLayout="row">
-            <custom-search-select formControlName="Pedido" (selectionChange)="tipoDocumentoSelected($event)" [options]="listPedidos"
-                [multiple]="false"
-                placeholder="Selecione o Pedido" label="Pedido">
-            </custom-search-select>
+                    <span class="logo-text h1 ml-16" [@animate]="{value:'*',params:{delay:'200ms',x:'-25px'}}">
+                        Relatórios
+                    </span>
+                </div>
+
+            </div>
+            <!-- / APP TITLE -->
+            <div>
+            </div>
         </div>
+        <!-- / HEADER -->
+        <!-- CONTENT -->
+        <form class="content" name="filtroForm" [formGroup]="filtroForm">
+            <div class="content">
+                <mat-tab-group dynamicHeight="true">
+                    <mat-tab label="Checklist">
+                        <div class="tab-content" fusePerfectScrollbar fxLayout="row wrap" fxLayoutAlign="center">
 
-        <mat-form-field fxFlex="100" appearance="outline">
-            <mat-label>Credenciadora</mat-label>
-            <mat-select formControlName="IdCredenciadora">
-                <mat-option>--</mat-option>
-            </mat-select>
-            <!-- <mat-hint class="text-red-500" *ngIf="myError('IdCredenciadora', 'required', form)">
-            Campo <strong>Obrigatorio</strong>
-        </mat-hint> -->
-        </mat-form-field>
-        <button (click)="gerarRelatorio()">GERAR RELATÓRIO</button>
-    </Form>
+                            <div fxFlex="51">
+                                <custom-search-select [options]="listPedidos" [required]="false"
+                                    formControlName="pedido" placeholder="Selecione um Pedido" label="Pedido"
+                                    class="col-span-4">
+                                </custom-search-select>
+                            </div>
+
+                            <!-- <mat-form-field fxFlex="51" appearance="outline">
+                                <mat-label>Ordem de serviço</mat-label>
+                                <input type="text" matInput required #osInput [matAutocomplete]="autoResp"
+                                    formControlName="oss">
+                                <mat-autocomplete #autoResp="matAutocomplete" [displayWith]="displayFnResp">
+                                    <mat-option *ngFor="let os of OsOptions | async" [value]="os">
+                                        {{os.numero}} - {{os.descricao}}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field> -->
+
+                            <div fxFlex="51">
+                                <custom-search-select (searchChange)="searchOs($event)"
+                                    (selectionChange)="isTravarPesquisa = true" [multiple]="false" [options]="OsOptions"
+                                    formControlName="oss" [required]="false" placeholder="Selecione as OS"
+                                    label="Ordem de Serviço" class="col-span-4">
+                                </custom-search-select>
+                            </div>
+
+                            <div fxFlex="51" fxLayout="row wrap" fxLayoutAlign="end">
+
+                                <button class="mr-8" mat-raised-button color="primary" [disabled]="filtroForm.invalid"
+                                    (click)="gerarRelatorio()">Gerar Relatório</button>
+                            </div>
+
+                        </div>
+                    </mat-tab>
+
+                </mat-tab-group>
+
+            </div>
+        </form>
+        <!-- / CONTENT -->
+
+    </div>
+    <!-- / CENTER -->
 </div>
