@@ -271,7 +271,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 								AND ZNB.ZNB_DTFIM>GETDATE()-30
 							JOIN CountDocumentos CD ON CD.RA_MAT = [numcad]
 							WHERE
-								ZNB_OS = '001701001'
+								ZNB_OS = @Oss
 							order by
 								Nome";
 
@@ -1264,7 +1264,23 @@ namespace Imetame.Documentacao.WebApi.Controllers
                     }
 
                 }
-                return Ok(StatusDocumentoObrigatoriosDTO);
+
+				// ADICIONAR DOCUMENTOS MARCADOS COMO OBRIGATOÓRIO E RELACIONADOS A LISTA ENVIADA
+				IList<Documento> listDocumentos = await _repDocumento.SelectContext()
+								   .AsNoTracking()
+								   .Where(x => lista.Select(y => y.DescArquivo).Contains(x.Descricao) && x.Obrigatorio == true)
+								   .ToListAsync();
+				foreach (var doc in listDocumentos)
+				{
+					StatusDocumentoObrigatoriosDTO.Add(
+					  new StatusDocumentoObrigatoriosModel
+					  {
+						  DocDestra = doc.DescricaoDestra,
+						  DocProtheus = doc.DescricaoProtheus,
+						  Status = "Ok"
+					  });
+				}
+				return Ok(StatusDocumentoObrigatoriosDTO);
             }
             catch (Exception ex)
             {

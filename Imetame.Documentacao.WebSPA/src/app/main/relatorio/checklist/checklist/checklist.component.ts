@@ -21,6 +21,8 @@ import { ColaboradorModel, ColaboradorProtheusModel } from "app/models/DTO/Colab
 import { ChecklistModel } from "app/models/DTO/RelatorioModel";
 import * as _ from "lodash";
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
+import { ColaboradorStatusDestra } from "app/models/Enums/DestraEnums";
+import { MatTableDataSource } from "@angular/material/table";
 
 @Component({
   selector: 'checklist',
@@ -30,14 +32,20 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from "@angular/material
   animations: fuseAnimations,
 })
 export class ChecklistComponent implements OnInit, OnDestroy {
+  displayedColumns = ["NOME", "MATRICULA", "EQUIPE", "DTADMISSAO", "OS", "NUMPEDIDO", "STATUSDESTRA", "RG", "CPF"];
   isTravarPesquisa: boolean = false;
   OsOptions: CustomOptionsSelect[] = [];
 
+  dataSource: MatTableDataSource<ChecklistModel> = new MatTableDataSource();;
   listPedidos: CustomOptionsSelect[] = [];
   ordemServicoOptions: CustomOptionsSelect[] = [];
   filteredOss: Observable<any[]>;
   oss: string[] = [];
   osCtrl = new FormControl();
+
+  carregarDataTable: boolean = false;
+
+
 
   filtroForm: UntypedFormGroup;
   private _unsubscribeAll: Subject<any>;
@@ -129,56 +137,23 @@ export class ChecklistComponent implements OnInit, OnDestroy {
   }
 
   //#region GERAR EXCEL
-  gerarRelatorio() {
+  carregarRelatorio() {
     if (!this.filtroForm.valid) {
       return;
     }
+    this._fuseProgressBarService.show();
     const idPedido = this.filtroForm.get("pedido").value;
     const codOs = this.filtroForm.get("oss").value;
     this._relatorioService.GetDadosCheckList(idPedido, codOs).subscribe({
+
       next: (response: ChecklistModel[]) => {
-        const dadosExcel = response;
-        const workbook = new ExcelJS.Workbook();
-
-        const worksheetChecklist = workbook.addWorksheet('Checklist');
-
-        const estiloHeader: Partial<ExcelJS.Style> = { alignment: { horizontal: 'centerContinuous', vertical: 'middle', wrapText: true }, };
-
-        //  DEFINIÇÃO DAS COLUNAS
-        worksheetChecklist.columns = [
-          { header: 'NOME', key: 'nome', width: 12, style: estiloHeader },
-          { header: 'CPF', key: 'cpf', width: 32, style: estiloHeader },
-          { header: 'ATIVIDADES ESPECIFICAS', key: 'atividade', width: 40, style: estiloHeader },
-        ];
-
-        const rowHeader = worksheetChecklist.getRow(1);
-        rowHeader.eachCell(cell => {
-          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
-          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-          cell.font = { bold: true, size: 14 }
-        });
-
-        // USAR dadosExcel.ListaMateriais.forEach(material => worksheetChecklist.addRow(material)); PARA QUANDO TODOS DADOS NECESSARIOS FOREM RETORNADOS 
-        // OS ATRIBUTOS DEVEM SER EQUIVALENTES AS DEFINIÇOES DAS COLUNAS
-        dadosExcel.forEach((colaborador) => {
-          const atividades = colaborador.Atividades.join(',');
-          worksheetChecklist.addRow({ nome: colaborador.Nome, cpf: this.formatCPF(colaborador.Cpf), atividade: atividades });
-        });
-
-        // Escreve o arquivo Excel
-        workbook.xlsx.writeBuffer().then((buffer) => {
-          // Cria um Blob a partir do buffer
-          const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-          // Cria um link temporário para download
-          const link = document.createElement('a');
-          link.href = window.URL.createObjectURL(blob);
-          link.download = 'Checklist.xlsx';
-          // Dispara o clique no link para iniciar o download
-          link.click();
-        });
+        this.carregarDataTable = true;
+        this.dataSource.data = response;
+        this._fuseProgressBarService.hide();
       },
       error: (error) => {
-        this._snackbar.open("Erro ao gerar Excel.", 'X', {
+        this._fuseProgressBarService.hide();
+        this._snackbar.open(error.error, 'X', {
           duration: 2500,
           panelClass: 'snackbar-error',
         });
@@ -186,11 +161,84 @@ export class ChecklistComponent implements OnInit, OnDestroy {
     })
   }
 
+  gerarRelatorio() {
+    this._fuseProgressBarService.show();
+    const dadosExcel = this.dataSource.data;
+    const workbook = new ExcelJS.Workbook();
+
+    const worksheetChecklist = workbook.addWorksheet('Checklist');
+
+    const estiloHeader: Partial<ExcelJS.Style> = { alignment: { horizontal: 'centerContinuous', vertical: 'middle', wrapText: true }, };
+
+    //  DEFINIÇÃO DAS COLUNAS
+    worksheetChecklist.columns = [
+      { header: 'NOME', key: 'Nome', width: 32, style: estiloHeader },
+      { header: 'MATRICULA', key: 'Matricula', width: 20, style: estiloHeader },
+      { header: 'EQUIPE', key: 'Equipe', width: 19, style: estiloHeader },
+      { header: 'DATA ADMISSÃO', key: 'DataAdmissao', width: 23, style: estiloHeader },
+      { header: 'ORDEM SERVIÇO', key: 'OrdemServico', width: 32, style: estiloHeader },
+      { header: 'PEDIDO', key: 'Pedido', width: 15, style: estiloHeader },
+      { header: 'Documentos', key: 'Documentos', width: 63, style: estiloHeader },
+      { header: 'STATUS DESTRA', key: 'StatusDestra', width: 22, style: estiloHeader },
+      { header: 'CPF', key: 'Cpf', width: 20, style: estiloHeader },
+      { header: 'RG', key: 'Rg', width: 17, style: estiloHeader },
+      //{ header: 'CTPS', key: 'Ctps', width: 32, style: estiloHeader }
+      { header: 'ATIVIDADES ESPECIFICAS', key: 'Atividades', width: 38, style: estiloHeader },
+    ];
+
+    const rowHeader = worksheetChecklist.getRow(1);
+    rowHeader.eachCell(cell => {
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
+      cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+      cell.font = { bold: true, size: 14 }
+    });
+
+    // OS ATRIBUTOS DEVEM SER EQUIVALENTES AS DEFINIÇOES DAS COLUNAS
+    dadosExcel.forEach((colaborador) => {
+      const atividades = colaborador.Atividades.join(',');
+      worksheetChecklist.addRow(
+        {
+          Nome: colaborador.Nome,
+          Matricula: colaborador.Matricula,
+          Equipe: colaborador.Equipe,
+          DataAdmissao: colaborador.DataAdmissao,
+          OrdemServico: colaborador.OrdemServico,
+          Pedido: colaborador.NumPedido,
+          Documentos: colaborador.ItensDestra.join(','),
+          StatusDestra: ColaboradorStatusDestra.getNameEnum(colaborador.StatusDestra),
+          Cpf: this.formatCPF(colaborador.Cpf),
+          Rg: colaborador.Rg,
+          //Ctps: colaborador.Ctps,
+          Atividades: atividades,
+        }
+      );
+      //worksheetChecklist.addRow(colaborador);
+    });
+
+    // Escreve o arquivo Excel
+    workbook.xlsx.writeBuffer().then((buffer) => {
+      // Cria um Blob a partir do buffer
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      // Cria um link temporário para download
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = 'Checklist.xlsx';
+      // Dispara o clique no link para iniciar o download
+      link.click();
+      this._fuseProgressBarService.hide();
+    });
+  }
+  //#endregion
+
+  //#region  FORMATAÇÃO DE CAMPOS
   formatCPF(cpf: string): string {
     // Remove qualquer caractere que não seja número
     cpf = cpf.replace(/\D/g, '');
     // Aplica a máscara
     return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  }
+  getColaboradorStatusDestra(valor: number): string {
+    return ColaboradorStatusDestra.getNameEnum(valor);
   }
   //#endregion
 }
