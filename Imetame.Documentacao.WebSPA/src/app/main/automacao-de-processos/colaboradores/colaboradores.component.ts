@@ -114,13 +114,6 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
         item.check = !item.check;
     }
 
-
-    loadColaboradores(filtro: string): void {
-        this.service.GetColaboradoresPorOs(filtro).then(() => {
-            // A lista na tabela será atualizada automaticamente pelo `FilesDataSource`
-        });
-    }
-
     loadColaboradores(filtro: string): void {
         this.service.GetColaboradoresPorOs(filtro).then(() => {
           // A lista na tabela será atualizada automaticamente pelo `FilesDataSource`
