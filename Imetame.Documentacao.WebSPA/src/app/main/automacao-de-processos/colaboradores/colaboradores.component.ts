@@ -109,8 +109,8 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
     }
 
     toggleSelection(item): void {
-        if (this.checkIsDisable(item) == true)
-            return
+        // if (this.checkIsDisable(item) == true)
+        //     return
         item.check = !item.check;
     }
 
@@ -120,6 +120,12 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
             // A lista na tabela será atualizada automaticamente pelo `FilesDataSource`
         });
     }
+
+    loadColaboradores(filtro: string): void {
+        this.service.GetColaboradoresPorOs(filtro).then(() => {
+          // A lista na tabela será atualizada automaticamente pelo `FilesDataSource`
+        });
+      }
 
     getStatusDestra(statusNum: number): string {
         return ColaboradorStatusDestra.getNameEnum(statusNum);
@@ -165,12 +171,12 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
         );
     }
 
-    checkIsDisable(Colaborador: Colaborador) {
-        if (this.isBusy || this.isResult || Colaborador.IsAssociado)
-            return true;
-        else
-            return false;
-    }
+    // checkIsDisable(Colaborador: Colaborador) {
+    //     if (this.isBusy || this.isResult || Colaborador.IsAssociado)
+    //         return true;
+    //     else
+    //         return false;
+    // }
 
     getDocumentosProtheus(colaborador: ColaboradorModel) {
         this._fuseProgressBarService.setMode("indeterminate");
@@ -220,6 +226,7 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
 
     enviarParaColaboradorDestra() {
         let colaboradores = this.service.itens.filter(col => col.check);
+ 
         if (colaboradores.length == 0) {
             this._snackbar.open("Não há colaboradores selecionados.", 'X', {
                 duration: 2500,
@@ -233,6 +240,7 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
         this.service.EnviarColaboradorDestra(colaboradores, this.service.routeParams.idPedido, this.service.routeParams.ordemServico).subscribe(
             {
                 next: (response: ColaboradorProtheusModel) => {
+                    this.loadColaboradores("");
                     this._fuseProgressBarService.hide();
                     this.blockRequisicao = false;
                     this._snackbar.open("Item enviado para com sucesso", 'X', {

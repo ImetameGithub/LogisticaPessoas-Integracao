@@ -5,7 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { Observable, Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, map, startWith, takeUntil } from 'rxjs/operators';
+import { debounceTime, pairwise, filter, map, startWith } from 'rxjs/operators';
 import { CustomOptionsSelect } from './components.types';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -84,10 +84,12 @@ export class CustomSearchSelectComponent implements OnInit, OnChanges, ControlVa
       this.selectionChange.emit(value);
     });
     this.filterControl.valueChanges.pipe(
-      debounceTime(600) 
+      startWith(''),
+      debounceTime(600),
     ).subscribe(value => {
       this.searchChange.emit(value);
     });
+ 
   }
 
 
