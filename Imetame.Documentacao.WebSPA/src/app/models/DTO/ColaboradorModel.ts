@@ -28,6 +28,8 @@ export class ColaboradorModel extends BaseEntity {
     CountDocumento: number;
 
     ColaboradorxAtividade?: ColaboradorxAtividade[];
+
+    check: boolean = false;
 }
 
 export class ColaboradorProtheusModel extends BaseEntity {

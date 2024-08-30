@@ -1,0 +1,35 @@
+.buttonDoc {
+    background-color: #777777;
+}
+
+mat-dialog-container {
+    padding: 0px !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+}
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    /* Permite o scroll horizontal */
+}
+
+.mat-table {
+    display: table;
+    /* Importante para o comportamento da tabela */
+    width: 100%;
+    /* A tabela ocupa toda a largura do contêiner */
+}
+
+.mat-header-cell,
+.mat-cell {
+    //display: table-cell;
+    /* As células se comportam como células de tabela */
+    min-width: 170px;
+    max-width: 100vh;
+    /* Define uma largura mínima para as colunas */
+    white-space: nowrap;
+    /* Evita quebras de linha dentro das células */
+    overflow: hidden;
+    /* Esconde o conteúdo que ultrapassa a largura da célula */
+}

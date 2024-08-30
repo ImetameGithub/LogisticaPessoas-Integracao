@@ -102,38 +102,38 @@ export class PedidoListComponent implements OnInit {
 
   //#region FUNÇÃO DELETE - MATHEUS MONFREIDES - FARTEC SISTEMAS 
 
-  deleteItem(ItemDelete: string,index: number) {
+  deleteItem(ItemDelete: string, index: number) {
     this.confirmDialogRef = this.dialog.open(ConfirmDialogComponent, {
-        disableClose: false,
+      disableClose: false,
     });
 
     this.confirmDialogRef.componentInstance.confirmMessage =
-        "Deseja mesmo deletar o item?";
+      "Deseja mesmo deletar o item?";
 
     this.confirmDialogRef.afterClosed().subscribe((result) => {
-        if (result) {
-          this._PedidoService.Delete(ItemDelete).subscribe(
-            {
-              next: (response: Pedido) => {
-                this._snackbar.open("Item excluído com sucesso", 'X', {
-                  duration: 2500,
-                  panelClass: 'snackbar-success',
-                })
-                const data = this.dataSource.data;
-                data.splice(index, 1); // Remover o item na posição 'index'
-                this.dataSource.data = data; // Atualizar a fonte de dados
-              },
-              error: (error) => {
-                this._snackbar.open(error.error.erros, 'X', {
-                  duration: 2500,
-                  panelClass: ['mat-toolbar', 'mat-warn'],
-                })
-              }
-            })
-        }
-        this.confirmDialogRef = null;
+      if (result) {
+        this._PedidoService.Delete(ItemDelete).subscribe(
+          {
+            next: (response: Pedido) => {
+              this._snackbar.open("Item excluído com sucesso", 'X', {
+                duration: 2500,
+                panelClass: 'snackbar-success',
+              })
+              const data = this.dataSource.data;
+              data.splice(index, 1); // Remover o item na posição 'index'
+              this.dataSource.data = data; // Atualizar a fonte de dados
+            },
+            error: (error) => {
+              this._snackbar.open(error.error.erros, 'X', {
+                duration: 2500,
+                panelClass: ['mat-toolbar', 'mat-warn'],
+              })
+            }
+          })
+      }
+      this.confirmDialogRef = null;
     });
-}
+  }
   //#endregion
 
   //#region FUNÇÕES DE LOAD E ATUALIZAR PAGINA - 23/03/2024

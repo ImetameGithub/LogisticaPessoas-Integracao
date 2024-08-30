@@ -42,7 +42,7 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
     onProcessamentoChanged: BehaviorSubject<any>;
     onItensChanged: BehaviorSubject<any>;
     onSearchTextChanged: Subject<any>;
-    itens: any[];
+    itens: ColaboradorModel[];
     searchText: string;
     processamento: any;
     private intervaloDeLogs: any;

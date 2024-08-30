@@ -1,23 +1,9 @@
-import {
-    Component,
-    OnInit,
-    OnDestroy,
-    ViewEncapsulation,
-    ViewChildren,
-} from "@angular/core";
-
+import { Component, OnInit, OnDestroy, ViewEncapsulation, ViewChildren, } from "@angular/core";
 import { Subject } from "rxjs";
 import { fuseAnimations } from "@fuse/animations";
-import {
-    FormControl,
-} from "@angular/forms";
-import {
-    takeUntil,
-    debounceTime,
-    distinctUntilChanged,
-} from "rxjs/operators";
+import { FormControl, } from "@angular/forms";
+import { takeUntil, debounceTime, distinctUntilChanged, } from "rxjs/operators";
 import * as _ from "lodash";
-
 import { Title } from "@angular/platform-browser";
 import { FuseProgressBarService } from "@fuse/components/progress-bar/progress-bar.service";
 import { ShowErrosDialogComponent } from "app/shared/components/show-erros-dialog/show-erros-dialog.component";
@@ -45,23 +31,25 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
     private _unsubscribeAll: Subject<any>;
     displayedColumns = [
         "check",
-        "quantidadeDocumentos",
         "numCad",
         "nome",
         "funcao",
         "cracha",
         "equipe",
         "sincronizadoDestra",
+        "quantidadeDocumentos",
         "statusDestra",
         "documento",
     ];
-    dataSource: FilesDataSource<any>;
+    dataSource: FilesDataSource<ColaboradorModel>;
     isBusy: boolean = false;
     isResult: boolean = false;
     blockRequisicao: boolean = false;
 
+    allSelected: boolean = false;
+
     directiveScroll: FusePerfectScrollbarDirective;
-    todoMundo: boolean = false;
+    //todoMundo: boolean = false;
 
     searchInput: FormControl;
     searchInputEl: any;
@@ -124,7 +112,13 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
         if (this.checkIsDisable(item) == true)
             return
         item.check = !item.check;
-        this.todoMundo = this.service.itens.some(i => i.check);
+    }
+
+
+    loadColaboradores(filtro: string): void {
+        this.service.GetColaboradoresPorOs(filtro).then(() => {
+            // A lista na tabela será atualizada automaticamente pelo `FilesDataSource`
+        });
     }
 
     getStatusDestra(statusNum: number): string {
@@ -132,8 +126,7 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
     }
     toggleAllSelection(): void {
         this.service.itens.forEach((item) => {
-            if (!item.IsAssociado)
-                item.check = this.todoMundo;
+            item.check = this.allSelected;
         });
     }
 

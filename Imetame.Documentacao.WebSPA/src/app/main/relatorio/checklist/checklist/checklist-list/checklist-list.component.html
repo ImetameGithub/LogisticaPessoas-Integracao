@@ -1,0 +1,93 @@
+<div id="colaboradores" class="default-list-page page-layout simple inner-scroll">
+    <div class="center" fxFlex>
+        <div class="header accent-500 p-16 p-sm-24" fxLayout="column" fxLayoutAlign="start" fxLayout.gt-xs="row"
+            fxLayoutAlign.gt-xs="space-between center">
+            <div fxLayout="row" fxLayoutAlign="start center">
+                <div class="logo" fxLayout="row" fxLayoutAlign="start center">
+                    <mat-icon class="logo-icon mr-16 navi" [@animate]="{
+                    value: '*',
+                    params: { delay: '50ms', scale: '0.2' }
+                }" [routerLink]="'../../../'">
+                        arrow_back
+                    </mat-icon>
+                    <span class="logo-text h1" [@animate]="{
+                    value: '*',
+                    params: { delay: '100ms', x: '-25px' }
+                }">
+                        Checklist
+                    </span>
+                </div>
+            </div>
+            <div class="ml-sm-64 mr-sm-128" fxLayout="row" fxLayoutAlign="center center" fxFlex>
+                <div class="search-wrapper mt-16 mt-sm-0">
+                    <div class="search" fxFlex fxLayout="row" fxLayoutAlign="start center">
+                        <mat-icon>search</mat-icon>
+                        <input #searchInputEl [formControl]="searchInput" placeholder="Pesquise aqui..." />
+                    </div>
+                </div>
+            </div>
+            <div fxFlex="10" fxLayoutGap="15">
+                <!-- Botão para enviar colaboradores para Destra -->
+                <div fxFlex="100">
+                    <button (click)="gerarRelatorio()" class="add-file-button-respo" matTooltip="Gerar Excel" mat-fab
+                        color="accent" aria-label="Novo" [@animate]="{
+                                value: '*',
+                                params: { delay: '300ms', scale: '0.2' }
+                            }">
+                        <mat-icon>print</mat-icon>
+                        <!-- <mat-icon svgIcon="heroicons_outline:clipboard-document-list"></mat-icon> -->
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="table-container">
+            <mat-table class="mat-elevation-z8" mat-table #table [dataSource]="dataSource">
+                <ng-container matColumnDef="NOME">
+                    <mat-header-cell *matHeaderCellDef>Nome</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.Nome }}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="MATRICULA">
+                    <mat-header-cell *matHeaderCellDef>Matricula</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.Matricula }}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="EQUIPE">
+                    <mat-header-cell *matHeaderCellDef>Equipe</mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        {{ row.Equipe }}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="DTADMISSAO">
+                    <mat-header-cell *matHeaderCellDef>Admissão</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ formatarData(row.DataAdmissao) }}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="OS">
+                    <mat-header-cell *matHeaderCellDef>Ordem Servico</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.OrdemServico }}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="NUMPEDIDO">
+                    <mat-header-cell *matHeaderCellDef>N° Pedido</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.NumPedido }}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="ITENSDESTRA">
+                    <mat-header-cell *matHeaderCellDef>Itens Destra</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.ItensDestra }}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="STATUSDESTRA">
+                    <mat-header-cell *matHeaderCellDef>Status Destra</mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        {{getColaboradorStatusDestra(row.StatusDestra)}}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="RG">
+                    <mat-header-cell *matHeaderCellDef>RG</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.Rg }}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="CPF">
+                    <mat-header-cell *matHeaderCellDef>CPF</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{formatCPF(row.Cpf)}}</mat-cell>
+                </ng-container>
+                <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+                <mat-row *matRowDef="let item; columns: displayedColumns">
+                </mat-row>
+            </mat-table>
+        </div>
+    </div>
+</div>

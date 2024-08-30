@@ -13,9 +13,10 @@ import { MatOptionModule } from "@angular/material/core";
 import { CustomSearchSelectComponent } from "app/shared/components/custom-select/custom-select.component";
 import { MatGridListModule } from "@angular/material/grid-list";
 import { MatButtonModule } from "@angular/material/button";
+import { ChecklistListComponent } from './checklist/checklist/checklist-list/checklist-list.component';
 
 @NgModule({
-    declarations: [ChecklistComponent],
+    declarations: [ChecklistComponent, ChecklistListComponent],
     imports: [
         CommonModule,
         RelatorioRoutingModule,

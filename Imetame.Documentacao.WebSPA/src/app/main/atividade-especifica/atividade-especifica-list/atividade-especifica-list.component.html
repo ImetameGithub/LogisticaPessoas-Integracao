@@ -17,7 +17,7 @@
                             value: '*',
                             params: { delay: '100ms', x: '-25px' }
                         }">
-                        Atividades Específicas 
+                        Atividades Específicas
                     </span>
                 </div>
             </div>
@@ -35,19 +35,12 @@
 
             <!-- ADD FILE BUTTON -->
             <div class="file-uploader">
-                <button
-                    matTooltip="Atualizar Atividades"
-                    mat-fab
-                    color="accent"
-                    class="add-file-button"
-                    (click)="getAtividadesDestra()"
-                    aria-label="Novo"
-                    [@animate]="{
+                <button matTooltip="Atualizar Atividades" mat-fab color="accent" class="add-file-button"
+                    (click)="getAtividadesDestra()" aria-label="Novo" [@animate]="{
                         value: '*',
                         params: { delay: '300ms', scale: '0.2' }
-                    }"
-                >
-                <mat-icon>cloud_download</mat-icon>
+                    }">
+                    <mat-icon>cloud_download</mat-icon>
                 </button>
             </div>
             <!-- / ADD FILE BUTTON -->
@@ -55,7 +48,8 @@
         <!-- / HEADER -->
         <!-- CONTENT -->
         <div class="content" fusePerfectScrollbar>
-            <mat-table mat-table #table [dataSource]="dataSource" class="mat-elevation-z8 demo-table" [@animateStagger]="{ value: '50' }">
+            <mat-table mat-table #table [dataSource]="dataSource" class="mat-elevation-z8 demo-table"
+                [@animateStagger]="{ value: '50' }">
                 <ng-container matColumnDef="codigo">
                     <mat-header-cell fxFlex="45%" *matHeaderCellDef>Atividades Específicas</mat-header-cell>
                     <mat-cell fxFlex="45%" *matCellDef="let row">
@@ -74,7 +68,7 @@
 
                 <ng-container matColumnDef="colaboradoresCadastrados">
                     <mat-header-cell *matHeaderCellDef>Colaboradores Cadastrados </mat-header-cell>
-                    <mat-cell *matCellDef="let row">10</mat-cell>
+                    <mat-cell *matCellDef="let row">{{row.QuantColaboradores}}</mat-cell>
                 </ng-container>
 
                 <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>

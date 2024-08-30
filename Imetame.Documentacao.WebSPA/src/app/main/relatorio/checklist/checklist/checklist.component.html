@@ -25,87 +25,26 @@
                 <mat-tab-group dynamicHeight="true">
                     <mat-tab label="Checklist">
                         <div class="tab-content" fusePerfectScrollbar fxLayout="row wrap" fxLayoutAlign="center">
-                            <div fxFlex="100" fxLayout="row" fxLayoutAlign="center center">
-                                <div fxFlex="40">
-                                    <custom-search-select [options]="listPedidos" [required]="false"
-                                        formControlName="pedido" placeholder="Selecione um Pedido" label="Pedido"
-                                        class="col-span-4">
-                                    </custom-search-select>
-                                </div>
 
-                                <div fxFlex="40">
-                                    <custom-search-select (searchChange)="searchOs($event)"
-                                        (selectionChange)="isTravarPesquisa = true" [multiple]="false"
-                                        [options]="OsOptions" formControlName="oss" [required]="false"
-                                        placeholder="Selecione as OS" label="Ordem de Serviço" class="col-span-4">
-                                    </custom-search-select>
-                                </div>
-
-                                <div fxFlex="20" fxLayout="row wrap" fxLayoutAlign="start center"
-                                    style="padding-bottom: 11px;">
-                                    <button mat-raised-button color="primary" [disabled]="filtroForm.invalid"
-                                        (click)="carregarRelatorio()">Carregar Dados</button>
-                                </div>
+                            <div fxFlex="51">
+                                <custom-search-select [options]="listPedidos" [required]="false"
+                                    formControlName="pedido" placeholder="Selecione um Pedido" label="Pedido"
+                                    class="col-span-4">
+                                </custom-search-select>
                             </div>
-                            <div *ngIf="carregarDataTable" style="width: 100%;">
-                                <div style="width: 100%;" fxLayout="row" fxLayoutAlign="end end">
-                                    <button style="background-color: rgb(22, 163, 75); color: white; margin-top: 15px;"
-                                        mat-raised-button color="primary" (click)="gerarRelatorio()">Gerar
-                                        Relatório</button>
-                                </div>
-                                <div style="width: 100%; margin-top: 10px;">
-                                    <mat-table mat-table #table [dataSource]="dataSource">
-                                        <ng-container matColumnDef="NOME">
-                                            <mat-header-cell *matHeaderCellDef>Nome</mat-header-cell>
-                                            <mat-cell *matCellDef="let row"> {{ row.Nome }}</mat-cell>
-                                        </ng-container>
-                                        <ng-container matColumnDef="MATRICULA">
-                                            <mat-header-cell *matHeaderCellDef>Matricula</mat-header-cell>
-                                            <mat-cell *matCellDef="let row"> {{ row.Matricula }}</mat-cell>
-                                        </ng-container>
-                                        <ng-container matColumnDef="EQUIPE">
-                                            <mat-header-cell *matHeaderCellDef>Equipe</mat-header-cell>
-                                            <mat-cell *matCellDef="let row">
-                                                {{ row.Equipe }}</mat-cell>
-                                        </ng-container>
 
-                                        <ng-container matColumnDef="DTADMISSAO">
-                                            <mat-header-cell *matHeaderCellDef>Admissão</mat-header-cell>
-                                            <mat-cell *matCellDef="let row"> {{ row.DataAdmissao }}</mat-cell>
-                                        </ng-container>
-                                        <ng-container matColumnDef="OS">
-                                            <mat-header-cell *matHeaderCellDef>Ordem Servico</mat-header-cell>
-                                            <mat-cell *matCellDef="let row"> {{ row.OrdemServico }}</mat-cell>
-                                        </ng-container>
-                                        <ng-container matColumnDef="NUMPEDIDO">
-                                            <mat-header-cell *matHeaderCellDef>N° Pedido</mat-header-cell>
-                                            <mat-cell *matCellDef="let row"> {{ row.NumPedido }}</mat-cell>
-                                        </ng-container>
-                                        <!-- <ng-container matColumnDef="ITENSDESTRA">
-                                        <mat-header-cell *matHeaderCellDef>Itens Destra</mat-header-cell>
-                                        <mat-cell *matCellDef="let row"> {{ row.ItensDestra }}</mat-cell>
-                                    </ng-container> -->
-                                        <ng-container matColumnDef="STATUSDESTRA">
-                                            <mat-header-cell *matHeaderCellDef>Status Destra</mat-header-cell>
-                                            <mat-cell *matCellDef="let row">
-                                                {{getColaboradorStatusDestra(row.StatusDestra)}}</mat-cell>
-                                        </ng-container>
-                                        <ng-container matColumnDef="RG">
-                                            <mat-header-cell *matHeaderCellDef>RG</mat-header-cell>
-                                            <mat-cell *matCellDef="let row"> {{ row.Rg }}</mat-cell>
-                                        </ng-container>
-                                        <ng-container matColumnDef="CPF">
-                                            <mat-header-cell *matHeaderCellDef>CPF</mat-header-cell>
-                                            <mat-cell *matCellDef="let row"> {{formatCPF(row.Cpf)}}</mat-cell>
-                                        </ng-container>
+                            <custom-search-select fxFlex="51" (searchChange)="searchOs($event)"
+                                (selectionChange)="isTravarPesquisa = true" [multiple]="false" [options]="OsOptions"
+                                formControlName="oss" [required]="false" placeholder="Selecione as OS"
+                                label="Ordem de Serviço">
+                            </custom-search-select>
 
-                                        <mat-header-row
-                                            *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
-                                        <mat-row *matRowDef="let item; columns: displayedColumns">
-                                        </mat-row>
-                                    </mat-table>
-                                </div>
+                            <div fxFlex="51" fxLayout="row wrap" fxLayoutAlign="end">
+
+                                <button class="mr-8" mat-raised-button color="primary" [disabled]="filtroForm.invalid"
+                                    (click)="avancar()">Carregar Dados</button>
                             </div>
+
                         </div>
                     </mat-tab>
 
@@ -113,6 +52,8 @@
 
             </div>
         </form>
+
+
         <!-- / CONTENT -->
 
     </div>

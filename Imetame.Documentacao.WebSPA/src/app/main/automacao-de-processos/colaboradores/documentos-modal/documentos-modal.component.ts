@@ -19,6 +19,7 @@ import { MatProgressSpinner, MatProgressSpinnerModule } from '@angular/material/
 import { Console } from 'console';
 import { HttpEvent, HttpEventType } from '@angular/common/http';
 import { CustomOptionsSelect } from 'app/shared/components/custom-select/components.types';
+import { REFUSED } from 'dns';
 
 @Component({
   selector: 'documentos-modal',
@@ -270,7 +271,7 @@ export class DocumentosModalComponent implements OnInit {
         confirm: {
           show: true,
           label: "Fechar",
-          color: "primary"
+          color: "warn"
         },
         cancel: {
           show: false,
@@ -297,7 +298,8 @@ export class DocumentosModalComponent implements OnInit {
           this._snackbar.open("Item enviado para com sucesso", 'X', {
             duration: 2500,
             panelClass: 'snackbar-success',
-          })
+          });
+          this.carregarDocumentosProtheus();
         },
         error: (error) => {
           this.isLoading = false;
@@ -313,12 +315,37 @@ export class DocumentosModalComponent implements OnInit {
             },
             dismissible: true,
           });
+          this.carregarDocumentosProtheus();
         }
       }
     )
   }
 
 
+  carregarDocumentosProtheus() {
+    this._fuseProgressBarService.show();
+    const numCad = '0' + this._data._colaborador.NumCad;
+    this.service.GetDocumentosProtheus(numCad).subscribe(
+      {
+        next: (response: DocumentoxColaboradorModel[]) => {
+          this._fuseProgressBarService.hide();
+          if (response.length <= 0) {
+            return
+          }
+          this.todosDocumentos = response;
+          this.documentos = response;
+          this._fuseProgressBarService.hide();
+        },
+        error: (error) => {
+          this._fuseProgressBarService.hide();
+          this._snackbar.open('Erro ao consultar documentos', 'X', {
+            duration: 2500,
+            panelClass: 'snackbar-error',
+          })
+        }
+      }
+    )
+  }
 
 
   public openAbaAtividadeEspecifica(): void {
