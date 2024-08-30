@@ -8,6 +8,7 @@ using Imetame.Documentacao.WebAPI.Helpers;
 using Imetame.Documentacao.WebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using OpenIddict.Validation.AspNetCore;
@@ -232,10 +233,60 @@ namespace Imetame.Documentacao.WebApi.Controllers
 																	.Where(x => x.IdDestra!.Equals(docDestra!.codigo!))
 																	.FirstOrDefaultAsync();
 
-						if (documento != null)
-						{
+						//if (documento != null)
+						//{
+						//	using (var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"))) // Substitua connectionString pela sua string de conexão
+						//	{
+						//		conn.Open();
+						//		var sql = @"SELECT 
+      //                  UZI.UZI_CODIGO AS Codigo,
+      //                  SRA.RA_NOME AS NomeColaborador,
+      //                  SRA.RA_MAT AS Matricula,
+      //                  UZI.UZI_DESC AS DescArquivo,
+      //                  UZJ.UZJ_VENC AS DtVencimento,
+      //                  UZJ.UZJ_DOC AS NomeArquivo,
+      //                  UZJ.R_E_C_N_O_ AS Recno,
+      //                  UZJ.UZJ_SEQ AS Sequencia,     
+      //                  UZJ.UZJ_CODTDO AS IdTipoDocumento,
+      //                  UZI.UZI_DESC AS TipoDocumento
+      //                    FROM SRA010 SRA
+      //                    INNER JOIN DADOSADV_LUC..UZJ010 UZJ 
+      //                            ON  UZJ.UZJ_FILIAL = SRA.RA_FILIAL
+      //                            AND UZJ.UZJ_MAT = SRA.RA_MAT
+      //                            AND UZJ.D_E_L_E_T_ = ''
+      //                    INNER JOIN DADOSADV_LUC..UZI010 UZI 
+      //                            ON UZI.UZI_FILIAL = UZJ.UZJ_FILIAL 
+      //                            AND UZI.UZI_CODIGO = UZJ.UZJ_CODTDO           
+      //                            AND UZI.D_E_L_E_T_ = ''
+      //                            AND UZJ.UZJ_CODTDO <> '01'  
+      //                    WHERE RA_FILIAL = '' 
+      //                        AND RA_MAT = @Matricula
+      //                        AND SRA.D_E_L_E_T_  = ''";
 
-						}
+						//		List<DocumentoxColaboradorModel> documentos = (await conn.QueryAsync<DocumentoxColaboradorModel>(sql, new { Matricula = matricula })).ToList();
+
+						//		foreach (DocumentoxColaboradorModel item in documentos.Where(m => m.Vencido != true || m.Vencer != true))
+						//		{
+						//			bool docRelacao = await _repDocxColaborador.SelectContext().AsNoTracking()
+						//				.Include(m => m.Colaborador)
+						//				.Where(m => m.DXC_CODPROTHEUS == item.Codigo && m.Colaborador.Matricula == matricula.Remove(0, 1)).AnyAsync();
+
+						//			if (docRelacao)
+						//			{
+						//				item.SincronizadoDestra = true;
+						//			}
+
+						//			bool relacionadoDestra = await _repDocumento.SelectContext().AsNoTracking().Where(m => m.IdProtheus == item.Codigo).AnyAsync();
+
+						//			if (relacionadoDestra)
+						//			{
+						//				item.RelacionadoDestra = true;
+						//			}
+						//		}
+
+						//		return documentos;
+						//	}
+						//}
 						//TODO PEGAR DOCUMENTO DO PROTHEUS E DEPOIS TRABALHAR COM O VENCIMENTO DELE PARA EXIBIR DOCUMENTO E VENCIMENTO NO
 						//RELATÓRIO DE CHECKLIST
 
