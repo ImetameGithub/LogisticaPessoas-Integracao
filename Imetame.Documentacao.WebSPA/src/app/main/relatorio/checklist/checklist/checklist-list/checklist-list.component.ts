@@ -58,6 +58,9 @@ export class ChecklistListComponent implements OnInit {
   getColaboradorStatusDestra(valor: number): string {
     return ColaboradorStatusDestra.getNameEnum(valor);
   }
+  getStatusDestraColor(valor: number): string {
+    return DocumentoStatusDestra.getColorEnum(valor);
+  }
   formatarData(inputDate: string): string {
     const year = inputDate.substring(0, 4);
     const month = inputDate.substring(4, 6);
@@ -104,9 +107,24 @@ export class ChecklistListComponent implements OnInit {
       documentosColumns.forEach((documento, index) => {
         const documentoColaborador: CheckDocumento | undefined = colaborador.Documentos.find(x => x.IdDestra == documento.IdDestra);
         if (documentoColaborador) {
-          row.getCell(3 + index).value = `Validade: \n ${documentoColaborador.validade} - Destra \n ${DocumentoStatusDestra.getNameEnum(documentoColaborador.Status)}`;
+
+          row.getCell(3 + index).value = {
+            richText: [
+              {
+                text: `Validade: \n ${documentoColaborador.validade} - Destra \n`,
+                font: { color: { argb: '000000' } } // Cor preta
+              },
+              {
+                text: `${DocumentoStatusDestra.getNameEnum(documentoColaborador.Status)}`,
+                font: { color: { argb: this.getStatusDestraColor(documentoColaborador.Status)} } // Cor azul
+              }
+            ]
+          };
+
+
+         // row.getCell(3 + index).value = `Validade: \n ${documentoColaborador.validade} - Destra \n ${DocumentoStatusDestra.getNameEnum(documentoColaborador.Status)}`;
         } else {
-          row.getCell(3 + index).value = "Não Sincronizado";
+          row.getCell(3 + index).value = "Não Relacionado";
         }
       })
 

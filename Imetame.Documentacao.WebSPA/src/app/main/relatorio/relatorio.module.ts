@@ -14,6 +14,7 @@ import { CustomSearchSelectComponent } from "app/shared/components/custom-select
 import { MatGridListModule } from "@angular/material/grid-list";
 import { MatButtonModule } from "@angular/material/button";
 import { ChecklistListComponent } from './checklist/checklist/checklist-list/checklist-list.component';
+import { MatTreeFlatDataSource, MatTreeFlattener, MatTreeModule } from "@angular/material/tree";
 
 @NgModule({
     declarations: [ChecklistComponent, ChecklistListComponent],
@@ -32,6 +33,7 @@ import { ChecklistListComponent } from './checklist/checklist/checklist-list/che
         CommonModule,
         MatGridListModule,
         MatButtonModule,
+        MatTreeModule
     ],
     providers: [RelatorioService],
 })
