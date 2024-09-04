@@ -40,53 +40,33 @@
                 </div>
             </div>
         </div>
-        <div>
-            <mat-table mat-table #table [dataSource]="dataSource">
-                <ng-container matColumnDef="NOME">
-                    <mat-header-cell *matHeaderCellDef>Nome</mat-header-cell>
-                    <mat-cell *matCellDef="let row"> {{ row.Nome }}</mat-cell>
+        <div class="table-container">
+            <mat-table mat-table #table [dataSource]="dataSource" class="mat-table">
+                <!-- Coluna fixa: Nome do Colaborador -->
+                <ng-container matColumnDef="nome">
+                    <mat-header-cell *matHeaderCellDef>Nome do Colaborador</mat-header-cell>
+                    <mat-cell *matCellDef="let colaborador"> {{ colaborador.Nome }} </mat-cell>
                 </ng-container>
-                <ng-container matColumnDef="MATRICULA">
-                    <mat-header-cell *matHeaderCellDef>Matricula</mat-header-cell>
-                    <mat-cell *matCellDef="let row"> {{ row.Matricula }}</mat-cell>
+
+                <!-- Coluna fixa: Atividade -->
+                <ng-container matColumnDef="atividade">
+                    <mat-header-cell *matHeaderCellDef>Atividade</mat-header-cell>
+                    <mat-cell class="break-line" *matCellDef="let colaborador"> {{ colaborador.Atividade }} </mat-cell>
                 </ng-container>
-                <ng-container matColumnDef="EQUIPE">
-                    <mat-header-cell *matHeaderCellDef>Equipe</mat-header-cell>
-                    <mat-cell *matCellDef="let row">
-                        {{ row.Equipe }}</mat-cell>
+
+                <!-- Colunas dinâmicas: Documentos -->
+                <ng-container *ngFor="let documentCol of getDocumentColumns()" [matColumnDef]="documentCol">
+                    <mat-header-cell *matHeaderCellDef> {{ documentCol }} </mat-header-cell>
+                    <mat-cell *matCellDef="let colaborador">
+                        {{ getDocumento(documentCol,colaborador) }}
+                    </mat-cell>
                 </ng-container>
-                <ng-container matColumnDef="DTADMISSAO">
-                    <mat-header-cell *matHeaderCellDef>Admissão</mat-header-cell>
-                    <mat-cell *matCellDef="let row"> {{ formatarData(row.DataAdmissao) }}</mat-cell>
-                </ng-container>
-                <ng-container matColumnDef="OS">
-                    <mat-header-cell *matHeaderCellDef>Ordem Servico</mat-header-cell>
-                    <mat-cell *matCellDef="let row"> {{ row.OrdemServico }}</mat-cell>
-                </ng-container>
-                <ng-container matColumnDef="NUMPEDIDO">
-                    <mat-header-cell *matHeaderCellDef>N° Pedido</mat-header-cell>
-                    <mat-cell *matCellDef="let row"> {{ row.NumPedido }}</mat-cell>
-                </ng-container>
-                <ng-container matColumnDef="ITENSDESTRA">
-                    <mat-header-cell *matHeaderCellDef>Itens Destra</mat-header-cell>
-                    <mat-cell *matCellDef="let row"> {{ row.ItensDestra }}</mat-cell>
-                </ng-container>
-                <ng-container matColumnDef="STATUSDESTRA">
-                    <mat-header-cell *matHeaderCellDef>Status Destra</mat-header-cell>
-                    <mat-cell *matCellDef="let row">
-                        {{getColaboradorStatusDestra(row.StatusDestra)}}</mat-cell>
-                </ng-container>
-                <ng-container matColumnDef="RG">
-                    <mat-header-cell *matHeaderCellDef>RG</mat-header-cell>
-                    <mat-cell *matCellDef="let row"> {{ row.Rg }}</mat-cell>
-                </ng-container>
-                <ng-container matColumnDef="CPF">
-                    <mat-header-cell *matHeaderCellDef>CPF</mat-header-cell>
-                    <mat-cell *matCellDef="let row"> {{formatCPF(row.Cpf)}}</mat-cell>
-                </ng-container>
-                <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
-                <mat-row *matRowDef="let item; columns: displayedColumns">
-                </mat-row>
+
+                <!-- Cabeçalho da tabela -->
+                <mat-header-row *matHeaderRowDef="getAllColumns()"></mat-header-row>
+
+                <!-- Linha da tabela -->
+                <mat-row *matRowDef="let colaborador; columns: getAllColumns();"></mat-row>
             </mat-table>
         </div>
     </div>

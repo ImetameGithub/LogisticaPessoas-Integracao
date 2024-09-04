@@ -2,34 +2,54 @@
     background-color: #777777;
 }
 
-// mat-dialog-container {
-//     padding: 0px !important;
-//     max-width: 100% !important;
-//     overflow: hidden !important;
-// }
+mat-dialog-container {
+    padding: 0px !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+}
 
-// .table-container {
-//     width: 100%;
-//     overflow-x: auto;
-//     /* Permite o scroll horizontal */
-// }
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    /* Permite o scroll horizontal */
+}
 
-// .mat-table {
-//     display: table;
-//     /* Importante para o comportamento da tabela */
-//     width: 100%;
-//     /* A tabela ocupa toda a largura do contêiner */
-// }
+.mat-table {
+    display: table;
+    /* Importante para o comportamento da tabela */
+    width: 100%;
+    /* A tabela ocupa toda a largura do contêiner */
+    table-layout: auto;
+}
 
-// .mat-header-cell,
-// .mat-cell {
-//     //display: table-cell;
-//     /* As células se comportam como células de tabela */
-//     min-width: 170px;
-//     max-width: 100vh;
-//     /* Define uma largura mínima para as colunas */
-//     white-space: nowrap;
-//     /* Evita quebras de linha dentro das células */
-//     overflow: hidden;
-//     /* Esconde o conteúdo que ultrapassa a largura da célula */
-// }
+.mat-header-cell,
+.mat-cell {
+    // //display: table-cell;
+    // /* As células se comportam como células de tabela */
+    // min-width: 170px;
+    // max-width: 100vh;
+    // /* Define uma largura mínima para as colunas */
+    // white-space: nowrap;
+    // /* Evita quebras de linha dentro das células */
+    // overflow: hidden;
+    // /* Esconde o conteúdo que ultrapassa a largura da célula */
+
+
+    min-width: 170px;
+    /* Defina uma largura mínima maior se necessário */
+    white-space: nowrap;
+    /* Evita quebras de linha dentro das células */
+    overflow: hidden;
+    /* Esconde o conteúdo que ultrapassa a largura da célula */
+    text-overflow: ellipsis;
+    /* Adiciona reticências ao conteúdo que ultrapassa a largura */
+}
+
+/* Especificamente para a célula de atividade */
+.break-line {
+    white-space: normal; /* Permite a quebra de linha */
+    word-wrap: break-word; /* Quebra palavras longas se necessário */
+    overflow: visible; /* Permite que o conteúdo visível se ajuste corretamente */
+    align-self: center;
+    align-items: center;
+}

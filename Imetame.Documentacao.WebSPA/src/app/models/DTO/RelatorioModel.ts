@@ -1,14 +1,14 @@
 export class ChecklistModel {
     Nome: string;
-    Matricula: string;
-    Equipe: string;
-    DataAdmissao: string;
-    OrdemServico: string;
-    NumPedido: string;
+    //Matricula: string;
+    //Equipe: string;
+    //DataAdmissao: string;
+    //OrdemServico: string;
+    //NumPedido: string;
     Documentos: CheckDocumento[];
-    Cpf: string;
-    StatusDestra: number;
-    Rg: string;
+    //Cpf: string;
+    //StatusDestra: number;
+    //Rg: string;
     Atividade: string;
 }
 

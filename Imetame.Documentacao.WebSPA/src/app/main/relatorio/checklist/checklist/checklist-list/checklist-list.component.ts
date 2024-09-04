@@ -23,7 +23,11 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 export class ChecklistListComponent implements OnInit {
   dataSource: MatTableDataSource<ChecklistModel> = new MatTableDataSource();
   searchInput: FormControl;
-  displayedColumns = ["NOME", "MATRICULA", "EQUIPE", "DTADMISSAO", "OS", "NUMPEDIDO", "STATUSDESTRA", "RG", "CPF"];
+
+  documentosColumns: CheckDocumento[] = [];
+  //displayedColumns = ["NOME", "ATIVIDADE"];
+  displayedColumns: string[] = ['nome', 'atividade'];
+
   todosRegistros: ChecklistModel[];
   constructor(
     private titleService: Title,
@@ -44,10 +48,41 @@ export class ChecklistListComponent implements OnInit {
   ngOnInit(): void {
     this.dataSource.data = this.route.snapshot.data['data'];
     this.todosRegistros = this.dataSource.data;
+
+
+    //#region LISTAR TODOS DOCUMENTOS
+    let todosDocumentos: CheckDocumento[] = [];
+    this.dataSource.data.forEach((colaborador) => {
+      todosDocumentos.push(...colaborador.Documentos);
+    });
+    this.documentosColumns = todosDocumentos.filter((item, index, self) =>
+      index === self.findIndex((t) => t.IdDestra === item.IdDestra)
+    );
+    //#endregion
   }
 
   filtrar(searchValue: string) {
     this.dataSource.data = this.todosRegistros.filter(x => x.Nome.includes(searchValue.toUpperCase()))
+  }
+
+  // Função que retorna o nome das colunas dos documentos
+  getDocumentColumns() {
+    return this.documentosColumns.map(x => x.nome);
+  }
+
+  // Combina as colunas fixas com as colunas dinâmicas
+  getAllColumns() {
+    return [...this.displayedColumns, ...this.getDocumentColumns()];
+  }
+
+  // Função para pegar o documento no índice correspondente
+  getDocumento(documento: string, checklistModel: ChecklistModel) {
+    //const doc: CheckDocumento = this.documentosColumns.find(x => x.nome == documento);
+    const doc: CheckDocumento = checklistModel.Documentos.find(x => x.nome == documento)
+    if (doc != null)
+      return `Validade: \n ${doc.validade} - Destra \n ${DocumentoStatusDestra.getNameEnum(doc.Status)}`;
+    else
+      return `Não Relacionado`;
   }
 
   //#region  FORMATAÇÃO DE CAMPOS
@@ -76,16 +111,6 @@ export class ChecklistListComponent implements OnInit {
     const dadosExcel = this.dataSource.data;
     const workbook = new ExcelJS.Workbook();
 
-    //#region LISTAR TODOS DOCUMENTOS
-    let todosDocumentos: CheckDocumento[] = [];
-    dadosExcel.forEach((colaborador) => {
-      todosDocumentos.push(...colaborador.Documentos);
-    });
-    const documentosColumns = todosDocumentos.filter((item, index, self) =>
-      index === self.findIndex((t) => t.IdDestra === item.IdDestra)
-    );
-    //#endregion
-
     const worksheetChecklist = workbook.addWorksheet('Checklist');
 
     const estiloHeader: Partial<ExcelJS.Style> = { alignment: { horizontal: 'centerContinuous', vertical: 'middle', wrapText: true }, };
@@ -95,7 +120,7 @@ export class ChecklistListComponent implements OnInit {
     rowHeader.getCell(1).value = "COLABORADOR";
     rowHeader.getCell(2).value = "ATIVIDADE";
 
-    documentosColumns.forEach((documento, index) => {
+    this.documentosColumns.forEach((documento, index) => {
       rowHeader.getCell(3 + index).value = documento.nome;
     })
 
@@ -104,7 +129,7 @@ export class ChecklistListComponent implements OnInit {
       row.getCell(1).value = colaborador.Nome;
       row.getCell(2).value = colaborador.Atividade;
 
-      documentosColumns.forEach((documento, index) => {
+      this.documentosColumns.forEach((documento, index) => {
         const documentoColaborador: CheckDocumento | undefined = colaborador.Documentos.find(x => x.IdDestra == documento.IdDestra);
         if (documentoColaborador) {
 
@@ -116,13 +141,13 @@ export class ChecklistListComponent implements OnInit {
               },
               {
                 text: `${DocumentoStatusDestra.getNameEnum(documentoColaborador.Status)}`,
-                font: { color: { argb: this.getStatusDestraColor(documentoColaborador.Status)} } // Cor azul
+                font: { color: { argb: this.getStatusDestraColor(documentoColaborador.Status) } } // Cor azul
               }
             ]
           };
 
 
-         // row.getCell(3 + index).value = `Validade: \n ${documentoColaborador.validade} - Destra \n ${DocumentoStatusDestra.getNameEnum(documentoColaborador.Status)}`;
+          // row.getCell(3 + index).value = `Validade: \n ${documentoColaborador.validade} - Destra \n ${DocumentoStatusDestra.getNameEnum(documentoColaborador.Status)}`;
         } else {
           row.getCell(3 + index).value = "Não Relacionado";
         }
