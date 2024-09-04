@@ -40,8 +40,8 @@
                 </div>
             </div>
         </div>
-        <div class="table-container">
-            <mat-table class="mat-elevation-z8" mat-table #table [dataSource]="dataSource">
+        <div>
+            <mat-table mat-table #table [dataSource]="dataSource">
                 <ng-container matColumnDef="NOME">
                     <mat-header-cell *matHeaderCellDef>Nome</mat-header-cell>
                     <mat-cell *matCellDef="let row"> {{ row.Nome }}</mat-cell>

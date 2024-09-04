@@ -1,4 +1,5 @@
-﻿using Imetame.Documentacao.CrossCutting.Services.Destra.Models;
+﻿using DocumentFormat.OpenXml.Office.Word;
+using Imetame.Documentacao.CrossCutting.Services.Destra.Models;
 using Imetame.Documentacao.Domain.Entities;
 using Imetame.Documentacao.Domain.Models;
 
@@ -14,6 +15,7 @@ using Newtonsoft.Json;
 using OpenIddict.Validation.AspNetCore;
 using System.Linq;
 using System.Text;
+using static Imetame.Documentacao.Domain.Models.HistoricoDocumento;
 using static Imetame.Documentacao.Domain.Models.RelatorioModel;
 using Pedido = Imetame.Documentacao.Domain.Entities.Pedido;
 
@@ -182,6 +184,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 		{
 			try
 			{
+				// TODO - DEVIDO AS DIVERSAS ALTERAÇÕES NO FORMATO DO RELATORIO NECESSARIO REFATORAR O CÓDIGO
 				if (!ModelState.IsValid)
 					throw new Exception("Parametros necessarios nao informados");
 
@@ -193,6 +196,8 @@ namespace Imetame.Documentacao.WebApi.Controllers
 																		.Include(y => y.ColaboradorxAtividade)
 																			.ThenInclude(x => x.AtividadeEspecifica)
 																		.ToListAsync();
+
+				IList<Documento> documentosBasicos = await _repDocumento.SelectByCondition(x => x.Obrigatorio == true).ToListAsync();
 
 				IList<ChecklistModel> colaboradoresModel = new List<ChecklistModel>();
 				foreach (Colaborador colaborador in colaboradores)
@@ -206,9 +211,8 @@ namespace Imetame.Documentacao.WebApi.Controllers
 						Rg = colaborador!.Rg,
 						OrdemServico = $"{colaborador!.Codigo_OS.Trim()} - {colaborador!.Nome_OS}",
 						Cpf = colaborador!.Cpf,
-						Atividades = colaborador.ColaboradorxAtividade.Select(y => y.AtividadeEspecifica!.Descricao).ToList(),
 						NumPedido = colaborador.ColaboradorxPedido.Select(x => $"{x.Pedido!.NumPedido} - {x.Pedido.Unidade}").FirstOrDefault(),
-
+						Documentos = new List<CheckDocumento>(),
 					};
 
 					string json = await _destraController.GetColaborador(colaborador.Cpf!);
@@ -218,14 +222,103 @@ namespace Imetame.Documentacao.WebApi.Controllers
 						checklistModel.StatusDestra = (Int32)colaboradorDestra!.DADOS[0].status!;
 					}
 
-					ListaDocumentosDestraModel DocsPorAtividade = new ListaDocumentosDestraModel() { LISTA = new List<DocumentosDestra>() };
-					foreach (ColaboradorxAtividade colaboradorxAtividade in colaborador.ColaboradorxAtividade)
+
+					HistoricoDestraApiModel historicoDocumentoDestras = new HistoricoDestraApiModel() { LISTA = new List<HistoricoDocumentoDestra>() };
+					var jsonResponseHistorico = await _destraController.GetHistoricoDocumentosByColaborador(colaborador.Cpf);
+					historicoDocumentoDestras = JsonConvert.DeserializeObject<HistoricoDestraApiModel>(jsonResponseHistorico);
+					historicoDocumentoDestras.LISTA = historicoDocumentoDestras.LISTA!
+																		.GroupBy(d => d.idDocto)
+																		.Select(g => g.OrderByDescending(d => d.id).First())
+																		.ToList();
+
+					IList<AtividadeEspecifica> atividades = colaborador.ColaboradorxAtividade.Select(y => y.AtividadeEspecifica!).ToList();
+
+					// GUARDA ATIVIDADE COM A FORMATAÇÃO SOLICITADA PARA A EXIBIÇÃO NO RELATÓRIO
+					string atividadeFormatada = "";
+					int numAtividade = 1;
+					foreach (AtividadeEspecifica atividade in atividades)
 					{
-						var jsonResponse = await _destraController.GetDocumentosRequeridos(colaboradorxAtividade.AtividadeEspecifica!.IdDestra.ToString());
-						ListaDocumentosDestraModel docs = JsonConvert.DeserializeObject<ListaDocumentosDestraModel>(jsonResponse);
-						DocsPorAtividade.LISTA.AddRange(docs!.LISTA);
+						// VERIFICAR SE É O ULTIMO ITEM DE ATIVIDADES PARA QUE NÃO PULE A LINHA
+						if (numAtividade == atividades.Count)
+							atividadeFormatada = atividadeFormatada + $"{numAtividade}) {atividade.Descricao}";
+						else
+							atividadeFormatada = atividadeFormatada + $"{numAtividade}) {atividade.Descricao}\n";
+
+						numAtividade++;
+						ListaDocumentosDestraModel DocsPorAtividade = new ListaDocumentosDestraModel() { LISTA = new List<DocumentosDestra>() };
+						var jsonResponse = await _destraController.GetDocumentosRequeridos(atividade!.IdDestra.ToString());
+						DocsPorAtividade = JsonConvert.DeserializeObject<ListaDocumentosDestraModel>(jsonResponse);
+
+
+
+						foreach (var item in DocsPorAtividade!.LISTA)
+						{
+							HistoricoDocumentoDestra historicoDestraApiModel = historicoDocumentoDestras.LISTA!.Where(x => x.idDocto! == item.codigo!).FirstOrDefault();
+							CheckDocumento checkDocumento;
+							if (historicoDestraApiModel != null)
+							{
+								checkDocumento = new CheckDocumento()
+								{
+									IdDestra = historicoDestraApiModel.idDocto,
+									//Atividade = atividade.Descricao,
+									impeditivo = item.impeditivo,
+									nome = item.nome,
+									Status = historicoDestraApiModel.status,
+									validade = historicoDestraApiModel.validade!,
+								};
+							}
+							else
+							{
+								checkDocumento = new CheckDocumento()
+								{
+									IdDestra = item.codigo,
+									//Atividade = atividade.Descricao,
+									impeditivo = item.impeditivo,
+									nome = item.nome,
+									Status = -2,
+									validade = "Não Informado",
+								};
+							}
+							checklistModel.Documentos.Add(checkDocumento);
+						}
 					}
-					checklistModel.ItensDestra = DocsPorAtividade!.LISTA.Distinct().Select(x => x.nome).ToList();
+					checklistModel.Atividade = atividadeFormatada;
+					foreach (Documento docBasico in documentosBasicos)
+					{
+						HistoricoDocumentoDestra historicoDestraApiModel = historicoDocumentoDestras.LISTA.Where(x => x.idDocto.ToString() == docBasico.IdDestra).FirstOrDefault();
+
+						// TRATAR PARA QUE UM DOCUMENTO MARCADADO COMO OBRIGATÓRIO NÃO SEJA SEJA REPETIDO NO RELATÓRIO
+						if (!checklistModel.Documentos.Any(x => x.IdDestra.ToString() == docBasico.IdDestra))
+						{
+							CheckDocumento checkDocumento;
+							if (historicoDestraApiModel != null)
+							{
+								checkDocumento = new CheckDocumento()
+								{
+									IdDestra = historicoDestraApiModel.idDocto,
+									//Atividade = "DOCUMENTO BÁSICO",
+									impeditivo = historicoDestraApiModel!.impeditivo!,
+									nome = historicoDestraApiModel!.nomeDocto!,
+									Status = historicoDestraApiModel.status,
+									validade = historicoDestraApiModel.validade!,
+								};
+							}
+							else
+							{
+								checkDocumento = new CheckDocumento()
+								{
+									IdDestra = Convert.ToInt32(docBasico.IdDestra),
+									//Atividade = "DOCUMENTO BÁSICO",
+									impeditivo = "N",
+									nome = docBasico!.DescricaoDestra!,
+									Status = -2,
+									validade = "Não Informado",
+								};
+							}
+							checklistModel.Documentos.Add(checkDocumento);
+						}
+					}
+					//checklistModel.ItensDestra = DocsPorAtividade!.LISTA.Distinct().Select(x => x.nome).ToList();
 					colaboradoresModel.Add(checklistModel);
 				}
 				return Ok(colaboradoresModel);

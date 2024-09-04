@@ -1,14 +1,16 @@
+import { DOCUMENT } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MAT_SORT_HEADER_INTL_PROVIDER_FACTORY } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
 import { FuseProgressBarService } from '@fuse/components/progress-bar/progress-bar.service';
 import { RelatorioService } from 'app/main/relatorio/relatorio.service';
-import { ChecklistModel } from 'app/models/DTO/RelatorioModel';
-import { ColaboradorStatusDestra } from 'app/models/Enums/DestraEnums';
+import { CheckDocumento, ChecklistModel } from 'app/models/DTO/RelatorioModel';
+import { ColaboradorStatusDestra, DocumentoStatusDestra } from 'app/models/Enums/DestraEnums';
 import * as ExcelJS from 'exceljs'
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
@@ -71,55 +73,71 @@ export class ChecklistListComponent implements OnInit {
     const dadosExcel = this.dataSource.data;
     const workbook = new ExcelJS.Workbook();
 
+    //#region LISTAR TODOS DOCUMENTOS
+    let todosDocumentos: CheckDocumento[] = [];
+    dadosExcel.forEach((colaborador) => {
+      todosDocumentos.push(...colaborador.Documentos);
+    });
+    const documentosColumns = todosDocumentos.filter((item, index, self) =>
+      index === self.findIndex((t) => t.IdDestra === item.IdDestra)
+    );
+    //#endregion
+
     const worksheetChecklist = workbook.addWorksheet('Checklist');
 
     const estiloHeader: Partial<ExcelJS.Style> = { alignment: { horizontal: 'centerContinuous', vertical: 'middle', wrapText: true }, };
 
-    //  DEFINIÇÃO DAS COLUNAS
-    worksheetChecklist.columns = [
-      { header: 'NOME', key: 'Nome', width: 32, style: estiloHeader },
-      { header: 'MATRICULA', key: 'Matricula', width: 20, style: estiloHeader },
-      { header: 'EQUIPE', key: 'Equipe', width: 19, style: estiloHeader },
-      { header: 'DATA ADMISSÃO', key: 'DataAdmissao', width: 23, style: estiloHeader },
-      { header: 'ORDEM SERVIÇO', key: 'OrdemServico', width: 32, style: estiloHeader },
-      { header: 'PEDIDO', key: 'Pedido', width: 15, style: estiloHeader },
-      { header: 'Documentos', key: 'Documentos', width: 63, style: estiloHeader },
-      { header: 'STATUS DESTRA', key: 'StatusDestra', width: 22, style: estiloHeader },
-      { header: 'CPF', key: 'Cpf', width: 20, style: estiloHeader },
-      { header: 'RG', key: 'Rg', width: 17, style: estiloHeader },
-      { header: 'ATIVIDADES ESPECIFICAS', key: 'Atividades', width: 38, style: estiloHeader },
-    ];
-
+    // RECEBE A PRIMEIRA LINHA DA PLANILHA
     const rowHeader = worksheetChecklist.getRow(1);
+    rowHeader.getCell(1).value = "COLABORADOR";
+    rowHeader.getCell(2).value = "ATIVIDADE";
+
+    documentosColumns.forEach((documento, index) => {
+      rowHeader.getCell(3 + index).value = documento.nome;
+    })
+
+    dadosExcel.forEach((colaborador, rowIndex) => {
+      const row = worksheetChecklist.getRow(rowIndex + 2);
+      row.getCell(1).value = colaborador.Nome;
+      row.getCell(2).value = colaborador.Atividade;
+
+      documentosColumns.forEach((documento, index) => {
+        const documentoColaborador: CheckDocumento | undefined = colaborador.Documentos.find(x => x.IdDestra == documento.IdDestra);
+        if (documentoColaborador) {
+          row.getCell(3 + index).value = `Validade: \n ${documentoColaborador.validade} - Destra \n ${DocumentoStatusDestra.getNameEnum(documentoColaborador.Status)}`;
+        } else {
+          row.getCell(3 + index).value = "Não Sincronizado";
+        }
+      })
+
+      row.eachCell(cell => {
+        cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
+        cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+        cell.font = { bold: false, size: 12 }
+      });
+    });
+
     rowHeader.eachCell(cell => {
+      cell.alignment = { horizontal: 'center' };
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
       cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
       cell.font = { bold: true, size: 14 }
     });
 
-    worksheetChecklist.autoFilter = 'A1:K1';
-
-    // OS ATRIBUTOS DEVEM SER EQUIVALENTES AS DEFINIÇOES DAS COLUNAS
-    dadosExcel.forEach((colaborador) => {
-      const atividades = colaborador.Atividades.join(',');
-      worksheetChecklist.addRow(
-        {
-          Nome: colaborador.Nome,
-          Matricula: colaborador.Matricula,
-          Equipe: colaborador.Equipe,
-          DataAdmissao: colaborador.DataAdmissao,
-          OrdemServico: colaborador.OrdemServico,
-          Pedido: colaborador.NumPedido,
-          Documentos: colaborador.ItensDestra.join(','),
-          StatusDestra: ColaboradorStatusDestra.getNameEnum(colaborador.StatusDestra),
-          Cpf: this.formatCPF(colaborador.Cpf),
-          Rg: colaborador.Rg,
-          //Ctps: colaborador.Ctps,
-          Atividades: atividades,
+    // Ajuste da largura das colunas com base no conteúdo
+    worksheetChecklist.columns.forEach(column => {
+      let maxLength = 0;
+      column.eachCell({ includeEmpty: true }, cell => {
+        const columnLength = cell.value ? cell.value.toString().length : 0;
+        if (columnLength > maxLength) {
+          maxLength = columnLength;
         }
-      );
-      //worksheetChecklist.addRow(colaborador);
+      });
+      column.width = maxLength + 2; // Ajuste conforme necessário
     });
+
+    worksheetChecklist.autoFilter = "A1";
 
     // Escreve o arquivo Excel
     workbook.xlsx.writeBuffer().then((buffer) => {

@@ -5,11 +5,17 @@ export class ChecklistModel {
     DataAdmissao: string;
     OrdemServico: string;
     NumPedido: string;
+    Documentos: CheckDocumento[];
     Cpf: string;
-    ItensDestra: string[];
-    //DataVencimento: string = "Pendente";
     StatusDestra: number;
     Rg: string;
-    Ctps: string;
-    Atividades: string[];
+    Atividade: string;
+}
+
+export class CheckDocumento {
+    IdDestra?: number;
+    nome: string;
+    impeditivo: string;
+    validade: string;
+    Status: number;
 }

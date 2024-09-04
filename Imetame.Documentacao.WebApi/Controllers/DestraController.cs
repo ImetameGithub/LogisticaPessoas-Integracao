@@ -241,6 +241,65 @@ namespace Imetame.Documentacao.WebApi.Controllers
 			}
 		}
 
+		[HttpGet]
+		public async Task<string> GetHistoricoDocumentosByColaborador(string cpf)
+		{
+			try
+			{
+				AuthResponse response = await Login();
+				string endPoint = $"/service/docto/funcionario/historico?cpf={cpf}";
+
+				if (!response.Erro)
+				{
+					var result = await _destraService.GetAsync(endPoint, response.Token);
+					if (result.IsSuccessStatusCode)
+					{
+						return await result.Content.ReadAsStringAsync();
+					}
+
+					throw new Exception(await result.Content.ReadAsStringAsync());
+				}
+				else
+				{
+					throw new Exception(response.MensagemErro);
+				}
+			}
+			catch (Exception ex)
+			{
+				throw new Exception("Erro ao obter historico de documentos", ex);
+			}
+		}
+
+		//[HttpGet]
+		//public async Task<string> GetHistoricoDocumentosByDocumento(string cpf, string codDoc)
+		//{
+		//	try
+		//	{
+		//		AuthResponse response = await Login();
+
+		//		//string endPoint = $"/service/docto/funcionario/historico?cpf={cpf}";
+		//		string endPoint = $"/service/docto/funcionario/historico?cpf={cpf}&idDocto={codDoc}";
+
+		//		if (!response.Erro)
+		//		{
+		//			var result = await _destraService.GetAsync(endPoint, response.Token);
+		//			if (result.IsSuccessStatusCode)
+		//			{
+		//				return await result.Content.ReadAsStringAsync();
+		//			}
+
+		//			throw new Exception(await result.Content.ReadAsStringAsync());
+		//		}
+		//		else
+		//		{
+		//			throw new Exception(response.MensagemErro);
+		//		}
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		throw new Exception("Erro ao obter historico de documentos", ex);
+		//	}
+		//}
 		[HttpGet("{Id}")]
 		public async Task<string> GetDocumentosRequeridos(string Id)
 		{

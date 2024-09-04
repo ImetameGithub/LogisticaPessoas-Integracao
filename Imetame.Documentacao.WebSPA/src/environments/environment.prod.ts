@@ -5,14 +5,14 @@ export const environment = {
     production: true,
     urlApi: 'https://jaguare.imetame.com.br:5012/api',
     hmr: false,
-    //#region PEDIDO
-    Pedido: {
+     Pedido: {
         GetItem: `${baseUrl}/Pedido/GetItem`,
         Add: `${baseUrl}/Pedido/Add`,
         Update: `${baseUrl}/Pedido/Update`,
         Delete: `${baseUrl}/Pedido/Delete`,
         GetAll: `${baseUrl}/Pedido/GetAll`,
         GetAllPaginated: `${baseUrl}/Pedido/GetAllPaginated`,
+        GetDadosCheckList:`${baseUrl}/Pedido/GetDadosCheckList`,
     },
     //#endregion
     //#region CREDENCIADORA
@@ -56,6 +56,7 @@ export const environment = {
         Delete: `${baseUrl}/Colaboradores/Delete`,
         GetAll: `${baseUrl}/Colaboradores/GetAll`,
         GetAllPaginated: `${baseUrl}/Colaboradores/GetAllPaginated`,
+        GetProgress: `${baseUrl}/Colaboradores/GetProgress`,
     },
     //#endregion
 
@@ -70,11 +71,13 @@ export const environment = {
         GetAllPaginated: `${baseUrl}/AtividadeEspecifica/GetAllPaginated`,
     },
     //#endregion
+
     //#region PROCESSAMENTO
     Processamento: {
         Criar: `${baseUrl}/ProcessamentoFartec/Criar`,
     },
     //#endregion
+
     //#region PROTHEUS
     Protheus: {
         GetOs: `${baseUrl}/Protheus/GetOs`,

@@ -38,7 +38,6 @@ namespace Imetame.Documentacao.Domain.Models
 		[NotMapped]
 		public int StatusDestra { get; set; } = -2;
 		
-		// DEFINIDO COMO INT TEMPORARIAMENTE ATÉ QUE TENHA AS RELAÇÕES DO ENUM DA DESTRA
 		[NotMapped]
 		public bool IsAssociado { get; set; } = false;
 	}
