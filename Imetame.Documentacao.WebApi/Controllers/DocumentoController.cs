@@ -81,6 +81,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 				throw new Exception("Parametros necessarios nao informados");
 
 			List<Documento> listaPedido = await _repDocumento.SelectContext()
+															.AsNoTracking()
 															.ToListAsync();
 			return Ok(listaPedido);
 		}
@@ -92,6 +93,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 				throw new Exception("Parametros necessarios nao informados");
 
 			Documento Documento = await _repDocumento.SelectContext()
+															.AsNoTracking()
 															.Where(e => e.Id.Equals(id))
 															.FirstAsync();
 			return Ok(Documento);
@@ -113,7 +115,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 				model.Id = new Guid();
 
 				//Verificar se o documento Destra ou Protheus já está sendo utilizado
-				List<Documento> listDocumentosDestra = _repDocumento.SelectContext().Where(e => e.IdDestra == model.IdDestra).ToList();
+				List<Documento> listDocumentosDestra = _repDocumento.SelectContext().Where(e => e.IdDocCredenciadora == model.IdDocCredenciadora).ToList();
 				List<Documento> listDocumentosProtheus = _repDocumento.SelectContext().Where(e => e.IdProtheus == model.IdProtheus).ToList();
 
 				if (listDocumentosDestra.Count() > 0)
@@ -149,7 +151,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 				}
 
 				//Verificar se o documento Destra ou Protheus já está sendo utilizado
-				List<Documento> listDocumentosDestra = _repDocumento.SelectContext().Where(e => e.Id != model.Id && e.IdDestra == model.IdDestra).ToList();
+				List<Documento> listDocumentosDestra = _repDocumento.SelectContext().Where(e => e.Id != model.Id && e.IdDocCredenciadora == model.IdDocCredenciadora).ToList();
 				List<Documento> listDocumentosProtheus = _repDocumento.SelectContext().Where(e => e.Id != model.Id && e.IdProtheus == model.IdProtheus).ToList();
 
 				if (listDocumentosDestra.Count() > 0)

@@ -231,10 +231,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
 					foreach (Documento docBasico in documentosBasicos)
 					{
-						HistoricoDocumentoDestra historicoDestraApiModel = historicoDocumentoDestras.LISTA.Where(x => x.idDocto.ToString() == docBasico.IdDestra).FirstOrDefault();
+						HistoricoDocumentoDestra historicoDestraApiModel = historicoDocumentoDestras.LISTA.Where(x => x.idDocto.ToString() == docBasico.IdDocCredenciadora).FirstOrDefault();
 
 						// TRATAR PARA QUE UM DOCUMENTO MARCADADO COMO OBRIGATÓRIO NÃO SEJA SEJA REPETIDO NO RELATÓRIO
-						if (!checklistModel.Documentos.Any(x => x.IdDestra.ToString() == docBasico.IdDestra))
+						if (!checklistModel.Documentos.Any(x => x.IdDestra.ToString() == docBasico.IdDocCredenciadora))
 						{
 							CheckDocumento checkDocumento;
 							if (historicoDestraApiModel != null)
@@ -253,10 +253,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
 							{
 								checkDocumento = new CheckDocumento()
 								{
-									IdDestra = Convert.ToInt32(docBasico.IdDestra),
+									IdDestra = Convert.ToInt32(docBasico.IdDocCredenciadora),
 									//Atividade = "DOCUMENTO BÁSICO",
 									impeditivo = "N",
-									nome = docBasico!.DescricaoDestra!,
+									nome = docBasico!.DescricaoCredenciadora!,
 									Status = -2,
 									validade = "Não Informado",
 								};

@@ -16,11 +16,16 @@ namespace Imetame.Documentacao.Infra.Data.Mappings
             builder.ToTable(nameof(Documento));
 
             builder.Property(c => c.Descricao).HasColumnType("varchar(50)").HasMaxLength(255).IsRequired();
-            builder.Property(c => c.IdDestra).HasColumnType("varchar(50)").HasMaxLength(255).IsRequired();
-            builder.Property(c => c.DescricaoDestra).HasColumnType("varchar(255)").HasMaxLength(255).IsRequired();
+            builder.Property(c => c.IdDocCredenciadora).HasColumnType("varchar(50)").HasMaxLength(255).IsRequired();
+            builder.Property(c => c.DescricaoCredenciadora).HasColumnType("varchar(255)").HasMaxLength(255).IsRequired();
             builder.Property(c => c.IdProtheus).HasColumnType("varchar(50)").HasMaxLength(255).IsRequired();
             builder.Property(c => c.DescricaoProtheus).HasColumnType("varchar(255)").HasMaxLength(255).IsRequired();
 			builder.Property(c => c.Obrigatorio).HasColumnType("bit").HasDefaultValue(false).IsRequired();
+
+
+			builder.HasOne(x => x.Credenciadora)
+				 .WithMany()
+				 .HasForeignKey(x => x.IdCredenciadora);
 		}
     }
 }

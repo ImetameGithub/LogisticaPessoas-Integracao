@@ -52,15 +52,20 @@
                         <Form [formGroup]="form" class="w-100-p" fxLayout="row wrap" fxLayoutAlign="space-between">
                             <mat-form-field fxFlex="100" appearance="outline">
                                 <mat-label>Documento</mat-label>
-                                <input matInput name="Descricao" formControlName="Descricao" placeholder="Documento" />
+                                <input matInput name="Descricao" formControlName="Descricao"  placeholder="Documento" />
                                 <mat-hint class="text-red-500" *ngIf="myError('Descricao', 'required', form)">
                                     Campo <strong>Obrigatorio</strong>
                                 </mat-hint>
                             </mat-form-field>
 
-                            <custom-search-select [options]="documentosdestra" [multiple]="false" [required]="true"
-                                fxFlex="100" formControlName="IdDestra" placeholder="Selecione o Documento"
-                                label="Documento Destra">
+                            <custom-search-select (selectionChange)="credenciadoraIsSelected($event)" [options]="credenciadoras" [multiple]="false" [required]="true"
+                                fxFlex="100" formControlName="IdCredenciadora" placeholder="Selecione a Credenciadora"
+                                label="Credenciadora">
+                            </custom-search-select>
+
+                            <custom-search-select [disabled]="isDisable" [options]="documentosdestra" [multiple]="false" [required]="true"
+                                fxFlex="100" formControlName="IdDocCredenciadora" placeholder="Selecione o Documento"
+                                label="Documento Credenciadora">
                             </custom-search-select>
 
                             <custom-search-select [options]="documentosprotheus" [multiple]="false" [required]="true"
@@ -70,26 +75,14 @@
 
                             <div fxLayout="row" fxLayoutAlign="start center">
                                 <label style="padding-top: 1px;">Documento é obrigatório?</label>
-                                <mat-radio-group (change)="isObrigatorioChanged($event)" style="padding-bottom: 0px;" aria-labelledby="radioLabel">
-                                    <mat-radio-button style="margin-left: 4px;" [checked]="isObrigatorio" [value]="true">Sim</mat-radio-button>
-                                    <mat-radio-button style="margin-left: 3px;" [checked]="!isObrigatorio" [value]="false">Não</mat-radio-button>
+                                <mat-radio-group (change)="isObrigatorioChanged($event)" style="padding-bottom: 0px;"
+                                    aria-labelledby="radioLabel">
+                                    <mat-radio-button style="margin-left: 4px;" [checked]="isObrigatorio"
+                                        [value]="true">Sim</mat-radio-button>
+                                    <mat-radio-button style="margin-left: 3px;" [checked]="!isObrigatorio"
+                                        [value]="false">Não</mat-radio-button>
                                 </mat-radio-group>
                             </div>
-                            <!-- <mat-form-field fxFlex="100" appearance="outline">
-                                <mat-label>Codigo Destra</mat-label>
-                                <input matInput name="IdDestra" formControlName="IdDestra" placeholder="IdDestra" required />
-                                <mat-hint class="text-red-500" *ngIf="myError('IdDestra', 'required', form)">
-                                    Campo <strong>Obrigatorio</strong>
-                                </mat-hint>
-                            </mat-form-field>
-
-                            <mat-form-field fxFlex="100" appearance="outline">
-                                <mat-label>Codigo Protheus</mat-label>
-                                <input matInput name="IdProtheus" formControlName="IdProtheus" placeholder="IdProtheus" required />
-                                <mat-hint class="text-red-500" *ngIf="myError('IdProtheus', 'required', form)">
-                                    Campo <strong>Obrigatorio</strong>
-                                </mat-hint>
-                            </mat-form-field> -->
                         </Form>
                     </div>
                 </mat-tab>

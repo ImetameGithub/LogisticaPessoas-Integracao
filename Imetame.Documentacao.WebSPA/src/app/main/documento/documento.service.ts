@@ -11,6 +11,7 @@ import { map, tap } from "rxjs/operators";
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from "@angular/router";
 import { DocumentosDestra } from "app/models/DocumentosDestra";
 import { DocumentosProtheus } from "app/models/DocumentosProtheus";
+import { Credenciadora } from "app/models/Crendenciadora";
 
 @Injectable()
 export class DocumentoService implements Resolve<Documento> {
@@ -29,10 +30,10 @@ export class DocumentoService implements Resolve<Documento> {
     }
 
     //#region FUNÇÕES DE ECAPSULAMENTOS
-    get listDocumentosDestra$(): Observable<DocumentosDestra[]>{
+    get listDocumentosDestra$(): Observable<DocumentosDestra[]> {
         return this._listDocumentosDestra.asObservable();
     }
-    get listDocumentosProtheus$(): Observable<DocumentosProtheus[]>{
+    get listDocumentosProtheus$(): Observable<DocumentosProtheus[]> {
         return this._listDocumentosProtheus.asObservable();
     }
     get listDocumento$(): Observable<PaginatedResponse<Documento>> {
@@ -49,10 +50,10 @@ export class DocumentoService implements Resolve<Documento> {
     ): Observable<any> | Promise<any> | any {
         this.routeParams = route.params;
 
-        if(this.routeParams.id == 'novo'){
+        if (this.routeParams.id == 'novo') {
             this._selectDocumento.next(null)
         }
-        else{
+        else {
             // this.Get(this.routeParams)
             return this._httpClient.get<Documento>(`${environment.Documento.GetItem}/${this.routeParams.id}`).pipe(
                 tap((selectDocumento: Documento) => {
@@ -60,8 +61,8 @@ export class DocumentoService implements Resolve<Documento> {
                 })
             );
         }
-      
-    
+
+
     }
 
     //#region FUNÇÕES CRUD MATHEUS MONFREIDES - FARTEC SISTEMAS
@@ -96,13 +97,16 @@ export class DocumentoService implements Resolve<Documento> {
     }
     Delete(id: string): Observable<Documento> {
         return this._httpClient.delete<Documento>(`${environment.Documento.Delete}/${id}`)
-    }    
+    }
     getDocumentosDestra(): Observable<DocumentosDestra[]> {
         return this._httpClient.get<DocumentosDestra[]>(environment.Documento.GetDocumentosDestra).pipe(
             tap((listFeriados: DocumentosDestra[]) => {
                 this._listDocumentosDestra.next(listFeriados);
             })
         );
+    }
+    getCredenciadoras(): Observable<Credenciadora[]> {
+        return this._httpClient.get<Credenciadora[]>(environment.Credenciadora.GetAll);
     }
     getDocumentosProtheus(): Observable<DocumentosProtheus[]> {
         return this._httpClient.get<DocumentosProtheus[]>(environment.Documento.GetDocumentosProtheus).pipe(

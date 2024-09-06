@@ -38,6 +38,7 @@ import { Documento } from "app/models/Documento";
 import { DocumentosDestra } from "app/models/DocumentosDestra";
 import { CustomOptionsSelect } from 'app/shared/components/custom-select/components.types';
 import { DocumentosProtheus } from "app/models/DocumentosProtheus";
+import { Credenciadora } from "app/models/Crendenciadora";
 
 
 @Component({
@@ -59,9 +60,11 @@ export class DocumentoFormComponent implements OnInit {
     confirmDialogRef: MatDialogRef<ConfirmDialogComponent>;
     documentosdestra: CustomOptionsSelect[] = [];
     documentosprotheus: CustomOptionsSelect[] = [];
+    credenciadoras: CustomOptionsSelect[] = [];
 
     form: UntypedFormGroup;
 
+    isDisable: boolean = true;
     item: any = {};
     isBusy: boolean = false;
 
@@ -77,26 +80,25 @@ export class DocumentoFormComponent implements OnInit {
         private _fuseProgressBarService: FuseProgressBarService,
     ) {
         this.form = new FormGroup({
-            IdDestra: new FormControl('', [Validators.required]),
+            IdDocCredenciadora: new FormControl('', [Validators.required]),
             IdProtheus: new FormControl('', [Validators.required]),
             Descricao: new FormControl('', [Validators.required]),
+            IdCredenciadora: new FormControl('', [Validators.required]),
         });
         this.titleService.setTitle("Novo - Documento - Imetame");
     }
 
-
     ngOnInit() {
-
-        this._Documentoservice.getDocumentosDestra().subscribe(
-            (documentosdestra: DocumentosDestra[]) => {
-                console.log(documentosdestra)
-                //this.documentosdestra = documentosdestra;
-                this.documentosdestra = documentosdestra.map(x => new CustomOptionsSelect(x.codigo.toString(), x.nome)) ?? [];
+        this._Documentoservice.getCredenciadoras().subscribe({
+            next: (credenciadoras: Credenciadora[]) => {
+                this.credenciadoras = credenciadoras.map(x => new CustomOptionsSelect(x.Id, x.Descricao));
+                const IdCredenciadora = this.form.get("IdCredenciadora").value;
+                this.credenciadoraIsSelected(IdCredenciadora);
             },
-            (error) => {
-                console.error('Erro ao buscar documentos Destra', error);
+            error(error) {
+                console.error('Erro ao buscar credenciadoras:' + error, error);
             }
-        );
+        })
 
         this._Documentoservice.getDocumentosProtheus().subscribe(
             (documentosprotheus: DocumentosProtheus[]) => {
@@ -110,18 +112,20 @@ export class DocumentoFormComponent implements OnInit {
         );
 
         this._Documentoservice._selectDocumento$.subscribe(
-            (data: any) => {
+            (data: Documento) => {
                 if (data != null) {
                     this.selectDocumento = data;
                     this.isObrigatorio = data.Obrigatorio;
                     this.form = this._formBuilder.group({
                         Descricao: [data?.Descricao, [Validators.required]],
-                        IdDestra: [data?.IdDestra, [Validators.required]],
+                        IdDocCredenciadora: [data?.IdDocCredenciadora, [Validators.required]],
                         IdProtheus: [data?.IdProtheus, [Validators.required]],
+                        IdCredenciadora: [data?.IdCredenciadora, [Validators.required]],
                     });
                     this.titleService.setTitle(
                         data.Credenciadora + " - Documento - Imetame"
                     );
+                    this.isDisable = false;
                 }
             },
             (error) => {
@@ -159,9 +163,38 @@ export class DocumentoFormComponent implements OnInit {
         this.isObrigatorio = event.value;
     }
 
+    credenciadoraIsSelected(event: any) {
+        this.isDisable = false;
+        const credenciadora = this.credenciadoras.find(x => x.value == event);
+        if (credenciadora == null) {
+            this.isDisable = true;
+            return;
+        } else {
+            if (credenciadora.display.toLowerCase().includes("destra")) {
+                this._fuseProgressBarService.show();
+                this._Documentoservice.getDocumentosDestra().subscribe(
+                    (documentosdestra: DocumentosDestra[]) => {
+                        this._fuseProgressBarService.hide();
+                        this.documentosdestra = documentosdestra.map(x => new CustomOptionsSelect(x.codigo.toString(), x.nome)) ?? [];
+                    },
+                    (error) => {
+                        this._fuseProgressBarService.hide();
+                        console.error('Erro ao buscar documentos Destra', error);
+                    }
+                );
+            }
+            else {
+                if (credenciadora.display.toLowerCase().includes("meta")) {
+                    this._fuseProgressBarService.show();
+                    this._fuseProgressBarService.hide();
+                }
+            }
+        }
+    }
+
     add(model: Documento) {
 
-        model.DescricaoDestra = this.documentosdestra.find(m => m.value == model.IdDestra).display
+        model.DescricaoCredenciadora = this.documentosdestra.find(m => m.value == model.IdDocCredenciadora).display
         model.DescricaoProtheus = this.documentosprotheus.find(m => m.value == model.IdProtheus).display
         model.Obrigatorio = this.isObrigatorio;
         this._fuseProgressBarService.setMode("indeterminate");
@@ -191,7 +224,7 @@ export class DocumentoFormComponent implements OnInit {
     }
 
     update(model: Documento) {
-        model.DescricaoDestra = this.documentosdestra.find(m => m.value == model.IdDestra).display
+        model.DescricaoCredenciadora = this.documentosdestra.find(m => m.value == model.IdCredenciadora).display
         model.DescricaoProtheus = this.documentosprotheus.find(m => m.value == model.IdProtheus).display
         model.Obrigatorio = this.isObrigatorio;
         this._fuseProgressBarService.setMode("indeterminate");

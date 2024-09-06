@@ -1030,7 +1030,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
                 DocumentoDestra itemDestra = new DocumentoDestra
                 {
-                    idDocto = docRelacao.IdDestra,
+                    idDocto = docRelacao.IdDocCredenciadora,
                     cpf = colaboradorCadastrado.Cpf,
                     arquivo = documento.Bytes,
                     validade = DateTime.Now.AddYears(1).ToString("yyyy-MM-dd"),
@@ -1047,8 +1047,8 @@ namespace Imetame.Documentacao.WebApi.Controllers
                         Id = new Guid(),
                         DXC_CODPROTHEUS = documento.Codigo,
                         DXC_DESCPROTHEUS = documento.DescArquivo,
-                        DXC_CODDESTRA = docRelacao.IdDestra,
-                        DXC_DESCDESTRA = docRelacao.DescricaoDestra,
+                        DXC_CODDESTRA = docRelacao.IdDocCredenciadora,
+                        DXC_DESCDESTRA = docRelacao.DescricaoCredenciadora,
                         DXC_IDCOLABORADOR = colaboradorCadastrado.Id,
                         DXC_BASE64 = $"data:image/png;base64,{Convert.ToBase64String(documento.Bytes)}"
                     };
@@ -1182,7 +1182,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                 foreach (var docDestra in todosOsDocsDestra)
                 {
                     Documento docRelacao = await _repDocumento.SelectContext()
-                        .Where(m => m.IdDestra == docDestra.codigo.ToString()) // Ajustado para usar IdDestra
+                        .Where(m => m.IdDocCredenciadora == docDestra.codigo.ToString()) // Ajustado para usar IdDestra
                         .FirstOrDefaultAsync();
 
                     if (docRelacao == null)
@@ -1217,7 +1217,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                         StatusDocumentoObrigatoriosDTO.Add(
                         new StatusDocumentoObrigatoriosModel
                         {
-                            DocDestra = docRelacao.DescricaoDestra,
+                            DocDestra = docRelacao.DescricaoCredenciadora,
                             DocProtheus = docRelacao.DescricaoProtheus,
                             Status = "Pendente"
                         }
@@ -1228,7 +1228,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
                         StatusDocumentoObrigatoriosDTO.Add(
                           new StatusDocumentoObrigatoriosModel
                           {
-                              DocDestra = docRelacao.DescricaoDestra,
+                              DocDestra = docRelacao.DescricaoCredenciadora,
                               DocProtheus = docRelacao.DescricaoProtheus,
                               Status = "Ok"
                           });
@@ -1246,7 +1246,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 					StatusDocumentoObrigatoriosDTO.Add(
 					  new StatusDocumentoObrigatoriosModel
 					  {
-						  DocDestra = doc.DescricaoDestra,
+						  DocDestra = doc.DescricaoCredenciadora,
 						  DocProtheus = doc.DescricaoProtheus,
 						  Status = "Ok"
 					  });

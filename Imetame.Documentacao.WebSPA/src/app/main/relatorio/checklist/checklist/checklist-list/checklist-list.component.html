@@ -57,7 +57,7 @@
                 <!-- Colunas dinâmicas: Documentos -->
                 <ng-container *ngFor="let documentCol of getDocumentColumns()" [matColumnDef]="documentCol">
                     <mat-header-cell *matHeaderCellDef> {{ documentCol }} </mat-header-cell>
-                    <mat-cell *matCellDef="let colaborador">
+                    <mat-cell class="break-line" *matCellDef="let colaborador">
                         {{ getDocumento(documentCol,colaborador) }}
                     </mat-cell>
                 </ng-container>

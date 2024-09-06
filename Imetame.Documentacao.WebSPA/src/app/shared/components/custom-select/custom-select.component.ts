@@ -19,7 +19,7 @@ import { MatIconModule } from '@angular/material/icon';
   template: `
     <mat-form-field class="w-full" appearance="outline" [ngClass]="{'fuse-mat-rounded' :rounded}">
       <mat-label *ngIf="label != null">{{label}}</mat-label>
-      <mat-select [formControl]="formControl" [multiple]="multiple" [placeholder]="placeholder" (selectionChange)="onSelectionChange()">
+      <mat-select [formControl]="formControl" [multiple]="multiple" [disabled]="disabled" [placeholder]="placeholder" (selectionChange)="onSelectionChange()">
         <mat-option>
           <ngx-mat-select-search [noEntriesFoundLabel]="'Nenhuma opção encontrada'" [formControl]="filterControl" [placeholderLabel]="placeholder"></ngx-mat-select-search>
         </mat-option>
@@ -55,6 +55,7 @@ export class CustomSearchSelectComponent implements OnInit, OnChanges, ControlVa
   @Input() options: CustomOptionsSelect[] = [];
   @Input() placeholder: string = 'Pesquisar...';
   @Input() label: string;
+  @Input() disabled: boolean = false;
   @Input() fxFlex: string;
   @Input() formControl: FormControl = new FormControl();
   @Input() multiple: boolean = false;
