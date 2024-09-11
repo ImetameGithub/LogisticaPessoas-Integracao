@@ -59,40 +59,40 @@ namespace Imetame.Documentacao.Infra.Data.Repositories
         {
             var processamento = await _processamentoRepository.GetByIdAsync(idProcessamento, cancellationToken);
             var sql = @"SELECT distinct [empresa] as Empresa
-      ,[numcad] as NumCad
-      ,[numcracha] as NumCracha
-      ,[status] as Status
-      ,[nomefuncionario] as Nome
-      ,[cpf] as Cpf
-      ,[funcaoatual] as FuncaoAtual
-      ,[funcaoinicial] as FuncaoInicial
-      ,[dataafastamento] as DataAfastamento
-      ,[dataadmissao] as DataAdmissao
-      ,[datanascimento] as DataNascimento
-      ,[equipe] as Equipe
-      ,[perfil] as Perfil
-      ,[endereco] as Endereco
-      ,[numero] as Numero
-      ,[bairro] as Bairro
-      ,[cidade] as Cidade
-      ,[cep] as Cep
-      ,[ddd] as Ddd
-      ,[numtel] as NumTel
-      ,[ddd2] as Ddd2
-      ,[numtel2] as NumTel2
-      ,[estado] as Estado
-      ,[tempoempresaanos] as TempoEmpresaAnos
-      ,[tempoempresaanosint] as TempoEmpresaAnosInt
-      ,[tempoempresamesesint] as TempoEmpresaMesesInt
-      ,[tempoempresatexto] as TempoEmpresaTeexto
+                          ,[numcad] as NumCad
+                          ,[numcracha] as NumCracha
+                          ,[status] as Status
+                          ,[nomefuncionario] as Nome
+                          ,[cpf] as Cpf
+                          ,[funcaoatual] as FuncaoAtual
+                          ,[funcaoinicial] as FuncaoInicial
+                          ,[dataafastamento] as DataAfastamento
+                          ,[dataadmissao] as DataAdmissao
+                          ,[datanascimento] as DataNascimento
+                          ,[equipe] as Equipe
+                          ,[perfil] as Perfil
+                          ,[endereco] as Endereco
+                          ,[numero] as Numero
+                          ,[bairro] as Bairro
+                          ,[cidade] as Cidade
+                          ,[cep] as Cep
+                          ,[ddd] as Ddd
+                          ,[numtel] as NumTel
+                          ,[ddd2] as Ddd2
+                          ,[numtel2] as NumTel2
+                          ,[estado] as Estado
+                          ,[tempoempresaanos] as TempoEmpresaAnos
+                          ,[tempoempresaanosint] as TempoEmpresaAnosInt
+                          ,[tempoempresamesesint] as TempoEmpresaMesesInt
+                          ,[tempoempresatexto] as TempoEmpresaTeexto
 	 
 
-  FROM [DW_IMETAME_NOVA_OS].[dbo].VW_FUSION_GP_COLABORADOR (nolock)  COLAB
+                      FROM [DW_IMETAME_NOVA_OS].[dbo].VW_FUSION_GP_COLABORADOR (nolock)  COLAB
 
-  join DADOSADV_LUC..ZNB010 (nolock) ZNB ON ZNB.ZNB_MATRIC = COLAB.[numcad] AND ZNB.D_E_L_E_T_='' AND ZNB.ZNB_DTFIM>GETDATE()-30
+                      join ZNB010 (nolock) ZNB ON ZNB.ZNB_MATRIC = COLAB.[numcad] AND ZNB.D_E_L_E_T_='' AND ZNB.ZNB_DTFIM>GETDATE()-30
 
-  WHERE ZNB_OS = @Oss
-order by Nome";
+                      WHERE ZNB_OS = @Oss
+                    order by Nome";
             //WHERE ZNB_OS in ('001701001')";
             var lista = (await this.conn.QueryAsync<ColaboradorModel>(sql, new {Oss= processamento.Oss }));
 
@@ -111,9 +111,9 @@ order by Nome";
 		                        Sequencia = RTRIM(LTRIM(ISNULL(UZJ.UZJ_SEQ, ''))), 		
 		                        RTRIM(LTRIM(UZJ_DOC)) as Nome
 		                        --UZJ_IMG as ImagemDocumento
-                        FROM	DADOSADV..UZJ{0}0 UZJ
-		                        INNER JOIN DADOSADV..UZI010 UZI	ON UZI.D_E_L_E_T_ = '' AND UZI.UZI_CODIGO = UZJ.UZJ_CODTDO
-		                        INNER JOIN DADOSADV..SRA{0}0 SRA ON SRA.D_E_L_E_T_ = ''AND SRA.RA_MAT = UZJ.UZJ_MAT
+                        FROM  UZJ{0}0 UZJ
+		                        INNER JOIN UZI010 UZI	ON UZI.D_E_L_E_T_ = '' AND UZI.UZI_CODIGO = UZJ.UZJ_CODTDO
+		                        INNER JOIN SRA{0}0 SRA ON SRA.D_E_L_E_T_ = ''AND SRA.RA_MAT = UZJ.UZJ_MAT
 
                         WHERE UZJ.D_E_L_E_T_ = ''
                         AND UZJ.UZJ_CODTDO <> '01'
@@ -148,9 +148,9 @@ order by Nome";
 		                        Id = UZJ.R_E_C_N_O_,		
                                 UZJ_DOC as Nome,
 		                        UZJ_IMG as Bytes
-                        FROM	DADOSADV..UZJ{0}0 UZJ
-		                        INNER JOIN DADOSADV..UZI010 UZI	ON UZI.D_E_L_E_T_ = '' AND UZI.UZI_CODIGO = UZJ.UZJ_CODTDO
-		                        INNER JOIN DADOSADV..SRA{0}0 SRA ON SRA.D_E_L_E_T_ = ''AND SRA.RA_MAT = UZJ.UZJ_MAT
+                        FROM	UZJ{0}0 UZJ
+		                        INNER JOIN UZI010 UZI	ON UZI.D_E_L_E_T_ = '' AND UZI.UZI_CODIGO = UZJ.UZJ_CODTDO
+		                        INNER JOIN SRA{0}0 SRA ON SRA.D_E_L_E_T_ = ''AND SRA.RA_MAT = UZJ.UZJ_MAT
 
                         WHERE   UZJ.D_E_L_E_T_ = ''
                                 AND UZJ.UZJ_CODTDO <> '01'

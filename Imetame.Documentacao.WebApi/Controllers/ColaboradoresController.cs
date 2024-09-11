@@ -184,12 +184,12 @@ namespace Imetame.Documentacao.WebApi.Controllers
 							    	COUNT(*) as contagem
 								FROM
 									SRA010 SRA
-								INNER JOIN DADOSADV_LUC..UZJ010 UZJ 
+								INNER JOIN UZJ010 UZJ 
 							        ON
 									UZJ.UZJ_FILIAL = SRA.RA_FILIAL
 									AND UZJ.UZJ_MAT = SRA.RA_MAT
 									AND UZJ.D_E_L_E_T_ = ''
-								INNER JOIN DADOSADV_LUC..UZI010 UZI 
+								INNER JOIN UZI010 UZI 
 							        ON
 									UZI.UZI_FILIAL = UZJ.UZJ_FILIAL
 									AND UZI.UZI_CODIGO = UZJ.UZJ_CODTDO
@@ -229,8 +229,8 @@ namespace Imetame.Documentacao.WebApi.Controllers
 								[tempoempresamesesint] as TempoEmpresaMesesInt,
 								[tempoempresatexto] as TempoEmpresaTeexto
 							FROM
-								[DADOSADV_LUC].[dbo].VW_FUSION_GP_COLABORADOR (nolock) COLAB
-							join [DADOSADV_LUC].[dbo].ZNB010 (nolock) ZNB ON
+								VW_FUSION_GP_COLABORADOR (nolock) COLAB
+							join ZNB010 (nolock) ZNB ON
 								ZNB.ZNB_MATRIC = COLAB.[numcad]
 								AND ZNB.D_E_L_E_T_ = ''
 								AND ZNB.ZNB_DTFIM>GETDATE()-30
@@ -471,11 +471,11 @@ namespace Imetame.Documentacao.WebApi.Controllers
                         UZJ.UZJ_CODTDO AS IdTipoDocumento,
                         UZI.UZI_DESC AS TipoDocumento
                           FROM SRA010 SRA
-                          INNER JOIN DADOSADV_LUC..UZJ010 UZJ 
+                          INNER JOIN UZJ010 UZJ 
                                   ON  UZJ.UZJ_FILIAL = SRA.RA_FILIAL
                                   AND UZJ.UZJ_MAT = SRA.RA_MAT
                                   AND UZJ.D_E_L_E_T_ = ''
-                          INNER JOIN DADOSADV_LUC..UZI010 UZI 
+                          INNER JOIN UZI010 UZI 
                                   ON UZI.UZI_FILIAL = UZJ.UZJ_FILIAL 
                                   AND UZI.UZI_CODIGO = UZJ.UZJ_CODTDO           
                                   AND UZI.D_E_L_E_T_ = ''
