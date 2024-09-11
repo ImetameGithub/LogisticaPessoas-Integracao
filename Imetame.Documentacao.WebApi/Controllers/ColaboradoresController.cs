@@ -198,6 +198,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 								WHERE
 									RA_FILIAL = ''
 									AND SRA.D_E_L_E_T_ = ''
+                                    AND SRA.RA_DEMISSA = ''
 								GROUP BY SRA.RA_MAT)
 							SELECT
 								distinct [empresa] as Empresa,
