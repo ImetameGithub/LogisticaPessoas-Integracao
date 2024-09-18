@@ -19,6 +19,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import * as _ from 'lodash';
 import { takeUntil, startWith, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { AutomacaoDeProcessosService } from 'app/main/automacao-de-processos/automacao-de-processos.service';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
     selector: 'colaboradores-atividade-modal',
@@ -56,6 +57,12 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
     isBusy: boolean = false;
 
     selectColaborador: any;
+
+    //#region PAGINATE e ITENS
+    page: number = 1;
+    pageSize: number = 5;
+    totalCount: number = 0;
+    //#endregion 
 
     atividadesOptions: CustomOptionsSelect[] = [];
     perfilOptions: CustomOptionsSelect[] = [];
@@ -198,7 +205,9 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
         // Obtém os valores do formulário
         var filtroValues = this.formFiltro.getRawValue();
 
-        // Filtra a lista de colaboradores de acordo com os valores do formulário
+        const skip = (this.page - 1) * this.pageSize;
+        const take = this.pageSize + 1;
+
         let colaboradoresFiltrados = this._data._listColaboradores.filter(colaborador => {
             let matchPerfil = filtroValues.Perfil.length > 0 ? filtroValues.Perfil.includes(colaborador.PERFIL) : true;
             let matchEquipe = filtroValues.Equipe.length > 0 ? filtroValues.Equipe.includes(colaborador.CODIGO_EQUIPE + ' - ' + colaborador.NOME_EQUIPE) : true;
@@ -208,12 +217,17 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
 
             return matchPerfil && matchEquipe && matchOs && matchFuncao && matchDisciplina;
         });
+        this.totalCount = colaboradoresFiltrados.length
+
+        colaboradoresFiltrados = colaboradoresFiltrados.slice(skip, take);
+
+        // Filtra a lista de colaboradores de acordo com os valores do formulário
         this.dataSource.data = colaboradoresFiltrados;
 
-        this._snackbar.open("Filtro aplicado com sucesso", 'X', {
-            duration: 2500,
-            panelClass: 'snackbar-success',
-        })
+        // this._snackbar.open("Filtro aplicado com sucesso", 'X', {
+        //     duration: 2500,
+        //     panelClass: 'snackbar-success',
+        // })
     }
 
     colaboradorIsChecked(item: ColaboradorProtheusModel): boolean {
@@ -292,4 +306,11 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
     };
     //#endregion
 
+    //#region FUNÇÃO PAGINAÇÃO - MATHEUS MONFREIDES 01/12/2023
+    onPageChange(event: PageEvent) {
+        this.page = event.pageIndex + 1;
+        this.pageSize = event.pageSize;
+         this.filtrarColaboradores();
+    }
+    //#endregion
 }

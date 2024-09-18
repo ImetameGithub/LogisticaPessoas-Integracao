@@ -230,7 +230,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 								[tempoempresamesesint] as TempoEmpresaMesesInt,
 								[tempoempresatexto] as TempoEmpresaTeexto
 							FROM
-								VW_FUSION_GP_COLABORADOR (nolock) COLAB
+								DW_IMETAME_NOVA_OS..VW_FUSION_GP_COLABORADOR (nolock) COLAB
 							join ZNB010 (nolock) ZNB ON
 								ZNB.ZNB_MATRIC = COLAB.[numcad]
 								AND ZNB.D_E_L_E_T_ = ''

@@ -88,10 +88,8 @@ namespace Imetame.Documentacao.Infra.Data.Repositories
 	 
 
                       FROM [DW_IMETAME_NOVA_OS].[dbo].VW_FUSION_GP_COLABORADOR (nolock)  COLAB
-
-                      join ZNB010 (nolock) ZNB ON ZNB.ZNB_MATRIC = COLAB.[numcad] AND ZNB.D_E_L_E_T_='' AND ZNB.ZNB_DTFIM>GETDATE()-30
-
-                      WHERE ZNB_OS = @Oss
+                      join ZNB010 (nolock) ZNB ON ZNB.ZNB_MATRIC = COLAB.[numcad] AND ZNB.D_E_L_E_T_='' AND ZNB.ZNB_DTFIM>GETDATE()-30                       
+                      WHERE ZNB_OS = @Oss                       
                     order by Nome";
             //WHERE ZNB_OS in ('001701001')";
             var lista = (await this.conn.QueryAsync<ColaboradorModel>(sql, new {Oss= processamento.Oss }));
