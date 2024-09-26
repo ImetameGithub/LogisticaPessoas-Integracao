@@ -94,7 +94,7 @@ export class ChecklistComponent implements OnInit, OnDestroy {
       }
     );
   }
-
+  
   searchOs(searchValue) {
     if (!this.isTravarPesquisa && searchValue != '')
       this._relatorioService.getOss(searchValue).subscribe(

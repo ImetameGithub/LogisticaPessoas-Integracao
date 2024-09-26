@@ -40,7 +40,7 @@ namespace Imetame.Documentacao.Infra.Data.Repositories
 
         public async Task<Domain.Entities.Processamento> GetProcessamentoAtivo(Guid idPedido)
         {
-            return await DbSet.FirstOrDefaultAsync(q => q.IdPedido == idPedido && q.Status == StatusProcessamento.Executando);
+			return await DbSet.FirstOrDefaultAsync(q => q.IdPedido == idPedido && q.Status == StatusProcessamento.Executando);
         }
               
 

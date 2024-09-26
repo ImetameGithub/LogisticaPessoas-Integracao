@@ -19,7 +19,11 @@ mat-dialog-container {
     /* Importante para o comportamento da tabela */
     width: 100%;
     /* A tabela ocupa toda a largura do contêiner */
-    table-layout: auto;
+    //    table-layout: auto;
+
+
+
+
 }
 
 .mat-header-cell,
@@ -29,27 +33,37 @@ mat-dialog-container {
     // min-width: 170px;
     // max-width: 100vh;
     // /* Define uma largura mínima para as colunas */
+    // /* Evita quebras de linha dentro das células */
+    // overflow: hidden;
+    // /* Esconde o conteúdo que ultrapassa a largura da célula */
+    white-space: normal;
+    /* Permite a quebra de linha */
+    word-wrap: break-word;
+    /* Quebra palavras longas se necessário */
+    overflow: visible;
+    /* Permite que o conteúdo visível se ajuste corretamente */
+    text-align: center;
+    align-self: center;
+    align-items: center;
+    padding: 0 8px;
+    //min-width: 170px;
+    /* Defina uma largura mínima maior se necessário */
     // white-space: nowrap;
     // /* Evita quebras de linha dentro das células */
     // overflow: hidden;
     // /* Esconde o conteúdo que ultrapassa a largura da célula */
-
-
-    min-width: 170px;
-    /* Defina uma largura mínima maior se necessário */
-    white-space: nowrap;
-    /* Evita quebras de linha dentro das células */
-    overflow: hidden;
-    /* Esconde o conteúdo que ultrapassa a largura da célula */
-    text-overflow: ellipsis;
+    // text-overflow: ellipsis;
     /* Adiciona reticências ao conteúdo que ultrapassa a largura */
 }
 
 /* Especificamente para a célula de atividade */
 .break-line {
-    white-space: normal; /* Permite a quebra de linha */
-    word-wrap: break-word; /* Quebra palavras longas se necessário */
-    overflow: visible; /* Permite que o conteúdo visível se ajuste corretamente */
+    white-space: normal;
+    /* Permite a quebra de linha */
+    word-wrap: break-word;
+    /* Quebra palavras longas se necessário */
+    overflow: visible;
+    /* Permite que o conteúdo visível se ajuste corretamente */
     align-self: center;
     align-items: center;
 }

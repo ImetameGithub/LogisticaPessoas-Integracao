@@ -13,8 +13,11 @@ namespace Imetame.Documentacao.Domain.Models
 		public class ChecklistModel
 		{
 			public string? Nome { get; set; }
-			//public string? Matricula { get; set; }
-			//public string? Equipe { get; set; }
+			public string? Matricula { get; set; }
+			public string? Cracha { get; set; }
+			public string? Equipe { get; set; }
+			public string? Funcao { get; set; }
+
 			//public string? DataAdmissao { get; set; }
 			//public string? OrdemServico { get; set; }
 			//public string? NumPedido { get; set; }

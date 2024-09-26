@@ -26,7 +26,7 @@ export class ChecklistListComponent implements OnInit {
 
   documentosColumns: CheckDocumento[] = [];
   //displayedColumns = ["NOME", "ATIVIDADE"];
-  displayedColumns: string[] = ['nome', 'atividade'];
+  displayedColumns: string[] = ['nome', 'matricula', 'cracha', 'equipe', 'funcao', 'atividade'];
 
   todosRegistros: ChecklistModel[];
   constructor(
@@ -103,6 +103,18 @@ export class ChecklistListComponent implements OnInit {
     // Retornar a data formatada
     return `${day}/${month}/${year}`;
   }
+
+  // Função para calcular a largura da coluna com base no comprimento do cabeçalho
+  getHeaderWidth(column: string): number {
+    const baseWidth = 20; // Largura base, pode ajustar conforme necessário
+    const additionalWidthPerCharacter = 8; // Pixels adicionais por caractere, ajuste conforme necessário
+
+    // Calcular a largura mínima da coluna com base no tamanho do cabeçalho
+    const calculatedWidth = baseWidth + column.length * additionalWidthPerCharacter;
+
+    // Definir um valor mínimo de largura
+    return Math.max(calculatedWidth, 100); // Definir o mínimo como 100px, ajuste conforme necessário
+  }
   //#endregion
 
   //#region GERAR EXCEL
@@ -118,22 +130,29 @@ export class ChecklistListComponent implements OnInit {
     // RECEBE A PRIMEIRA LINHA DA PLANILHA
     const rowHeader = worksheetChecklist.getRow(1);
     rowHeader.getCell(1).value = "COLABORADOR";
-    rowHeader.getCell(2).value = "ATIVIDADE";
+    rowHeader.getCell(2).value = "MATRICULA";
+    rowHeader.getCell(3).value = "CRACHA";
+    rowHeader.getCell(4).value = "EQUIPE";
+    rowHeader.getCell(5).value = "FUNÇÃO";
+    rowHeader.getCell(6).value = "ATIVIDADE";
 
     this.documentosColumns.forEach((documento, index) => {
-      rowHeader.getCell(3 + index).value = documento.nome;
+      rowHeader.getCell(7 + index).value = documento.nome;
     })
 
     dadosExcel.forEach((colaborador, rowIndex) => {
       const row = worksheetChecklist.getRow(rowIndex + 2);
       row.getCell(1).value = colaborador.Nome;
-      row.getCell(2).value = colaborador.Atividade;
+      row.getCell(2).value = colaborador.Matricula;
+      row.getCell(3).value = colaborador.Cracha;
+      row.getCell(4).value = colaborador.Equipe;
+      row.getCell(5).value = colaborador.Funcao;
+      row.getCell(6).value = colaborador.Atividade;
 
       this.documentosColumns.forEach((documento, index) => {
         const documentoColaborador: CheckDocumento | undefined = colaborador.Documentos.find(x => x.IdDestra == documento.IdDestra);
         if (documentoColaborador) {
-
-          row.getCell(3 + index).value = {
+          row.getCell(7 + index).value = {
             richText: [
               {
                 text: `Validade: \n ${documentoColaborador.validade} - Destra \n`,
@@ -145,11 +164,8 @@ export class ChecklistListComponent implements OnInit {
               }
             ]
           };
-
-
-          // row.getCell(3 + index).value = `Validade: \n ${documentoColaborador.validade} - Destra \n ${DocumentoStatusDestra.getNameEnum(documentoColaborador.Status)}`;
         } else {
-          row.getCell(3 + index).value = "Não Relacionado";
+          row.getCell(7 + index).value = "Não Relacionado";
         }
       })
 
@@ -177,10 +193,12 @@ export class ChecklistListComponent implements OnInit {
           maxLength = columnLength;
         }
       });
-      column.width = maxLength + 2; // Ajuste conforme necessário
+
+      // Calcula o width e garante que o mínimo seja 19
+      column.width = (maxLength + 2) < 19 ? 19 : maxLength + 2;
     });
 
-    worksheetChecklist.autoFilter = "A1";
+    worksheetChecklist.autoFilter = "A1:E1";
 
     // Escreve o arquivo Excel
     workbook.xlsx.writeBuffer().then((buffer) => {

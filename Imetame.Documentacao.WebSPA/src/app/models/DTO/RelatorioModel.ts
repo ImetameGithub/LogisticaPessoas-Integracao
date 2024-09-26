@@ -1,7 +1,9 @@
 export class ChecklistModel {
     Nome: string;
-    //Matricula: string;
-    //Equipe: string;
+    Matricula: string;
+    Cracha: string;
+    Equipe: string;
+    Funcao: string;
     //DataAdmissao: string;
     //OrdemServico: string;
     //NumPedido: string;

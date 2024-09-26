@@ -48,6 +48,30 @@
                     <mat-cell *matCellDef="let colaborador"> {{ colaborador.Nome }} </mat-cell>
                 </ng-container>
 
+                <!-- Coluna fixa: Matricula do Colaborador -->
+                <ng-container matColumnDef="matricula">
+                    <mat-header-cell *matHeaderCellDef>Matricula</mat-header-cell>
+                    <mat-cell *matCellDef="let colaborador"> {{ colaborador.Matricula }} </mat-cell>
+                </ng-container>
+
+                <!-- Coluna fixa: Cracha do Colaborador -->
+                <ng-container matColumnDef="cracha">
+                    <mat-header-cell *matHeaderCellDef>Crachá</mat-header-cell>
+                    <mat-cell *matCellDef="let colaborador"> {{ colaborador.Cracha }} </mat-cell>
+                </ng-container>
+
+                <!-- Coluna fixa: Equipe do Colaborador -->
+                <ng-container matColumnDef="equipe">
+                    <mat-header-cell *matHeaderCellDef>Equipe</mat-header-cell>
+                    <mat-cell *matCellDef="let colaborador"> {{ colaborador.Equipe }} </mat-cell>
+                </ng-container>
+
+                <!-- Coluna fixa: Função do Colaborador -->
+                <ng-container matColumnDef="funcao">
+                    <mat-header-cell *matHeaderCellDef>Função</mat-header-cell>
+                    <mat-cell *matCellDef="let colaborador"> {{ colaborador.Funcao }} </mat-cell>
+                </ng-container>
+
                 <!-- Coluna fixa: Atividade -->
                 <ng-container matColumnDef="atividade">
                     <mat-header-cell *matHeaderCellDef>Atividade</mat-header-cell>
@@ -56,7 +80,7 @@
 
                 <!-- Colunas dinâmicas: Documentos -->
                 <ng-container *ngFor="let documentCol of getDocumentColumns()" [matColumnDef]="documentCol">
-                    <mat-header-cell  *matHeaderCellDef> {{ documentCol }} </mat-header-cell>
+                    <mat-header-cell  *matHeaderCellDef [style.width.px]="getHeaderWidth(documentCol)"> {{ documentCol }} </mat-header-cell>
                     <mat-cell class="break-line" *matCellDef="let colaborador">
                         {{ getDocumento(documentCol,colaborador) }}
                     </mat-cell>

@@ -70,13 +70,13 @@ export const navigation: FuseNavigation[] = [
                         url: "/credenciadora",
                         icon: "label_important",
                     },
-                    {
-                        id: "processamento",
-                        title: "Processamento",
-                        type: "item",
-                        url: "/processamento",
-                        icon: "label_important",
-                    },
+                    // {
+                    //     id: "processamento",
+                    //     title: "Processamento",
+                    //     type: "item",
+                    //     url: "/processamento",
+                    //     icon: "label_important",
+                    // },
                 ]
             },
             {
