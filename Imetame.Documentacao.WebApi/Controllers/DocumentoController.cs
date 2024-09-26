@@ -10,6 +10,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Validation.AspNetCore;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 
@@ -21,12 +22,14 @@ namespace Imetame.Documentacao.WebApi.Controllers
 	public class DocumentoController : Controller
 	{
 		private readonly IBaseRepository<Documento> _repDocumento;
+		private readonly IBaseRepository<DocumentoProtheus> _repDocumentoProtheus;
 		private readonly DestraController _destraController;
 		private readonly IConfiguration _configuration;
 		protected readonly SqlConnection conn;
 		public DocumentoController
 		(
 			IBaseRepository<Documento> repDocumento,
+			IBaseRepository<DocumentoProtheus> repDocumentoProtheus,
 			DestraController destraController,
 			IConfiguration configuration
 		)
@@ -114,7 +117,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
 				//Verificar se o documento Destra ou Protheus já está sendo utilizado
 				List<Documento> listDocumentosDestra = _repDocumento.SelectContext().Where(e => e.IdDestra == model.IdDestra).ToList();
-				List<Documento> listDocumentosProtheus = _repDocumento.SelectContext().Where(e => e.IdProtheus == model.IdProtheus).ToList();
+
+				List<DocumentoProtheus> listDocumentosProtheus = _repDocumentoProtheus.SelectContext()
+																						.Where(e => model.DocumentoProtheus!.Select(x => x.IdProtheus).Contains(e.IdProtheus))
+																						.ToList();
 
 				if (listDocumentosDestra.Count() > 0)
 				{
@@ -150,7 +156,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
 				//Verificar se o documento Destra ou Protheus já está sendo utilizado
 				List<Documento> listDocumentosDestra = _repDocumento.SelectContext().Where(e => e.Id != model.Id && e.IdDestra == model.IdDestra).ToList();
-				List<Documento> listDocumentosProtheus = _repDocumento.SelectContext().Where(e => e.Id != model.Id && e.IdProtheus == model.IdProtheus).ToList();
+
+				List<DocumentoProtheus> listDocumentosProtheus = _repDocumentoProtheus.SelectContext()
+																						.Where(e => e.Id != model.Id && model.DocumentoProtheus!.Select(x => x.IdProtheus).Contains(e.IdProtheus))
+																						.ToList();
 
 				if (listDocumentosDestra.Count() > 0)
 				{

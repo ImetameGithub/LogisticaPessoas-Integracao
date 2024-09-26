@@ -36,6 +36,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 		private readonly IBaseRepository<Domain.Entities.Processamento> _repProcessamento;
 		private readonly IBaseRepository<Domain.Entities.DocumentoxColaborador> _repDocxColaborador;
 		private readonly IBaseRepository<Domain.Entities.Documento> _repDocumento;
+		private readonly IBaseRepository<Domain.Entities.DocumentoProtheus> _repDocumentoProtheus;
 		private readonly IBaseRepository<Domain.Entities.Colaborador> _repColaborador;
 		private readonly IBaseRepository<ColaboradorxAtividade> _repColaboradorxAtividade;
 		private readonly IBaseRepository<ColaboradorxPedido> _repColaboradorxPedido;
@@ -48,7 +49,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
 		public ColaboradoresController(IColaboradorRepository repository, IBaseRepository<Domain.Entities.Processamento> repProcessamento,
 			IConfiguration configuration, IBaseRepository<Domain.Entities.Colaborador> repColaborador,
-			IBaseRepository<ColaboradorxAtividade> repColaboradorxAtividade, DestraController destraController, IBaseRepository<Documento> repDocumento,
+			IBaseRepository<ColaboradorxAtividade> repColaboradorxAtividade, DestraController destraController, IBaseRepository<Documento> repDocumento, IBaseRepository<DocumentoProtheus> repDocumentoProtheus,
 			IBaseRepository<DocumentoxColaborador> repDocxColaborador, IBaseRepository<ColaboradorxPedido> repColaboradorxPedido, IBaseRepository<Pedido> repPedido)
 		{
 			_repository = repository;
@@ -59,6 +60,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 			_repColaboradorxAtividade = repColaboradorxAtividade;
 			_destraController = destraController;
 			_repDocumento = repDocumento;
+			_repDocumentoProtheus = repDocumentoProtheus;
 			_repDocxColaborador = repDocxColaborador;
 			_repColaboradorxPedido = repColaboradorxPedido;
 			_repPedido = repPedido;
@@ -569,8 +571,8 @@ namespace Imetame.Documentacao.WebApi.Controllers
 						{
 							item.SincronizadoDestra = true;
 						}
-
-						bool relacionadoDestra = await _repDocumento.SelectContext().AsNoTracking().Where(m => m.IdProtheus == item.Codigo).AnyAsync();
+						bool relacionadoDestra = await _repDocumentoProtheus.SelectByCondition(x => x.IdProtheus == item.Codigo).Include(x => x.Documento).Select(x => x.Documento).AnyAsync();
+						//bool relacionadoDestra = await _repDocumento.SelectContext().AsNoTracking().Where(m => m.IdProtheus.Contains(item.Codigo)).AnyAsync();
 
 						if (relacionadoDestra)
 						{
@@ -659,7 +661,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 						Base64 = $"data:image/png;base64,{Convert.ToBase64String(item)}"
 					};
 				}
-				
+
 				return Ok(objeto);
 			}
 			catch (Exception ex)
@@ -1011,8 +1013,9 @@ namespace Imetame.Documentacao.WebApi.Controllers
 			List<Task> tarefas = new List<Task>();
 			foreach (var doc in docsColaborador)
 			{
-				bool docRelacao = _repDocumento.SelectContext().AsNoTracking().Any(m => m.IdProtheus == doc.Codigo);
-				if (!docRelacao)
+				bool relacionadoDestra = _repDocumentoProtheus.SelectByCondition(x => x.IdProtheus == doc.Codigo).Include(x => x.Documento).Any();
+				// bool docRelacao = _repDocumento.SelectContext().AsNoTracking().Any(m => m.IdProtheus.Contains(doc.Codigo));
+				if (!relacionadoDestra)
 				{
 					docsSemRelacao.Add(doc.DescArquivo);
 				}
@@ -1071,8 +1074,11 @@ namespace Imetame.Documentacao.WebApi.Controllers
 					erro = ErrorHelper.GetErroModelState(ModelState.Values);
 					throw new Exception("Falha ao Salvar Dados.\n" + erro);
 				}
-
-				Documento? docRelacao = await _repDocumento.SelectContext().AsNoTracking().Where(m => m.IdProtheus == documento.Codigo).FirstOrDefaultAsync();
+				Documento? docRelacao = await _repDocumentoProtheus.SelectByCondition(x => x.IdProtheus == documento.Codigo)
+																	.Include(x => x.Documento)
+																	.Select(x => x.Documento)
+																	.FirstOrDefaultAsync();
+				//Documento? docRelacao = await _repDocumento.SelectContext().AsNoTracking().Where(m => m.IdProtheus.Contains(documento.Codigo)).FirstOrDefaultAsync();
 
 				if (docRelacao is null)
 					throw new Exception("O documento " + documento.DescArquivo + " não possue nenhuma relação com os documentos da Destra");
@@ -1264,6 +1270,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 				foreach (var docDestra in todosOsDocsDestra)
 				{
 					Documento docRelacao = await _repDocumento.SelectContext()
+						.Include(x => x.DocumentoProtheus)
 						.Where(m => m.IdDestra == docDestra.codigo.ToString()) // Ajustado para usar IdDestra
 						.FirstOrDefaultAsync();
 
@@ -1290,31 +1297,35 @@ namespace Imetame.Documentacao.WebApi.Controllers
 				// Verifica se o colaborador possui todos os documentos obrigatórios
 				foreach (var docRelacao in relacaoDestraProtheus)
 				{
-					bool possuiDocumento = lista.Any(d => d.Codigo == docRelacao.IdProtheus);
-
-					if (!possuiDocumento)
+					// TODO NECESSARIO VALIDAR
+					foreach (var docProtheus in docRelacao.DocumentoProtheus!)
 					{
-						//StatusDocumentoObrigatoriosDTO.Add("O colaborador não possui o documento " + docRelacao.DescricaoDestra + " na sua lista de documentos do Protheus");
+						bool possuiDocumento = lista.Any(d => docRelacao.DocumentoProtheus.Select(x => x.IdProtheus).Contains(d.Codigo));
 
-						StatusDocumentoObrigatoriosDTO.Add(
-						new StatusDocumentoObrigatoriosModel
+						if (!possuiDocumento)
 						{
-							DocDestra = docRelacao.DescricaoDestra,
-							DocProtheus = docRelacao.DescricaoProtheus,
-							Status = "Pendente"
-						}
-					  );
-					}
-					else
-					{
-						StatusDocumentoObrigatoriosDTO.Add(
-						  new StatusDocumentoObrigatoriosModel
-						  {
-							  DocDestra = docRelacao.DescricaoDestra,
-							  DocProtheus = docRelacao.DescricaoProtheus,
-							  Status = "Ok"
-						  });
+							//StatusDocumentoObrigatoriosDTO.Add("O colaborador não possui o documento " + docRelacao.DescricaoDestra + " na sua lista de documentos do Protheus");
 
+							StatusDocumentoObrigatoriosDTO.Add(
+							new StatusDocumentoObrigatoriosModel
+							{
+								DocDestra = docRelacao.DescricaoDestra,
+								DocProtheus = docProtheus.DescricaoProtheus,
+								Status = "Pendente"
+							}
+						  );
+						}
+						else
+						{
+							StatusDocumentoObrigatoriosDTO.Add(
+							  new StatusDocumentoObrigatoriosModel
+							  {
+								  DocDestra = docRelacao.DescricaoDestra,
+								  DocProtheus = docProtheus.DescricaoProtheus,
+								  Status = "Ok"
+							  });
+
+						}
 					}
 
 				}
@@ -1323,15 +1334,19 @@ namespace Imetame.Documentacao.WebApi.Controllers
 								   .AsNoTracking()
 								   .Where(x => lista.Select(y => y.DescArquivo).Contains(x.Descricao) && x.Obrigatorio == true)
 								   .ToListAsync();
+
 				foreach (var doc in listDocumentos)
 				{
-					StatusDocumentoObrigatoriosDTO.Add(
-					  new StatusDocumentoObrigatoriosModel
-					  {
-						  DocDestra = doc.DescricaoDestra,
-						  DocProtheus = doc.DescricaoProtheus,
-						  Status = "Ok"
-					  });
+					foreach (var docProtheus in doc.DocumentoProtheus!)
+					{
+						StatusDocumentoObrigatoriosDTO.Add(
+						  new StatusDocumentoObrigatoriosModel
+						  {
+							  DocDestra = doc.DescricaoDestra,
+							  DocProtheus = docProtheus.DescricaoProtheus,
+							  Status = "Ok"
+						  });
+					}
 				}
 				return Ok(StatusDocumentoObrigatoriosDTO);
 			}
