@@ -16,5 +16,7 @@ namespace Imetame.Documentacao.Domain.Entities
         public string DescricaoProtheus { get; set; }
         public bool Obrigatorio { get; set; } = false;
 
+        [NotMapped]
+        public List<DocumentoXProtheus>? DocumentoXProtheus { get; set; }
     }
 }

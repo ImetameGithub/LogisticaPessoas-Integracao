@@ -36,6 +36,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 		private readonly IBaseRepository<Domain.Entities.Processamento> _repProcessamento;
 		private readonly IBaseRepository<Domain.Entities.DocumentoxColaborador> _repDocxColaborador;
 		private readonly IBaseRepository<Domain.Entities.Documento> _repDocumento;
+		private readonly IBaseRepository<Domain.Entities.DocumentoXProtheus> _repDocumentoProtheus;
 		private readonly IBaseRepository<Domain.Entities.Colaborador> _repColaborador;
 		private readonly IBaseRepository<ColaboradorxAtividade> _repColaboradorxAtividade;
 		private readonly IBaseRepository<ColaboradorxPedido> _repColaboradorxPedido;
@@ -48,7 +49,8 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
 		public ColaboradoresController(IColaboradorRepository repository, IBaseRepository<Domain.Entities.Processamento> repProcessamento,
 			IConfiguration configuration, IBaseRepository<Domain.Entities.Colaborador> repColaborador,
-			IBaseRepository<ColaboradorxAtividade> repColaboradorxAtividade, DestraController destraController, IBaseRepository<Documento> repDocumento,
+			IBaseRepository<ColaboradorxAtividade> repColaboradorxAtividade, DestraController destraController, IBaseRepository<Documento> repDocumento, IBaseRepository<DocumentoXProtheus> repDocumentoProtheus,
+
 			IBaseRepository<DocumentoxColaborador> repDocxColaborador, IBaseRepository<ColaboradorxPedido> repColaboradorxPedido, IBaseRepository<Pedido> repPedido)
 		{
 			_repository = repository;
@@ -1263,7 +1265,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
 				foreach (var docDestra in todosOsDocsDestra)
 				{
-					Documento docRelacao = await _repDocumento.SelectContext()
+					Documento docRelacao = await _repDocumento.SelectContext()		
 						.Where(m => m.IdDestra == docDestra.codigo.ToString()) // Ajustado para usar IdDestra
 						.FirstOrDefaultAsync();
 
@@ -1290,11 +1292,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
 				// Verifica se o colaborador possui todos os documentos obrigatórios
 				foreach (var docRelacao in relacaoDestraProtheus)
 				{
-					bool possuiDocumento = lista.Any(d => d.Codigo == docRelacao.IdProtheus);
-
-					if (!possuiDocumento)
+					// TODO NECESSARIO VALIDAR
+					foreach (var docProtheus in docRelacao.DocumentoXProtheus!)
 					{
-						//StatusDocumentoObrigatoriosDTO.Add("O colaborador não possui o documento " + docRelacao.DescricaoDestra + " na sua lista de documentos do Protheus");
+						bool possuiDocumento = lista.Any(d => docRelacao.DocumentoXProtheus.Select(x => x.IdProtheus).Contains(d.Codigo));
 
 						StatusDocumentoObrigatoriosDTO.Add(
 						new StatusDocumentoObrigatoriosModel
@@ -1325,13 +1326,16 @@ namespace Imetame.Documentacao.WebApi.Controllers
 								   .ToListAsync();
 				foreach (var doc in listDocumentos)
 				{
-					StatusDocumentoObrigatoriosDTO.Add(
-					  new StatusDocumentoObrigatoriosModel
-					  {
-						  DocDestra = doc.DescricaoDestra,
-						  DocProtheus = doc.DescricaoProtheus,
-						  Status = "Ok"
-					  });
+					foreach (var docProtheus in doc.DocumentoXProtheus!)
+					{
+						StatusDocumentoObrigatoriosDTO.Add(
+						  new StatusDocumentoObrigatoriosModel
+						  {
+							  DocDestra = doc.DescricaoDestra,
+							  DocProtheus = docProtheus.DescricaoProtheus,
+							  Status = "Ok"
+						  });
+					}
 				}
 				return Ok(StatusDocumentoObrigatoriosDTO);
 			}

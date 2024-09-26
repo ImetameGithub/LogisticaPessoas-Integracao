@@ -21,16 +21,19 @@ namespace Imetame.Documentacao.WebApi.Controllers
 	public class DocumentoController : Controller
 	{
 		private readonly IBaseRepository<Documento> _repDocumento;
+		private readonly IBaseRepository<DocumentoXProtheus> _repDocumentoProtheus;
 		private readonly DestraController _destraController;
 		private readonly IConfiguration _configuration;
 		protected readonly SqlConnection conn;
 		public DocumentoController
 		(
 			IBaseRepository<Documento> repDocumento,
+			IBaseRepository<DocumentoXProtheus> repDocumentoProtheus,
 			DestraController destraController,
 			IConfiguration configuration
 		)
 		{
+			_repDocumentoProtheus = repDocumentoProtheus;
 			_repDocumento = repDocumento;
 			_destraController = destraController;
 			_configuration = configuration;
@@ -73,7 +76,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 			}
 		}
 
-		#region FUNÇÕES DE APOIO - MATHEUS MONFREIDES FARTEC SISTEMAS        
+		#region FUNï¿½ï¿½ES DE APOIO - MATHEUS MONFREIDES FARTEC SISTEMAS        
 		[HttpGet]
 		public async Task<IActionResult> GetAll()
 		{
@@ -98,7 +101,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 		}
 		#endregion
 
-		#region FUNÇÕES CRUD - MATHEUS MONFREIDES FARTEC SISTEMAS
+		#region FUNï¿½ï¿½ES CRUD - MATHEUS MONFREIDES FARTEC SISTEMAS
 		[HttpPost]
 		public async Task<IActionResult> Add([FromBody] Documento model, CancellationToken cancellationToken)
 		{
@@ -112,9 +115,13 @@ namespace Imetame.Documentacao.WebApi.Controllers
 				}
 				model.Id = new Guid();
 
-				//Verificar se o documento Destra ou Protheus já está sendo utilizado
+				//Verificar se o documento Destra ou Protheus jï¿½ estï¿½ sendo utilizado
 				List<Documento> listDocumentosDestra = _repDocumento.SelectContext().Where(e => e.IdDestra == model.IdDestra).ToList();
-				List<Documento> listDocumentosProtheus = _repDocumento.SelectContext().Where(e => e.IdProtheus == model.IdProtheus).ToList();
+
+				List<DocumentoXProtheus> listDocumentosProtheus = _repDocumentoProtheus.SelectContext()
+																						.Where(e => model.DocumentoXProtheus!.Select(x => x.IdProtheus).Contains(e.IdProtheus))
+																						.ToList();
+
 
 				if (listDocumentosDestra.Count() > 0)
 				{
@@ -125,7 +132,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 				{
 					throw new Exception("O documento PROTHEUS esta vinculado para outro documento DESTRA");
 				}
-
+				model.Id = new Guid();
 				await _repDocumento.SaveAsync(model);
 
 				return Ok(model);
@@ -148,9 +155,12 @@ namespace Imetame.Documentacao.WebApi.Controllers
 					throw new Exception("Falha ao Salvar Dados.\n" + erro);
 				}
 
-				//Verificar se o documento Destra ou Protheus já está sendo utilizado
+				//Verificar se o documento Destra ou Protheus jï¿½ estï¿½ sendo utilizado
 				List<Documento> listDocumentosDestra = _repDocumento.SelectContext().Where(e => e.Id != model.Id && e.IdDestra == model.IdDestra).ToList();
-				List<Documento> listDocumentosProtheus = _repDocumento.SelectContext().Where(e => e.Id != model.Id && e.IdProtheus == model.IdProtheus).ToList();
+
+				List<DocumentoXProtheus> listDocumentosProtheus = _repDocumentoProtheus.SelectContext()
+																						.Where(e => e.Id != model.Id && model.DocumentoXProtheus!.Select(x => x.IdProtheus).Contains(e.IdProtheus))
+																						.ToList();
 
 				if (listDocumentosDestra.Count() > 0)
 				{
