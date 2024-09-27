@@ -64,6 +64,8 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
     totalCount: number = 0;
     //#endregion 
 
+    searchInput: FormControl;
+
     atividadesOptions: CustomOptionsSelect[] = [];
     perfilOptions: CustomOptionsSelect[] = [];
     equipeOptions: CustomOptionsSelect[] = [];
@@ -83,6 +85,15 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
         private route: ActivatedRoute,
         private _fuseProgressBarService: FuseProgressBarService,
     ) {
+        this.searchInput = new FormControl("");
+
+        this.searchInput.valueChanges.pipe(
+            debounceTime(600),
+            distinctUntilChanged()
+        ).subscribe((newValue) => {
+            this.filtrarColaboradores(newValue);
+        });
+
         this.dataSource = new MatTableDataSource();
         this.listPerfil = Array.from(new Set(_data._listColaboradores.map(m => m.PERFIL)));
         this.listEquipe = Array.from(new Set(_data._listColaboradores.map(m => m.CODIGO_EQUIPE + ' - ' + m.NOME_EQUIPE)));
@@ -118,21 +129,7 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
         });
     }
 
-
-    // getOs(searchValue) {
-    //     this._Colaboradorservice.getOss(searchValue).subscribe(
-    //         (ordensServicos: any[]) => {
-    //             this.OsOptions = ordensServicos.map(item => new CustomOptionsSelect(item.os, item.numero + ' - ' + item.descricao)) ?? [];
-    //         },
-    //         (error) => {
-    //             console.error('Erro ao buscar pedidos', error);
-    //         }
-    //     );
-    // }
-
-
     //#region FUNÇÕES CRUD MATHEUS MONFREIDES - FARTEC SISTEMAS
-
     relacionarColaboradores() {
         this._fuseProgressBarService.show();
         const modelRelacao: ColaboradorxAtividadeModel = this.form.getRawValue();
@@ -201,33 +198,34 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
         )
     }
 
-    filtrarColaboradores() {
+    filtrarColaboradores(search?: string) {
         // Obtém os valores do formulário
         var filtroValues = this.formFiltro.getRawValue();
 
         const skip = (this.page - 1) * this.pageSize;
-        const take = this.pageSize + 1;
+        const take = this.pageSize;
 
         let colaboradoresFiltrados = this._data._listColaboradores.filter(colaborador => {
             let matchPerfil = filtroValues.Perfil.length > 0 ? filtroValues.Perfil.includes(colaborador.PERFIL) : true;
             let matchEquipe = filtroValues.Equipe.length > 0 ? filtroValues.Equipe.includes(colaborador.CODIGO_EQUIPE + ' - ' + colaborador.NOME_EQUIPE) : true;
             let matchOs = filtroValues.Os.length > 0 ? filtroValues.Os.includes(colaborador.CODIGO_OS + ' - ' + colaborador.NOME_OS) : true;
-            let matchFuncao = filtroValues.Funcao.length > 0 ? filtroValues.Funcao.includes(colaborador.CODIGO_FUNCAO + ' - ' + colaborador.NOME_FUNCAO) : true;
-            let matchDisciplina = filtroValues.Funcao.length > 0 ? filtroValues.Funcao.includes(colaborador.CODIGO_DISCIPLINA + ' - ' + colaborador.NOME_DISCIPLINA) : true;
+            let matchFuncao = filtroValues.Funcao.length > 0 ? filtroValues.Funcao.some(funcao => funcao.includes(colaborador.CODIGO_FUNCAO + ' - ' + colaborador.NOME_FUNCAO.trim())) : true;
+            let matchDisciplina = filtroValues.Disciplina.length > 0 ? filtroValues.Disciplina.includes(colaborador.CODIGO_DISCIPLINA + ' - ' + colaborador.NOME_DISCIPLINA) : true;
 
             return matchPerfil && matchEquipe && matchOs && matchFuncao && matchDisciplina;
         });
-        this.totalCount = colaboradoresFiltrados.length
 
-        colaboradoresFiltrados = colaboradoresFiltrados.slice(skip, take);
-
-        // Filtra a lista de colaboradores de acordo com os valores do formulário
-        this.dataSource.data = colaboradoresFiltrados;
-
-        // this._snackbar.open("Filtro aplicado com sucesso", 'X', {
-        //     duration: 2500,
-        //     panelClass: 'snackbar-success',
-        // })
+        if (search != null) {
+            const filteredColaboradores = colaboradoresFiltrados.filter(x => x.NOME.toUpperCase().includes(search.toUpperCase()))
+            this.dataSource.data = filteredColaboradores;
+            this.totalCount = filteredColaboradores.length;
+            colaboradoresFiltrados = filteredColaboradores.slice(skip, skip + take);
+        }
+        else {
+            this.dataSource.data = colaboradoresFiltrados;
+            this.totalCount = colaboradoresFiltrados.length;
+            colaboradoresFiltrados = colaboradoresFiltrados.slice(skip, skip + take);
+        }
     }
 
     colaboradorIsChecked(item: ColaboradorProtheusModel): boolean {
@@ -240,7 +238,7 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
 
     checkAll(event: any) {
         if (event.checked == true) {
-            this.checkedColaboradores = this.dataSource.data.map(colaborador => ({ ...colaborador }));;
+            this.checkedColaboradores = this._data._listColaboradores.map(colaborador => ({ ...colaborador }));;
         } else {
             this.checkedColaboradores = [];
         }
@@ -310,7 +308,7 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
     onPageChange(event: PageEvent) {
         this.page = event.pageIndex + 1;
         this.pageSize = event.pageSize;
-         this.filtrarColaboradores();
+        this.filtrarColaboradores();
     }
     //#endregion
 }

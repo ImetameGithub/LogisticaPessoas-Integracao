@@ -42,14 +42,23 @@
                 formControlName="ListAtividade" placeholder="Selecione as atividades" label="Atividades Específicas"
                 class="col-span-6">
             </custom-search-select>
+            
+            <mat-form-field class="col-span-6" appearance="outline">
+                <!-- <mat-label>Pedido</mat-label> -->
+                <input matInput [formControl]="searchInput" placeholder="Nome do Colaborador" />
+            </mat-form-field>
         </Form>
+
+        <mat-paginator [length]="totalCount" [pageIndex]="page - 1" [pageSize]="pageSize"
+            [pageSizeOptions]="[3,5,10,20,50]" (page)="onPageChange($event)">
+        </mat-paginator>
         <div class="border border-solid border-2 overflow-y-auto">
             <mat-table mat-table #table [dataSource]="dataSource">
                 <ng-container matColumnDef="check">
-                    <mat-header-cell *matHeaderCellDef>
+                    <mat-header-cell *matHeaderCellDef class="small-width">
                         <mat-checkbox (change)="checkAll($event)"></mat-checkbox>
                     </mat-header-cell>
-                    <mat-cell *matCellDef="let row">
+                    <mat-cell *matCellDef="let row" class="small-width">
                         <mat-checkbox (change)="checkChange(row)" [checked]="colaboradorIsChecked(row)"></mat-checkbox>
                     </mat-cell>
                 </ng-container>
