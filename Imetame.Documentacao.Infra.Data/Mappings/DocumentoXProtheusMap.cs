@@ -26,8 +26,8 @@ namespace Imetame.Documentacao.Infra.Data.Mappings
 						.IsRequired();
 
 			builder.HasOne(x => x.Documento)
-						.WithMany()
-						.HasForeignKey(x => x.IdDocumento)
+						.WithMany(x=>x.DocumentoXProtheus)
+						.HasForeignKey(x => x.DocumentoId)
 						.OnDelete(DeleteBehavior.Cascade);
 		}
 	}

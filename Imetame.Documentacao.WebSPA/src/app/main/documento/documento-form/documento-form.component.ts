@@ -112,18 +112,18 @@ export class DocumentoFormComponent implements OnInit {
         );
 
         this._Documentoservice._selectDocumento$.subscribe(
-            (data: any) => {
+            (data: Documento) => {
                 if (data != null) {
                     this.selectDocumento = data;
                     this.isObrigatorio = data.Obrigatorio;
                     this.form = this._formBuilder.group({
                         Descricao: [data?.Descricao, [Validators.required]],
                         IdDestra: [data?.IdDestra, [Validators.required]],
-                        IdProtheus: [data?.IdProtheus, [Validators.required]],
+                        IdProtheus: [data?.DocumentoXProtheus.map(x => x.IdProtheus), [Validators.required]],
                     });
-                    this.titleService.setTitle(
-                        data.Credenciadora + " - Documento - Imetame"
-                    );
+                    // this.titleService.setTitle(
+                    //     data.Credenciadora + " - Documento - Imetame"
+                    // );
                 }
             },
             (error) => {

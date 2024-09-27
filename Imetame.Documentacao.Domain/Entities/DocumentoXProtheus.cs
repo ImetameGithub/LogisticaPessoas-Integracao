@@ -15,7 +15,7 @@ namespace Imetame.Documentacao.Domain.Entities
 
 
 		[ForeignKey("Documento")]
-		public Guid IdDocumento{ get; set; }
+		public Guid DocumentoId { get; set; }
 		public virtual Documento? Documento { get; set; } = null;
 	}
 }

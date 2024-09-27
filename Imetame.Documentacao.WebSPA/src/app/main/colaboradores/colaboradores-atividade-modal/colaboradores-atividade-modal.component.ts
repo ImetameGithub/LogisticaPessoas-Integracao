@@ -223,11 +223,6 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
 
         // Filtra a lista de colaboradores de acordo com os valores do formulário
         this.dataSource.data = colaboradoresFiltrados;
-
-        // this._snackbar.open("Filtro aplicado com sucesso", 'X', {
-        //     duration: 2500,
-        //     panelClass: 'snackbar-success',
-        // })
     }
 
     colaboradorIsChecked(item: ColaboradorProtheusModel): boolean {

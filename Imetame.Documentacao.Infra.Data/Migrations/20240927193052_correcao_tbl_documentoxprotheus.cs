@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Imetame.Documentacao.Infra.Data.Migrations
 {
-    public partial class correcaodocumento : Migration
+    public partial class correcao_tbl_documentoxprotheus : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -14,20 +14,20 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
                 table: "DocumentoxColaborador",
                 type: "datetime2",
                 nullable: false,
-                defaultValue: new DateTime(2024, 9, 26, 17, 11, 32, 880, DateTimeKind.Local).AddTicks(9892),
+                defaultValue: new DateTime(2024, 9, 27, 16, 30, 52, 507, DateTimeKind.Local).AddTicks(5383),
                 oldClrType: typeof(DateTime),
                 oldType: "datetime2",
-                oldDefaultValue: new DateTime(2024, 9, 26, 16, 21, 59, 195, DateTimeKind.Local).AddTicks(3753));
+                oldDefaultValue: new DateTime(2024, 9, 27, 10, 29, 45, 169, DateTimeKind.Local).AddTicks(5041));
 
             migrationBuilder.AlterColumn<DateTime>(
                 name: "CXP_DTINCLUSAO",
                 table: "ColaboradorxPedido",
                 type: "datetime2",
                 nullable: false,
-                defaultValue: new DateTime(2024, 9, 26, 17, 11, 32, 882, DateTimeKind.Local).AddTicks(3881),
+                defaultValue: new DateTime(2024, 9, 27, 16, 30, 52, 508, DateTimeKind.Local).AddTicks(1681),
                 oldClrType: typeof(DateTime),
                 oldType: "datetime2",
-                oldDefaultValue: new DateTime(2024, 9, 26, 16, 21, 59, 196, DateTimeKind.Local).AddTicks(2050));
+                oldDefaultValue: new DateTime(2024, 9, 27, 10, 29, 45, 171, DateTimeKind.Local).AddTicks(3593));
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -37,20 +37,20 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
                 table: "DocumentoxColaborador",
                 type: "datetime2",
                 nullable: false,
-                defaultValue: new DateTime(2024, 9, 26, 16, 21, 59, 195, DateTimeKind.Local).AddTicks(3753),
+                defaultValue: new DateTime(2024, 9, 27, 10, 29, 45, 169, DateTimeKind.Local).AddTicks(5041),
                 oldClrType: typeof(DateTime),
                 oldType: "datetime2",
-                oldDefaultValue: new DateTime(2024, 9, 26, 17, 11, 32, 880, DateTimeKind.Local).AddTicks(9892));
+                oldDefaultValue: new DateTime(2024, 9, 27, 16, 30, 52, 507, DateTimeKind.Local).AddTicks(5383));
 
             migrationBuilder.AlterColumn<DateTime>(
                 name: "CXP_DTINCLUSAO",
                 table: "ColaboradorxPedido",
                 type: "datetime2",
                 nullable: false,
-                defaultValue: new DateTime(2024, 9, 26, 16, 21, 59, 196, DateTimeKind.Local).AddTicks(2050),
+                defaultValue: new DateTime(2024, 9, 27, 10, 29, 45, 171, DateTimeKind.Local).AddTicks(3593),
                 oldClrType: typeof(DateTime),
                 oldType: "datetime2",
-                oldDefaultValue: new DateTime(2024, 9, 26, 17, 11, 32, 882, DateTimeKind.Local).AddTicks(3881));
+                oldDefaultValue: new DateTime(2024, 9, 27, 16, 30, 52, 508, DateTimeKind.Local).AddTicks(1681));
         }
     }
 }

@@ -572,7 +572,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 							item.SincronizadoDestra = true;
 						}
 
-						bool relacionadoDestra = await _repDocumento.SelectContext().AsNoTracking().Where(m => m.IdProtheus == item.Codigo).AnyAsync();
+						bool relacionadoDestra = await _repDocumento.SelectContext().AsNoTracking().Include(x => x.DocumentoXProtheus).Where(m => m.DocumentoXProtheus!.Select(x => x.IdProtheus).Contains(item.Codigo)).AnyAsync();
 
 						if (relacionadoDestra)
 						{
@@ -661,7 +661,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 						Base64 = $"data:image/png;base64,{Convert.ToBase64String(item)}"
 					};
 				}
-				
+
 				return Ok(objeto);
 			}
 			catch (Exception ex)
@@ -1013,7 +1013,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 			List<Task> tarefas = new List<Task>();
 			foreach (var doc in docsColaborador)
 			{
-				bool docRelacao = _repDocumento.SelectContext().AsNoTracking().Any(m => m.IdProtheus == doc.Codigo);
+				bool docRelacao = _repDocumento.SelectContext().Include(x => x.DocumentoXProtheus).AsNoTracking().Any(m => m.DocumentoXProtheus.Select(x => x.IdProtheus).Contains(doc.Codigo));
 				if (!docRelacao)
 				{
 					docsSemRelacao.Add(doc.DescArquivo);
@@ -1074,7 +1074,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 					throw new Exception("Falha ao Salvar Dados.\n" + erro);
 				}
 
-				Documento? docRelacao = await _repDocumento.SelectContext().AsNoTracking().Where(m => m.IdProtheus == documento.Codigo).FirstOrDefaultAsync();
+				Documento? docRelacao = await _repDocumento.SelectContext().Include(x => x.DocumentoXProtheus).AsNoTracking().Where(m => m.DocumentoXProtheus!.Select(x => x.IdProtheus).Contains(documento.Codigo)).FirstOrDefaultAsync();
 
 				if (docRelacao is null)
 					throw new Exception("O documento " + documento.DescArquivo + " não possue nenhuma relação com os documentos da Destra");
@@ -1265,7 +1265,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
 				foreach (var docDestra in todosOsDocsDestra)
 				{
-					Documento docRelacao = await _repDocumento.SelectContext()		
+					Documento docRelacao = await _repDocumento.SelectContext()
 						.Where(m => m.IdDestra == docDestra.codigo.ToString()) // Ajustado para usar IdDestra
 						.FirstOrDefaultAsync();
 
@@ -1296,45 +1296,47 @@ namespace Imetame.Documentacao.WebApi.Controllers
 					foreach (var docProtheus in docRelacao.DocumentoXProtheus!)
 					{
 						bool possuiDocumento = lista.Any(d => docRelacao.DocumentoXProtheus.Select(x => x.IdProtheus).Contains(d.Codigo));
-
-						StatusDocumentoObrigatoriosDTO.Add(
-						new StatusDocumentoObrigatoriosModel
+						if (possuiDocumento)
 						{
-							DocDestra = docRelacao.DescricaoDestra,
-							DocProtheus = docRelacao.DescricaoProtheus,
-							Status = "Pendente"
+							StatusDocumentoObrigatoriosDTO.Add(
+							new StatusDocumentoObrigatoriosModel
+							{
+								DocDestra = docRelacao.DescricaoDestra,
+								DocProtheus = docProtheus.DescricaoProtheus,
+								Status = "Pendente"
+							}
+						  );
 						}
-					  );
-					}
-					else
-					{
-						StatusDocumentoObrigatoriosDTO.Add(
-						  new StatusDocumentoObrigatoriosModel
-						  {
-							  DocDestra = docRelacao.DescricaoDestra,
-							  DocProtheus = docRelacao.DescricaoProtheus,
-							  Status = "Ok"
-						  });
+						else
+						{
+							StatusDocumentoObrigatoriosDTO.Add(
+							  new StatusDocumentoObrigatoriosModel
+							  {
+								  DocDestra = docRelacao.DescricaoDestra,
+								  DocProtheus = docProtheus.DescricaoProtheus,
+								  Status = "Ok"
+							  });
+
+						}
 
 					}
-
-				}
-				// ADICIONAR DOCUMENTOS MARCADOS COMO OBRIGATOÓRIO E RELACIONADOS A LISTA ENVIADA
-				IList<Documento> listDocumentos = await _repDocumento.SelectContext()
-								   .AsNoTracking()
-								   .Where(x => lista.Select(y => y.DescArquivo).Contains(x.Descricao) && x.Obrigatorio == true)
-								   .ToListAsync();
-				foreach (var doc in listDocumentos)
-				{
-					foreach (var docProtheus in doc.DocumentoXProtheus!)
+					// ADICIONAR DOCUMENTOS MARCADOS COMO OBRIGATOÓRIO E RELACIONADOS A LISTA ENVIADA
+					IList<Documento> listDocumentos = await _repDocumento.SelectContext()
+									   .AsNoTracking()
+									   .Where(x => lista.Select(y => y.DescArquivo).Contains(x.Descricao) && x.Obrigatorio == true)
+									   .ToListAsync();
+					foreach (var doc in listDocumentos)
 					{
-						StatusDocumentoObrigatoriosDTO.Add(
-						  new StatusDocumentoObrigatoriosModel
-						  {
-							  DocDestra = doc.DescricaoDestra,
-							  DocProtheus = docProtheus.DescricaoProtheus,
-							  Status = "Ok"
-						  });
+						foreach (var docProtheus in doc.DocumentoXProtheus!)
+						{
+							StatusDocumentoObrigatoriosDTO.Add(
+							  new StatusDocumentoObrigatoriosModel
+							  {
+								  DocDestra = doc.DescricaoDestra,
+								  DocProtheus = docProtheus.DescricaoProtheus,
+								  Status = "Ok"
+							  });
+						}
 					}
 				}
 				return Ok(StatusDocumentoObrigatoriosDTO);

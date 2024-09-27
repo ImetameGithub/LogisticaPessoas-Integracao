@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Win32;
 using OpenIddict.Validation.AspNetCore;
 using System.Text;
 using System.Text.Json;
@@ -52,6 +53,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
 				IQueryable<Documento> query = _repDocumento.SelectContext()
 															 .AsNoTracking()
+															 .Include(x => x.DocumentoXProtheus)
 															 .OrderBy(x => x.Descricao);
 				if (!string.IsNullOrEmpty(texto))
 					query = query.Where(q => q.Descricao.Contains(texto));
@@ -84,7 +86,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
 				throw new Exception("Parametros necessarios nao informados");
 
 			List<Documento> listaPedido = await _repDocumento.SelectContext()
+															.AsNoTracking()
+															.Include(x => x.DocumentoXProtheus)
 															.ToListAsync();
+
 			return Ok(listaPedido);
 		}
 
@@ -97,6 +102,13 @@ namespace Imetame.Documentacao.WebApi.Controllers
 			Documento Documento = await _repDocumento.SelectContext()
 															.Where(e => e.Id.Equals(id))
 															.FirstAsync();
+
+
+			// TODO - CONFIGURAR INCLUDE FUTURAMENTE DEVIDO PRAZO MAL PROGRAMADO
+			if (Documento != null)
+			{
+				Documento.DocumentoXProtheus = await _repDocumentoProtheus.SelectByCondition(x => x.DocumentoId == Documento.Id).ToListAsync();
+			}
 			return Ok(Documento);
 		}
 		#endregion

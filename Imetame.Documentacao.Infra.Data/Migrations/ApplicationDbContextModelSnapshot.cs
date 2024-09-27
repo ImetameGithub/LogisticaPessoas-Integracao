@@ -159,7 +159,7 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
                     b.Property<DateTime>("CXP_DTINCLUSAO")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 8, 27, 13, 23, 46, 653, DateTimeKind.Local).AddTicks(8032));
+                        .HasDefaultValue(new DateTime(2024, 9, 27, 16, 30, 52, 508, DateTimeKind.Local).AddTicks(1681));
 
                     b.Property<Guid?>("CXP_IDCOLABORADOR")
                         .HasColumnType("uniqueidentifier");
@@ -242,17 +242,7 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
-                    b.Property<string>("DescricaoProtheus")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
-
                     b.Property<string>("IdDestra")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("IdProtheus")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
@@ -296,7 +286,7 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
                     b.Property<DateTime>("DXC_DTENVIO")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 8, 27, 13, 23, 46, 652, DateTimeKind.Local).AddTicks(6775));
+                        .HasDefaultValue(new DateTime(2024, 9, 27, 16, 30, 52, 507, DateTimeKind.Local).AddTicks(5383));
 
                     b.Property<Guid>("DXC_IDCOLABORADOR")
                         .HasColumnType("uniqueidentifier");
@@ -306,6 +296,32 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
                     b.HasIndex("DXC_IDCOLABORADOR");
 
                     b.ToTable("DocumentoxColaborador", (string)null);
+                });
+
+            modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.DocumentoXProtheus", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DescricaoProtheus")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<Guid>("DocumentoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("IdProtheus")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentoId");
+
+                    b.ToTable("DocumentoXProtheus", (string)null);
                 });
 
             modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.LogProcessamento", b =>
@@ -477,6 +493,17 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
                     b.Navigation("Colaborador");
                 });
 
+            modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.DocumentoXProtheus", b =>
+                {
+                    b.HasOne("Imetame.Documentacao.Domain.Entities.Documento", "Documento")
+                        .WithMany("DocumentoXProtheus")
+                        .HasForeignKey("DocumentoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Documento");
+                });
+
             modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.LogProcessamento", b =>
                 {
                     b.HasOne("Imetame.Documentacao.Domain.Entities.Processamento", "Processamento")
@@ -533,6 +560,11 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
             modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.Credenciadora", b =>
                 {
                     b.Navigation("Pedidos");
+                });
+
+            modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.Documento", b =>
+                {
+                    b.Navigation("DocumentoXProtheus");
                 });
 
             modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.Pedido", b =>
