@@ -33,6 +33,7 @@ import {
   import { FuseConfirmationService } from "@fuse/services/confirmation";
   import { PaginatedResponse } from "app/models/PaginatedResponse";
   import { DocumentoFormComponent } from "../documento-form/documento-form.component";
+import { DocumentoxColaborador } from "app/models/DocumentoxColaborador";
   
   @Component({
     selector: "documento-list",
@@ -143,7 +144,7 @@ import {
           this.totalCount = response.TotalCount;
           this.page = response.Page;
           this.pageSize = response.PageSize;
-          this.dataSource.data = response.Data;
+          this.dataSource.data = response.Data.map(x=>new Documento(x));
           this.reassignPaginatorAndSort();
         }
       );

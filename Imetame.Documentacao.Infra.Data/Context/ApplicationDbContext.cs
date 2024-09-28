@@ -27,6 +27,7 @@ namespace Imetame.Documentacao.Infra.Data.Context
         public DbSet<Domain.Entities.ColaboradorxAtividade> ColaboradorxAtividade { get; set; }
         public DbSet<Domain.Entities.DocumentoxColaborador> DocumentoxColaborador { get; set; }
         public DbSet<Domain.Entities.ColaboradorxPedido> ColaboradorxPedido { get; set; }
+		public DbSet<Domain.Entities.DocumentoXProtheus> DocumentoXProtheus { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -55,7 +56,6 @@ namespace Imetame.Documentacao.Infra.Data.Context
 
             base.OnModelCreating(modelBuilder);
 
-
             // MATHEUS FARTEC SISTEMAS - CONFIGURAÇÃO PARA OS MAP SEREM USADOS
             modelBuilder.Entity<Domain.Entities.ResultadoCadastro>(new ResultadoCadastroMap().Configure);
             modelBuilder.Entity<Domain.Entities.Credenciadora>(new CredenciadoraMap().Configure);
@@ -69,6 +69,7 @@ namespace Imetame.Documentacao.Infra.Data.Context
             modelBuilder.Entity<Domain.Entities.ColaboradorxAtividade>(new ColaboradorxAtividadeMap().Configure);
             modelBuilder.Entity<Domain.Entities.DocumentoxColaborador>(new DocumentoxColaboradorMap().Configure);
             modelBuilder.Entity<Domain.Entities.ColaboradorxPedido>(new ColaboradorxPedidoMap().Configure);
+			modelBuilder.Entity<Domain.Entities.DocumentoXProtheus>(new DocumentoXProtheusMap().Configure);
 
 
 

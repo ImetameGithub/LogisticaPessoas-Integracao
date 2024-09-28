@@ -8,7 +8,6 @@ import { SharedModule } from 'app/shared/shared.module';
 import { CredenciadoraComponent } from './credenciadora/credenciadora.component';
 import { ColaboradoresComponent } from './colaboradores/colaboradores.component';
 import { ShowLogDialogComponent } from './show-log-dialog/show-log-dialog.component';
-import { LogComponent } from './logs/logs.component';
 import { FinalizadosComponent } from './finalizados/finalizados.component';
 import { PedidoService } from '../pedido/pedido.service';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,6 +19,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { CustomSearchSelectComponent } from 'app/shared/components/custom-select/custom-select.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { LogComponent } from './logs/logs.component';
 
 
 

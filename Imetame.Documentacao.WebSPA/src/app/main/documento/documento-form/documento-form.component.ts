@@ -38,6 +38,8 @@ import { Documento } from "app/models/Documento";
 import { DocumentosDestra } from "app/models/DocumentosDestra";
 import { CustomOptionsSelect } from 'app/shared/components/custom-select/components.types';
 import { DocumentosProtheus } from "app/models/DocumentosProtheus";
+import { DocumentoXProtheus } from "app/models/DocumentoXProtheus";
+import { X } from "@angular/cdk/keycodes";
 
 
 @Component({
@@ -78,7 +80,7 @@ export class DocumentoFormComponent implements OnInit {
     ) {
         this.form = new FormGroup({
             IdDestra: new FormControl('', [Validators.required]),
-            IdProtheus: new FormControl('', [Validators.required]),
+            IdProtheus: new FormControl([], [Validators.required]),
             Descricao: new FormControl('', [Validators.required]),
         });
         this.titleService.setTitle("Novo - Documento - Imetame");
@@ -110,18 +112,18 @@ export class DocumentoFormComponent implements OnInit {
         );
 
         this._Documentoservice._selectDocumento$.subscribe(
-            (data: any) => {
+            (data: Documento) => {
                 if (data != null) {
                     this.selectDocumento = data;
                     this.isObrigatorio = data.Obrigatorio;
                     this.form = this._formBuilder.group({
                         Descricao: [data?.Descricao, [Validators.required]],
                         IdDestra: [data?.IdDestra, [Validators.required]],
-                        IdProtheus: [data?.IdProtheus, [Validators.required]],
+                        IdProtheus: [data?.DocumentoXProtheus.map(x => x.IdProtheus), [Validators.required]],
                     });
-                    this.titleService.setTitle(
-                        data.Credenciadora + " - Documento - Imetame"
-                    );
+                    // this.titleService.setTitle(
+                    //     data.Credenciadora + " - Documento - Imetame"
+                    // );
                 }
             },
             (error) => {
@@ -160,9 +162,16 @@ export class DocumentoFormComponent implements OnInit {
     }
 
     add(model: Documento) {
+        const codsProtheus = this.form.get("IdProtheus").value;
+        model.DescricaoDestra = this.documentosdestra.find(m => m.value == model.IdDestra).display;
+        model.DocumentoXProtheus = [];
+        codsProtheus.forEach(codProtheus => {
+            let documentoXProtheus: DocumentoXProtheus = new DocumentoXProtheus();
+            documentoXProtheus.IdProtheus = this.documentosprotheus.find(m => m.value == codProtheus).value.toString();
+            documentoXProtheus.DescricaoProtheus = this.documentosprotheus.find(m => m.value == codProtheus).display;
+            model.DocumentoXProtheus.push(documentoXProtheus);
+        });
 
-        model.DescricaoDestra = this.documentosdestra.find(m => m.value == model.IdDestra).display
-        model.DescricaoProtheus = this.documentosprotheus.find(m => m.value == model.IdProtheus).display
         model.Obrigatorio = this.isObrigatorio;
         this._fuseProgressBarService.setMode("indeterminate");
         this._fuseProgressBarService.show();
@@ -191,8 +200,16 @@ export class DocumentoFormComponent implements OnInit {
     }
 
     update(model: Documento) {
-        model.DescricaoDestra = this.documentosdestra.find(m => m.value == model.IdDestra).display
-        model.DescricaoProtheus = this.documentosprotheus.find(m => m.value == model.IdProtheus).display
+        const codsProtheus = this.form.get("IdProtheus").value;
+        model.DescricaoDestra = this.documentosdestra.find(m => m.value == model.IdDestra).display;
+        model.DocumentoXProtheus = [];
+        codsProtheus.forEach(codProtheus => {
+            let documentoXProtheus: DocumentoXProtheus = new DocumentoXProtheus();
+            documentoXProtheus.Id = model.Id;
+            documentoXProtheus.IdProtheus = this.documentosprotheus.find(m => m.value == codProtheus).value.toString();
+            documentoXProtheus.DescricaoProtheus = this.documentosprotheus.find(m => m.value == codProtheus).display;
+            model.DocumentoXProtheus.push(documentoXProtheus);
+        });
         model.Obrigatorio = this.isObrigatorio;
         this._fuseProgressBarService.setMode("indeterminate");
         this._fuseProgressBarService.show();

@@ -7,7 +7,6 @@ import * as _ from 'lodash';
 import { API_URL, EXTRANET_API_URL } from 'app/config/tokens';
 import { map, tap } from 'rxjs/operators';
 import { Finalizado } from './finalizados/finalizados.component';
-import { Log } from './logs/logs.component';
 import { environment } from 'environments/environment';
 import { Pedido } from 'app/models/Pedido';
 import { HttpClient, HttpEvent, HttpHeaders, HttpParams } from '@angular/common/http';
@@ -15,6 +14,7 @@ import { ColaboradorModel } from 'app/models/DTO/ColaboradorModel';
 import { DocumentoxColaboradorModel, ImagemProtheus } from 'app/models/DTO/DocumentoxColaboradorModel';
 import { PaginatedResponse } from 'app/models/PaginatedResponse';
 import { OAuthService } from 'angular-oauth2-oidc';
+import { Log } from './logs/logs.component';
 
 
 

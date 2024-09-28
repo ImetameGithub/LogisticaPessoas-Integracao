@@ -36,6 +36,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 		private readonly IBaseRepository<Domain.Entities.Processamento> _repProcessamento;
 		private readonly IBaseRepository<Domain.Entities.DocumentoxColaborador> _repDocxColaborador;
 		private readonly IBaseRepository<Domain.Entities.Documento> _repDocumento;
+		private readonly IBaseRepository<Domain.Entities.DocumentoXProtheus> _repDocumentoProtheus;
 		private readonly IBaseRepository<Domain.Entities.Colaborador> _repColaborador;
 		private readonly IBaseRepository<ColaboradorxAtividade> _repColaboradorxAtividade;
 		private readonly IBaseRepository<ColaboradorxPedido> _repColaboradorxPedido;
@@ -48,7 +49,8 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
 		public ColaboradoresController(IColaboradorRepository repository, IBaseRepository<Domain.Entities.Processamento> repProcessamento,
 			IConfiguration configuration, IBaseRepository<Domain.Entities.Colaborador> repColaborador,
-			IBaseRepository<ColaboradorxAtividade> repColaboradorxAtividade, DestraController destraController, IBaseRepository<Documento> repDocumento,
+			IBaseRepository<ColaboradorxAtividade> repColaboradorxAtividade, DestraController destraController, IBaseRepository<Documento> repDocumento, IBaseRepository<DocumentoXProtheus> repDocumentoProtheus,
+
 			IBaseRepository<DocumentoxColaborador> repDocxColaborador, IBaseRepository<ColaboradorxPedido> repColaboradorxPedido, IBaseRepository<Pedido> repPedido)
 		{
 			_repository = repository;
@@ -570,7 +572,11 @@ namespace Imetame.Documentacao.WebApi.Controllers
 							item.SincronizadoDestra = true;
 						}
 
-						bool relacionadoDestra = await _repDocumento.SelectContext().AsNoTracking().Where(m => m.IdProtheus == item.Codigo).AnyAsync();
+						bool relacionadoDestra = await _repDocumento.SelectContext()
+																	.AsNoTracking()
+																	.Include(x => x.DocumentoXProtheus)
+																	.Where(m => m.DocumentoXProtheus!.Select(x => x.IdProtheus).Contains(item.Codigo))
+																	.AnyAsync();
 
 						if (relacionadoDestra)
 						{
@@ -659,7 +665,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 						Base64 = $"data:image/png;base64,{Convert.ToBase64String(item)}"
 					};
 				}
-				
+
 				return Ok(objeto);
 			}
 			catch (Exception ex)
@@ -857,94 +863,6 @@ namespace Imetame.Documentacao.WebApi.Controllers
 			}
 		}
 
-		//[HttpPost]
-		//public async Task<IActionResult> EnviarDocsArrayDestra([FromBody] List<ColaboradorModel> listColaboradores)
-		//{
-		//    try
-		//    {
-		//        StringBuilder erro = new StringBuilder();
-		//        if (!ModelState.IsValid)
-		//        {
-		//            erro = ErrorHelper.GetErroModelState(ModelState.Values);
-		//            throw new Exception("Falha ao Salvar Dados.\n" + erro);
-		//        }
-
-		//        var matriculas = listColaboradores.Select(c => c.NumCad).Distinct().ToList();
-		//        var itensCadastrados = await _repColaborador.SelectContext()
-		//                                                    .AsNoTracking()
-		//                                                    .Where(c => matriculas.Contains(c.Matricula))
-		//                                                    .ToListAsync();
-
-		//        var colaboradoresSemAtividade = listColaboradores.Where(ei => !itensCadastrados.Any(m => m.Matricula == ei.NumCad)).ToList();
-		//        if (colaboradoresSemAtividade.Any())
-		//        {
-		//            var nomesColaboradores = string.Join(", ", colaboradoresSemAtividade.Select(c => c.Nome));
-		//            var plural = colaboradoresSemAtividade.Count > 1 ? "s" : "";
-		//            throw new Exception($"O colaborador{plural} {nomesColaboradores} não está{plural} relacionado a nenhuma atividade específica.");
-		//        }
-
-		//        List<string> colaboradoresComDocsVencidos = new List<string>();
-		//        List<string> docsSemRelacao = new List<string>();
-		//        DateTime dataAtual = DateTime.Now;
-
-
-		//        foreach (ColaboradorModel item in listColaboradores)
-		//        {
-		//            List<DocumentoxColaboradorModel> docsColaborador = await ConsultaDocsProtheus("0" + item.NumCad);
-
-		//            var validDocs = docsColaborador
-		//                .Where(m => !string.IsNullOrWhiteSpace(m.DtVencimento))
-		//                .ToList();
-
-		//            validDocs.ForEach(doc => doc.DtVencimentoFormatada = DateTime.ParseExact(doc.DtVencimento, "yyyyMMdd", CultureInfo.InvariantCulture));
-
-
-		//            List<DocumentoxColaboradorModel> docsVencidos = validDocs
-		//                .Where(m => m.DtVencimentoFormatada <= dataAtual.AddDays(10) && m.DtVencimentoFormatada > dataAtual || m.DtVencimentoFormatada <= dataAtual)
-		//                .ToList();
-
-		//            docsColaborador = docsColaborador.Except(docsVencidos).ToList();
-
-		//            foreach (var doc in docsColaborador)
-		//            {
-
-		//                bool docRelacao = await _repDocumento.SelectContext().AsNoTracking().Where(m => m.IdProtheus == doc.Codigo).AnyAsync();
-
-		//                if (docRelacao)
-		//                {
-		//                    docsSemRelacao.Add(doc.DescArquivo);
-		//                }
-
-		//                await EnviarDocumentoParaDestra(doc);
-		//            }
-
-		//            if (docsVencidos.Count > 0)
-		//            {
-		//                colaboradoresComDocsVencidos.Add(item.Nome);
-		//            }
-		//        }
-
-		//        if (docsSemRelacao.Count > 0)
-		//        {
-		//            string docsSemRelacaoStr = string.Join(", ", docsSemRelacao);
-		//            throw new Exception("Os seguintes documentos não possuem nenhuma relação com os documentos da Destra: " + docsSemRelacaoStr);
-		//        }
-
-		//        if (colaboradoresComDocsVencidos.Count > 0)
-		//        {
-		//            string colaboradoresComDocsVencidosStr = string.Join(", ", colaboradoresComDocsVencidos);
-		//            throw new Exception("Os seguintes colaboradores estão com documentos vencidos ou a vencer: " + colaboradoresComDocsVencidosStr);
-		//        }
-
-
-		//        return Ok();
-		//    }
-		//    catch (Exception ex)
-		//    {
-		//        return BadRequest(ErrorHelper.GetException(ex));
-		//    }
-		//}
-
 		[HttpPost]
 		public async Task<IActionResult> EnviarDocsArrayDestra([FromBody] List<ColaboradorModel> listColaboradores)
 		{
@@ -956,7 +874,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
 					return BadRequest("Falha ao Salvar Dados.\n" + erro);
 				}
 
-				var matriculas = listColaboradores.Select(c => c.NumCad).Distinct().ToList();
+				var matriculas = listColaboradores.Select(c => c.NumCad)
+												  .Distinct()
+												  .ToList();
+
 				var itensCadastrados = await _repColaborador.SelectContext()
 															.AsNoTracking()
 															.Where(c => matriculas.Contains(c.Matricula))
@@ -1011,7 +932,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 			List<Task> tarefas = new List<Task>();
 			foreach (var doc in docsColaborador)
 			{
-				bool docRelacao = _repDocumento.SelectContext().AsNoTracking().Any(m => m.IdProtheus == doc.Codigo);
+				bool docRelacao = _repDocumento.SelectContext().Include(x => x.DocumentoXProtheus).AsNoTracking().Any(m => m.DocumentoXProtheus.Select(x => x.IdProtheus).Contains(doc.Codigo));
 				if (!docRelacao)
 				{
 					docsSemRelacao.Add(doc.DescArquivo);
@@ -1026,40 +947,6 @@ namespace Imetame.Documentacao.WebApi.Controllers
 			}
 		}
 
-
-		//[HttpPost]
-		//public async Task<IActionResult> TESTE()
-		//{
-		//    try
-		//    {
-		//        StringBuilder erro = new StringBuilder();
-		//        if (!ModelState.IsValid)
-		//        {
-		//            erro = ErrorHelper.GetErroModelState(ModelState.Values);
-		//            throw new Exception("Falha ao Salvar Dados.\n" + erro);
-		//        }
-
-
-		//        Equipe equipe = new Equipe()
-		//        {
-		//            cnpj = "31790710001834",
-		//            numeroOS = "001701001",
-		//            cpf = "12461100756",
-		//            atividadeespecifica = new List<int> { 34, 36 }
-		//        };
-
-		//        var jsonResponseEquipe = await _destraController.AddColaboradorPedido(equipe) as OkObjectResult;
-
-
-		//        return Ok();
-		//    }
-		//    catch (Exception ex)
-		//    {
-		//        return BadRequest(ErrorHelper.GetException(ex));
-		//    }
-		//}
-
-
 		[HttpPost]
 		public async Task<IActionResult> EnviarDocumentoParaDestra([FromBody] DocumentoxColaboradorModel documento)
 		{
@@ -1072,7 +959,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 					throw new Exception("Falha ao Salvar Dados.\n" + erro);
 				}
 
-				Documento? docRelacao = await _repDocumento.SelectContext().AsNoTracking().Where(m => m.IdProtheus == documento.Codigo).FirstOrDefaultAsync();
+				Documento? docRelacao = await _repDocumento.SelectContext().Include(x => x.DocumentoXProtheus).AsNoTracking().Where(m => m.DocumentoXProtheus!.Select(x => x.IdProtheus).Contains(documento.Codigo)).FirstOrDefaultAsync();
 
 				if (docRelacao is null)
 					throw new Exception("O documento " + documento.DescArquivo + " não possue nenhuma relação com os documentos da Destra");
@@ -1290,48 +1177,52 @@ namespace Imetame.Documentacao.WebApi.Controllers
 				// Verifica se o colaborador possui todos os documentos obrigatórios
 				foreach (var docRelacao in relacaoDestraProtheus)
 				{
-					bool possuiDocumento = lista.Any(d => d.Codigo == docRelacao.IdProtheus);
-
-					if (!possuiDocumento)
+					// TODO NECESSARIO VALIDAR
+					foreach (var docProtheus in docRelacao.DocumentoXProtheus!)
 					{
-						//StatusDocumentoObrigatoriosDTO.Add("O colaborador não possui o documento " + docRelacao.DescricaoDestra + " na sua lista de documentos do Protheus");
-
-						StatusDocumentoObrigatoriosDTO.Add(
-						new StatusDocumentoObrigatoriosModel
+						bool possuiDocumento = lista.Any(d => docRelacao.DocumentoXProtheus.Select(x => x.IdProtheus).Contains(d.Codigo));
+						if (possuiDocumento)
 						{
-							DocDestra = docRelacao.DescricaoDestra,
-							DocProtheus = docRelacao.DescricaoProtheus,
-							Status = "Pendente"
+							StatusDocumentoObrigatoriosDTO.Add(
+							new StatusDocumentoObrigatoriosModel
+							{
+								DocDestra = docRelacao.DescricaoDestra,
+								DocProtheus = docProtheus.DescricaoProtheus,
+								Status = "Pendente"
+							}
+						  );
 						}
-					  );
+						else
+						{
+							StatusDocumentoObrigatoriosDTO.Add(
+							  new StatusDocumentoObrigatoriosModel
+							  {
+								  DocDestra = docRelacao.DescricaoDestra,
+								  DocProtheus = docProtheus.DescricaoProtheus,
+								  Status = "Ok"
+							  });
+
+						}
+
 					}
-					else
+					// ADICIONAR DOCUMENTOS MARCADOS COMO OBRIGATOÓRIO E RELACIONADOS A LISTA ENVIADA
+					IList<Documento> listDocumentos = await _repDocumento.SelectContext()
+									   .AsNoTracking()
+									   .Where(x => lista.Select(y => y.DescArquivo).Contains(x.Descricao) && x.Obrigatorio == true)
+									   .ToListAsync();
+					foreach (var doc in listDocumentos)
 					{
-						StatusDocumentoObrigatoriosDTO.Add(
-						  new StatusDocumentoObrigatoriosModel
-						  {
-							  DocDestra = docRelacao.DescricaoDestra,
-							  DocProtheus = docRelacao.DescricaoProtheus,
-							  Status = "Ok"
-						  });
-
+						foreach (var docProtheus in doc.DocumentoXProtheus!)
+						{
+							StatusDocumentoObrigatoriosDTO.Add(
+							  new StatusDocumentoObrigatoriosModel
+							  {
+								  DocDestra = doc.DescricaoDestra,
+								  DocProtheus = docProtheus.DescricaoProtheus,
+								  Status = "Ok"
+							  });
+						}
 					}
-
-				}
-				// ADICIONAR DOCUMENTOS MARCADOS COMO OBRIGATOÓRIO E RELACIONADOS A LISTA ENVIADA
-				IList<Documento> listDocumentos = await _repDocumento.SelectContext()
-								   .AsNoTracking()
-								   .Where(x => lista.Select(y => y.DescArquivo).Contains(x.Descricao) && x.Obrigatorio == true)
-								   .ToListAsync();
-				foreach (var doc in listDocumentos)
-				{
-					StatusDocumentoObrigatoriosDTO.Add(
-					  new StatusDocumentoObrigatoriosModel
-					  {
-						  DocDestra = doc.DescricaoDestra,
-						  DocProtheus = doc.DescricaoProtheus,
-						  Status = "Ok"
-					  });
 				}
 				return Ok(StatusDocumentoObrigatoriosDTO);
 			}

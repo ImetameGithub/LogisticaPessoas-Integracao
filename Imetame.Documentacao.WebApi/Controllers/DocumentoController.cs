@@ -9,233 +9,274 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Win32;
 using OpenIddict.Validation.AspNetCore;
 using System.Text;
 using System.Text.Json;
 
 namespace Imetame.Documentacao.WebApi.Controllers
 {
-	[Route("api/[controller]/[action]")]
-	[ApiController]
-	[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
-	public class DocumentoController : Controller
-	{
-		private readonly IBaseRepository<Documento> _repDocumento;
-		private readonly DestraController _destraController;
-		private readonly IConfiguration _configuration;
-		protected readonly SqlConnection conn;
-		public DocumentoController
-		(
-			IBaseRepository<Documento> repDocumento,
-			DestraController destraController,
-			IConfiguration configuration
-		)
-		{
-			_repDocumento = repDocumento;
-			_destraController = destraController;
-			_configuration = configuration;
-			conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-		}
+    [Route("api/[controller]/[action]")]
+    [ApiController]
+    [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
+    public class DocumentoController : Controller
+    {
+        private readonly IBaseRepository<Documento> _repDocumento;
+        private readonly IBaseRepository<DocumentoXProtheus> _repDocumentoProtheus;
+        private readonly DestraController _destraController;
+        private readonly IConfiguration _configuration;
+        protected readonly SqlConnection conn;
+        public DocumentoController
+        (
+            IBaseRepository<Documento> repDocumento,
+            IBaseRepository<DocumentoXProtheus> repDocumentoProtheus,
+            DestraController destraController,
+            IConfiguration configuration
+        )
+        {
+            _repDocumentoProtheus = repDocumentoProtheus;
+            _repDocumento = repDocumento;
+            _destraController = destraController;
+            _configuration = configuration;
+            conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+        }
 
-		[HttpGet]
-		public async Task<IActionResult> GetAllPaginated(int page = 1, int pageSize = 10, string texto = "")
-		{
-			try
-			{
-				if (!ModelState.IsValid)
-					throw new Exception("Parametros necessarios nao informados");
+        [HttpGet]
+        public async Task<IActionResult> GetAllPaginated(int page = 1, int pageSize = 10, string texto = "")
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    throw new Exception("Parametros necessarios nao informados");
 
-				int offset = (page - 1) * pageSize;
+                int offset = (page - 1) * pageSize;
 
-				IQueryable<Documento> query = _repDocumento.SelectContext()
-															 .AsNoTracking()
-															 .OrderBy(x => x.Descricao);
-				if (!string.IsNullOrEmpty(texto))
-					query = query.Where(q => q.Descricao.Contains(texto));
+                IQueryable<Documento> query = _repDocumento.SelectContext()
+                                                             .AsNoTracking()
+                                                             .Include(x => x.DocumentoXProtheus)
+                                                             .OrderBy(x => x.Descricao);
+                if (!string.IsNullOrEmpty(texto))
+                    query = query.Where(q => q.Descricao.Contains(texto));
 
-				int totalCount = await query.CountAsync();
+                int totalCount = await query.CountAsync();
 
-				IList<Documento> registros = await query.Skip(offset)
-															 .Take(pageSize).ToListAsync();
+                IList<Documento> registros = await query.Skip(offset)
+                                                             .Take(pageSize).ToListAsync();
 
-				PaginatedResponse<Documento> paginatedResponse = new PaginatedResponse<Documento>
-				{
-					TotalCount = totalCount,
-					Page = page,
-					PageSize = pageSize,
-					Data = registros
-				};
-				return Ok(paginatedResponse);
-			}
-			catch (Exception ex)
-			{
-				return BadRequest(ErrorHelper.GetException(ex));
-			}
-		}
+                PaginatedResponse<Documento> paginatedResponse = new PaginatedResponse<Documento>
+                {
+                    TotalCount = totalCount,
+                    Page = page,
+                    PageSize = pageSize,
+                    Data = registros
+                };
+                return Ok(paginatedResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ErrorHelper.GetException(ex));
+            }
+        }
 
-		#region FUNÇÕES DE APOIO - MATHEUS MONFREIDES FARTEC SISTEMAS        
-		[HttpGet]
-		public async Task<IActionResult> GetAll()
-		{
-			if (!ModelState.IsValid)
-				throw new Exception("Parametros necessarios nao informados");
+        #region FUNï¿½ï¿½ES DE APOIO - MATHEUS MONFREIDES FARTEC SISTEMAS        
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            if (!ModelState.IsValid)
+                throw new Exception("Parametros necessarios nao informados");
 
-			List<Documento> listaPedido = await _repDocumento.SelectContext()
-															.ToListAsync();
-			return Ok(listaPedido);
-		}
+            List<Documento> listaPedido = await _repDocumento.SelectContext()
+                                                            .AsNoTracking()
+                                                            .Include(x => x.DocumentoXProtheus)
+                                                            .ToListAsync();
 
-		[HttpGet("{id}")]
-		public async Task<IActionResult> GetItem(Guid id)
-		{
-			if (!ModelState.IsValid)
-				throw new Exception("Parametros necessarios nao informados");
+            return Ok(listaPedido);
+        }
 
-			Documento Documento = await _repDocumento.SelectContext()
-															.Where(e => e.Id.Equals(id))
-															.FirstAsync();
-			return Ok(Documento);
-		}
-		#endregion
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetItem(Guid id)
+        {
+            if (!ModelState.IsValid)
+                throw new Exception("Parametros necessarios nao informados");
 
-		#region FUNÇÕES CRUD - MATHEUS MONFREIDES FARTEC SISTEMAS
-		[HttpPost]
-		public async Task<IActionResult> Add([FromBody] Documento model, CancellationToken cancellationToken)
-		{
-			try
-			{
-				StringBuilder erro = new StringBuilder();
-				if (!ModelState.IsValid)
-				{
-					erro = ErrorHelper.GetErroModelState(ModelState.Values);
-					throw new Exception("Falha ao Salvar Dados.\n" + erro);
-				}
-				model.Id = new Guid();
-
-				//Verificar se o documento Destra ou Protheus já está sendo utilizado
-				List<Documento> listDocumentosDestra = _repDocumento.SelectContext().Where(e => e.IdDestra == model.IdDestra).ToList();
-				List<Documento> listDocumentosProtheus = _repDocumento.SelectContext().Where(e => e.IdProtheus == model.IdProtheus).ToList();
-
-				if (listDocumentosDestra.Count() > 0)
-				{
-					throw new Exception("O documento DESTRA esta vinculado para outro documento PROTHEUS");
-				}
-
-				if (listDocumentosProtheus.Count() > 0)
-				{
-					throw new Exception("O documento PROTHEUS esta vinculado para outro documento DESTRA");
-				}
-
-				await _repDocumento.SaveAsync(model);
-
-				return Ok(model);
-			}
-			catch (Exception ex)
-			{
-				return BadRequest(ErrorHelper.GetException(ex));
-			}
-		}
-
-		[HttpPut]
-		public async Task<IActionResult> Update([FromBody] Documento model, CancellationToken cancellationToken)
-		{
-			try
-			{
-				StringBuilder erro = new StringBuilder();
-				if (!ModelState.IsValid)
-				{
-					erro = ErrorHelper.GetErroModelState(ModelState.Values);
-					throw new Exception("Falha ao Salvar Dados.\n" + erro);
-				}
-
-				//Verificar se o documento Destra ou Protheus já está sendo utilizado
-				List<Documento> listDocumentosDestra = _repDocumento.SelectContext().Where(e => e.Id != model.Id && e.IdDestra == model.IdDestra).ToList();
-				List<Documento> listDocumentosProtheus = _repDocumento.SelectContext().Where(e => e.Id != model.Id && e.IdProtheus == model.IdProtheus).ToList();
-
-				if (listDocumentosDestra.Count() > 0)
-				{
-					throw new Exception("O documento DESTRA esta vinculado para outro documento PROTHEUS");
-				}
-
-				if (listDocumentosProtheus.Count() > 0)
-				{
-					throw new Exception("O documento PROTHEUS esta vinculado para outro documento DESTRA");
-				}
-
-				await _repDocumento.UpdateAsync(model);
+            Documento Documento = await _repDocumento.SelectContext()
+                                                            .Where(e => e.Id.Equals(id))
+                                                            .FirstAsync();
 
 
-				return Ok(model);
-			}
-			catch (Exception ex)
-			{
-				return BadRequest(ErrorHelper.GetException(ex));
-			}
-		}
+            // TODO - CONFIGURAR INCLUDE FUTURAMENTE DEVIDO PRAZO MAL PROGRAMADO
+            if (Documento != null)
+            {
+                Documento.DocumentoXProtheus = await _repDocumentoProtheus.SelectByCondition(x => x.DocumentoId == Documento.Id).ToListAsync();
+            }
+            return Ok(Documento);
+        }
+        #endregion
 
-		[HttpDelete("{id}")]
-		public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
-		{
-			try
-			{
-				Documento Documento = await _repDocumento.SelectAsync(id) ?? throw new Exception("Erro ao apagar o Pedido com o id fornecido.");
+        #region FUNï¿½ï¿½ES CRUD - MATHEUS MONFREIDES FARTEC SISTEMAS
+        [HttpPost]
+        public async Task<IActionResult> Add([FromBody] Documento model, CancellationToken cancellationToken)
+        {
+            try
+            {
+                StringBuilder erro = new StringBuilder();
+                if (!ModelState.IsValid)
+                {
+                    erro = ErrorHelper.GetErroModelState(ModelState.Values);
+                    throw new Exception("Falha ao Salvar Dados.\n" + erro);
+                }
+                model.Id = new Guid();
 
-				await _repDocumento.DeleteAsync(Documento);
+                //Verificar se o documento Destra ou Protheus jï¿½ estï¿½ sendo utilizado
+                List<Documento> listDocumentosDestra = _repDocumento.SelectContext().Where(e => e.IdDestra == model.IdDestra).ToList();
 
-				return Ok(new ApiResponse
-				{
-					Success = true,
-					Message = "Pedido excluido com sucesso"
-				});
-			}
-			catch (Exception ex)
-			{
-				return BadRequest(ex.Message);
-			}
-		}
-		#endregion
+                List<DocumentoXProtheus> listDocumentosProtheus = _repDocumentoProtheus.SelectContext()
+                                                                                        .Where(e => model.DocumentoXProtheus!.Select(x => x.IdProtheus).Contains(e.IdProtheus))
+                                                                                        .ToList();
 
-		[HttpGet()]
-		public async Task<IActionResult> GetDocumentosDestra(CancellationToken cancellationToken)
-		{
-			try
-			{
-				var jsonResponse = await _destraController.GetDocumentos();
 
-				List<DocumentosDestra> listDocumentos = new List<DocumentosDestra>();
+                if (listDocumentosDestra.Count() > 0)
+                {
+                    throw new Exception("O documento DESTRA esta vinculado para outro documento PROTHEUS");
+                }
 
-				ListaDocumentosDestraModel listaModel = JsonSerializer.Deserialize<ListaDocumentosDestraModel>(jsonResponse);
+                if (listDocumentosProtheus.Count() > 0)
+                {
+                    throw new Exception("O documento PROTHEUS esta vinculado para outro documento DESTRA");
+                }
+                model.Id = new Guid();
+                await _repDocumento.SaveAsync(model);
 
-				if (listaModel != null)
-				{
-					return Ok(listaModel.LISTA);
-				}
-				else
-				{
-					return BadRequest("Api de Documentos Destra vazia");
-				}
-			}
-			catch (Exception ex)
-			{
-				return BadRequest(ex.Message);
-			}
-		}
+                return Ok(model);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ErrorHelper.GetException(ex));
+            }
+        }
 
-		[HttpGet]
-		public async Task<IActionResult> GetDocumentosProtheus(CancellationToken cancellationToken)
-		{
-			try
-			{
-				conn.Open();
-				var sql = @"SELECT UZI_CODIGO AS codigo,TRIM(UZI_DESC) as nome FROM UZI010 WHERE D_E_L_E_T_ = '';";
-				var documentos = (await this.conn.QueryAsync<DocumentosProtheus>(sql));
+        [HttpPut]
+        public async Task<IActionResult> Update([FromBody] Documento model, CancellationToken cancellationToken)
+        {
+            try
+            {
+                StringBuilder erro = new StringBuilder();
+                if (!ModelState.IsValid)
+                {
+                    erro = ErrorHelper.GetErroModelState(ModelState.Values);
+                    throw new Exception("Falha ao Salvar Dados.\n" + erro);
+                }
 
-				return Ok(documentos);
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(500, "Internal Server Error: " + ex.Message);
-			}
-		}
-	}
+                //Verificar se o documento Destra ou Protheus jï¿½ estï¿½ sendo utilizado
+                List<Documento> listDocumentosDestra = _repDocumento.SelectContext().Where(e => e.Id != model.Id && e.IdDestra == model.IdDestra).ToList();
+
+                List<DocumentoXProtheus> listDocumentosProtheus = _repDocumentoProtheus.SelectContext()
+                                                                                        .Where(e => e.DocumentoId != model.Id && model.DocumentoXProtheus!.Select(x => x.IdProtheus).Contains(e.IdProtheus))
+                                                                                        .ToList();
+
+                if (listDocumentosDestra.Count() > 0)
+                {
+                    throw new Exception("O documento DESTRA esta vinculado para outro documento PROTHEUS");
+                }
+
+                if (listDocumentosProtheus.Count() > 0)
+                {
+                    throw new Exception("O documento PROTHEUS esta vinculado para outro documento DESTRA");
+                }
+
+                IList<DocumentoXProtheus> docsXProtheus = await _repDocumentoProtheus.SelectContext()
+                                                   .Where(i => i.DocumentoId == model.Id)
+                                                   .ToListAsync();
+
+                await _repDocumentoProtheus.DeleteRangeAsync(docsXProtheus);
+
+                foreach (DocumentoXProtheus doc in model.DocumentoXProtheus)
+                {
+                    DocumentoXProtheus newDocumentoProtheus = new DocumentoXProtheus()
+                    {
+                        Id = new Guid(),
+                        DescricaoProtheus = doc.DescricaoProtheus,
+                        IdProtheus = doc.IdProtheus,
+                        DocumentoId = model.Id,
+                    };
+
+                    await _repDocumentoProtheus.SaveAsync(newDocumentoProtheus);
+                }
+
+                await _repDocumento.UpdateAsync(model);
+
+
+                return Ok(model);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ErrorHelper.GetException(ex));
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+        {
+            try
+            {
+                Documento Documento = await _repDocumento.SelectAsync(id) ?? throw new Exception("Erro ao apagar o Pedido com o id fornecido.");
+
+                await _repDocumento.DeleteAsync(Documento);
+
+                return Ok(new ApiResponse
+                {
+                    Success = true,
+                    Message = "Pedido excluido com sucesso"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        #endregion
+
+        [HttpGet()]
+        public async Task<IActionResult> GetDocumentosDestra(CancellationToken cancellationToken)
+        {
+            try
+            {
+                var jsonResponse = await _destraController.GetDocumentos();
+
+                List<DocumentosDestra> listDocumentos = new List<DocumentosDestra>();
+
+                ListaDocumentosDestraModel listaModel = JsonSerializer.Deserialize<ListaDocumentosDestraModel>(jsonResponse);
+
+                if (listaModel != null)
+                {
+                    return Ok(listaModel.LISTA);
+                }
+                else
+                {
+                    return BadRequest("Api de Documentos Destra vazia");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDocumentosProtheus(CancellationToken cancellationToken)
+        {
+            try
+            {
+                conn.Open();
+                var sql = @"SELECT UZI_CODIGO AS codigo,TRIM(UZI_DESC) as nome FROM UZI010 WHERE D_E_L_E_T_ = '';";
+                var documentos = (await this.conn.QueryAsync<DocumentosProtheus>(sql));
+
+                return Ok(documentos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal Server Error: " + ex.Message);
+            }
+        }
+    }
 }

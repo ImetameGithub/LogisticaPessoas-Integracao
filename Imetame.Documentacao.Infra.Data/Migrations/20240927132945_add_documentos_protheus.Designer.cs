@@ -4,6 +4,7 @@ using Imetame.Documentacao.Infra.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Imetame.Documentacao.Infra.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240927132945_add_documentos_protheus")]
+    partial class add_documentos_protheus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -159,7 +161,7 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
                     b.Property<DateTime>("CXP_DTINCLUSAO")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 9, 27, 16, 30, 52, 508, DateTimeKind.Local).AddTicks(1681));
+                        .HasDefaultValue(new DateTime(2024, 9, 27, 10, 29, 45, 171, DateTimeKind.Local).AddTicks(3593));
 
                     b.Property<Guid?>("CXP_IDCOLABORADOR")
                         .HasColumnType("uniqueidentifier");
@@ -286,7 +288,7 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
                     b.Property<DateTime>("DXC_DTENVIO")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 9, 27, 16, 30, 52, 507, DateTimeKind.Local).AddTicks(5383));
+                        .HasDefaultValue(new DateTime(2024, 9, 27, 10, 29, 45, 169, DateTimeKind.Local).AddTicks(5041));
 
                     b.Property<Guid>("DXC_IDCOLABORADOR")
                         .HasColumnType("uniqueidentifier");
@@ -496,7 +498,7 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
             modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.DocumentoXProtheus", b =>
                 {
                     b.HasOne("Imetame.Documentacao.Domain.Entities.Documento", "Documento")
-                        .WithMany("DocumentoXProtheus")
+                        .WithMany()
                         .HasForeignKey("DocumentoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -560,11 +562,6 @@ namespace Imetame.Documentacao.Infra.Data.Migrations
             modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.Credenciadora", b =>
                 {
                     b.Navigation("Pedidos");
-                });
-
-            modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.Documento", b =>
-                {
-                    b.Navigation("DocumentoXProtheus");
                 });
 
             modelBuilder.Entity("Imetame.Documentacao.Domain.Entities.Pedido", b =>
