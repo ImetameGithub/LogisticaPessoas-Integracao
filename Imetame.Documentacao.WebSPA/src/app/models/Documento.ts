@@ -27,7 +27,6 @@ export class Documento extends BaseEntity {
     // Construtor que aceita um objeto do tipo Documento e inicializa a instância
     constructor(init?: Partial<Documento>) {
         super(); // Chamada para o construtor da classe base (BaseEntity)
-
         // Inicializa as propriedades do objeto com base no parâmetro recebido
         Object.assign(this, init);
 

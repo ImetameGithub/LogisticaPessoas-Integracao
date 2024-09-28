@@ -201,9 +201,11 @@ export class DocumentoFormComponent implements OnInit {
 
     update(model: Documento) {
         const codsProtheus = this.form.get("IdProtheus").value;
-        model.DescricaoDestra = this.documentosdestra.find(m => m.value == model.IdDestra).display
+        model.DescricaoDestra = this.documentosdestra.find(m => m.value == model.IdDestra).display;
+        model.DocumentoXProtheus = [];
         codsProtheus.forEach(codProtheus => {
             let documentoXProtheus: DocumentoXProtheus = new DocumentoXProtheus();
+            documentoXProtheus.Id = model.Id;
             documentoXProtheus.IdProtheus = this.documentosprotheus.find(m => m.value == codProtheus).value.toString();
             documentoXProtheus.DescricaoProtheus = this.documentosprotheus.find(m => m.value == codProtheus).display;
             model.DocumentoXProtheus.push(documentoXProtheus);

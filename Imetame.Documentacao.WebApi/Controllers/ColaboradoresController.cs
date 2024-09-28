@@ -572,7 +572,11 @@ namespace Imetame.Documentacao.WebApi.Controllers
 							item.SincronizadoDestra = true;
 						}
 
-						bool relacionadoDestra = await _repDocumento.SelectContext().AsNoTracking().Include(x => x.DocumentoXProtheus).Where(m => m.DocumentoXProtheus!.Select(x => x.IdProtheus).Contains(item.Codigo)).AnyAsync();
+						bool relacionadoDestra = await _repDocumento.SelectContext()
+																	.AsNoTracking()
+																	.Include(x => x.DocumentoXProtheus)
+																	.Where(m => m.DocumentoXProtheus!.Select(x => x.IdProtheus).Contains(item.Codigo))
+																	.AnyAsync();
 
 						if (relacionadoDestra)
 						{
@@ -859,94 +863,6 @@ namespace Imetame.Documentacao.WebApi.Controllers
 			}
 		}
 
-		//[HttpPost]
-		//public async Task<IActionResult> EnviarDocsArrayDestra([FromBody] List<ColaboradorModel> listColaboradores)
-		//{
-		//    try
-		//    {
-		//        StringBuilder erro = new StringBuilder();
-		//        if (!ModelState.IsValid)
-		//        {
-		//            erro = ErrorHelper.GetErroModelState(ModelState.Values);
-		//            throw new Exception("Falha ao Salvar Dados.\n" + erro);
-		//        }
-
-		//        var matriculas = listColaboradores.Select(c => c.NumCad).Distinct().ToList();
-		//        var itensCadastrados = await _repColaborador.SelectContext()
-		//                                                    .AsNoTracking()
-		//                                                    .Where(c => matriculas.Contains(c.Matricula))
-		//                                                    .ToListAsync();
-
-		//        var colaboradoresSemAtividade = listColaboradores.Where(ei => !itensCadastrados.Any(m => m.Matricula == ei.NumCad)).ToList();
-		//        if (colaboradoresSemAtividade.Any())
-		//        {
-		//            var nomesColaboradores = string.Join(", ", colaboradoresSemAtividade.Select(c => c.Nome));
-		//            var plural = colaboradoresSemAtividade.Count > 1 ? "s" : "";
-		//            throw new Exception($"O colaborador{plural} {nomesColaboradores} não está{plural} relacionado a nenhuma atividade específica.");
-		//        }
-
-		//        List<string> colaboradoresComDocsVencidos = new List<string>();
-		//        List<string> docsSemRelacao = new List<string>();
-		//        DateTime dataAtual = DateTime.Now;
-
-
-		//        foreach (ColaboradorModel item in listColaboradores)
-		//        {
-		//            List<DocumentoxColaboradorModel> docsColaborador = await ConsultaDocsProtheus("0" + item.NumCad);
-
-		//            var validDocs = docsColaborador
-		//                .Where(m => !string.IsNullOrWhiteSpace(m.DtVencimento))
-		//                .ToList();
-
-		//            validDocs.ForEach(doc => doc.DtVencimentoFormatada = DateTime.ParseExact(doc.DtVencimento, "yyyyMMdd", CultureInfo.InvariantCulture));
-
-
-		//            List<DocumentoxColaboradorModel> docsVencidos = validDocs
-		//                .Where(m => m.DtVencimentoFormatada <= dataAtual.AddDays(10) && m.DtVencimentoFormatada > dataAtual || m.DtVencimentoFormatada <= dataAtual)
-		//                .ToList();
-
-		//            docsColaborador = docsColaborador.Except(docsVencidos).ToList();
-
-		//            foreach (var doc in docsColaborador)
-		//            {
-
-		//                bool docRelacao = await _repDocumento.SelectContext().AsNoTracking().Where(m => m.IdProtheus == doc.Codigo).AnyAsync();
-
-		//                if (docRelacao)
-		//                {
-		//                    docsSemRelacao.Add(doc.DescArquivo);
-		//                }
-
-		//                await EnviarDocumentoParaDestra(doc);
-		//            }
-
-		//            if (docsVencidos.Count > 0)
-		//            {
-		//                colaboradoresComDocsVencidos.Add(item.Nome);
-		//            }
-		//        }
-
-		//        if (docsSemRelacao.Count > 0)
-		//        {
-		//            string docsSemRelacaoStr = string.Join(", ", docsSemRelacao);
-		//            throw new Exception("Os seguintes documentos não possuem nenhuma relação com os documentos da Destra: " + docsSemRelacaoStr);
-		//        }
-
-		//        if (colaboradoresComDocsVencidos.Count > 0)
-		//        {
-		//            string colaboradoresComDocsVencidosStr = string.Join(", ", colaboradoresComDocsVencidos);
-		//            throw new Exception("Os seguintes colaboradores estão com documentos vencidos ou a vencer: " + colaboradoresComDocsVencidosStr);
-		//        }
-
-
-		//        return Ok();
-		//    }
-		//    catch (Exception ex)
-		//    {
-		//        return BadRequest(ErrorHelper.GetException(ex));
-		//    }
-		//}
-
 		[HttpPost]
 		public async Task<IActionResult> EnviarDocsArrayDestra([FromBody] List<ColaboradorModel> listColaboradores)
 		{
@@ -958,7 +874,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
 					return BadRequest("Falha ao Salvar Dados.\n" + erro);
 				}
 
-				var matriculas = listColaboradores.Select(c => c.NumCad).Distinct().ToList();
+				var matriculas = listColaboradores.Select(c => c.NumCad)
+												  .Distinct()
+												  .ToList();
+
 				var itensCadastrados = await _repColaborador.SelectContext()
 															.AsNoTracking()
 															.Where(c => matriculas.Contains(c.Matricula))
@@ -1027,40 +946,6 @@ namespace Imetame.Documentacao.WebApi.Controllers
 				colaboradoresComDocsVencidos.Add(nomeColaborador);
 			}
 		}
-
-
-		//[HttpPost]
-		//public async Task<IActionResult> TESTE()
-		//{
-		//    try
-		//    {
-		//        StringBuilder erro = new StringBuilder();
-		//        if (!ModelState.IsValid)
-		//        {
-		//            erro = ErrorHelper.GetErroModelState(ModelState.Values);
-		//            throw new Exception("Falha ao Salvar Dados.\n" + erro);
-		//        }
-
-
-		//        Equipe equipe = new Equipe()
-		//        {
-		//            cnpj = "31790710001834",
-		//            numeroOS = "001701001",
-		//            cpf = "12461100756",
-		//            atividadeespecifica = new List<int> { 34, 36 }
-		//        };
-
-		//        var jsonResponseEquipe = await _destraController.AddColaboradorPedido(equipe) as OkObjectResult;
-
-
-		//        return Ok();
-		//    }
-		//    catch (Exception ex)
-		//    {
-		//        return BadRequest(ErrorHelper.GetException(ex));
-		//    }
-		//}
-
 
 		[HttpPost]
 		public async Task<IActionResult> EnviarDocumentoParaDestra([FromBody] DocumentoxColaboradorModel documento)
