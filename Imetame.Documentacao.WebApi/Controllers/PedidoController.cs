@@ -31,14 +31,16 @@ namespace Imetame.Documentacao.WebApi.Controllers
 	{
 		private readonly IBaseRepository<Pedido> _repPedido;
 		private readonly IProcessamentoService _service;
-		private readonly IBaseRepository<ColaboradorxPedido> _repColaboradorxPedido;
+        private readonly IBaseRepository<Domain.Entities.Processamento> _repProcessamento;
+        private readonly IBaseRepository<ColaboradorxPedido> _repColaboradorxPedido;
 		private readonly IBaseRepository<Colaborador> _repColaborador;
 		private readonly IBaseRepository<Documento> _repDocumento;
 		private readonly IConfiguration _configuration;
 		protected readonly SqlConnection conn;
 		private readonly DestraController _destraController;
-		public PedidoController(IProcessamentoService service, IBaseRepository<Pedido> repPedido, IConfiguration configuration, IBaseRepository<ColaboradorxPedido> repColaboradorxPedido, DestraController destraController, IBaseRepository<Colaborador> repColaborador, IBaseRepository<Documento> repDocumento)
+		public PedidoController(IProcessamentoService service, IBaseRepository<Domain.Entities.Processamento> repProcessamento, IBaseRepository<Pedido> repPedido, IConfiguration configuration, IBaseRepository<ColaboradorxPedido> repColaboradorxPedido, DestraController destraController, IBaseRepository<Colaborador> repColaborador, IBaseRepository<Documento> repDocumento)
 		{
+			_repProcessamento = repProcessamento;
 			_service = service;
 			_repPedido = repPedido;
 			_configuration = configuration;
@@ -187,7 +189,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
 		#region DADOS RELATÓRIO
 		[HttpGet]
-		public async Task<IActionResult> GetDadosCheckList(Guid idPedido, string codOs, CancellationToken cancellationToken)
+		public async Task<IActionResult> GetDadosCheckList(Guid idProcessamento, CancellationToken cancellationToken)
 		{
 			try
 			{
@@ -195,10 +197,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
 				if (!ModelState.IsValid)
 					throw new Exception("Parametros necessarios nao informados");
 
-				Domain.Models.Processamento processamento = await _service.GetProcessamentoAtivo(idPedido, cancellationToken);
-
+				//Domain.Models.Processamento processamento = await _service.GetProcessamentoAtivo(idProcesso, cancellationToken);
+                Domain.Entities.Processamento? processamento = await _repProcessamento.SelectContext().Where(m => m.Id == idProcessamento).FirstOrDefaultAsync();
 #if DEBUG
-				var sql = @"WITH CountDocumentos as
+                var sql = @"WITH CountDocumentos as
 											(	SELECT
 							    					SUBSTRING(SRA.RA_MAT,2,5) RA_MAT,
 							    					COUNT(*) as contagem

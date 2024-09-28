@@ -15,6 +15,9 @@ import { ChecklistModel } from "app/models/DTO/RelatorioModel";
 @Injectable()
 export class RelatorioService implements Resolve<any> {
     routeParams: any;
+    processamento: any;
+    onProcessamentoChanged: BehaviorSubject<any>;
+
     private _listPedido: ReplaySubject<Pedido[]> = new ReplaySubject<Pedido[]>(1);
     //private _listColaboradores: ReplaySubject<ColaboradorProtheusModel[]> = new ReplaySubject<ColaboradorProtheusModel[]>(1);
 
@@ -25,6 +28,7 @@ export class RelatorioService implements Resolve<any> {
         private dataService: DataService
     ) {
 
+        this.onProcessamentoChanged = new BehaviorSubject({});
     }
 
     //#region FUNÇÕES DE ECAPSULAMENTOS
@@ -47,6 +51,17 @@ export class RelatorioService implements Resolve<any> {
                 this._listPedido.next(pedidos);
             })
         );
+    }
+
+    getProcessoAtivo(params: any): Promise<any> {
+        return new Promise((resolve, reject) => {
+            this.dataService.get(this.apiUrl + `processamento/ativo`, params)
+                .subscribe((response: any) => {
+                    this.processamento = response;
+                    this.onProcessamentoChanged.next(this.processamento);
+                    resolve(response);
+                }, reject);
+        });
     }
 
     GetAllColaboradoresProtheus(): Observable<ColaboradorProtheusModel[]> {
@@ -86,10 +101,13 @@ export class RelatorioService implements Resolve<any> {
         );
     }
 
-    GetDadosCheckList(idPedido: string, codOs: string): Observable<ChecklistModel[]> {
+    cadastrarProcessamento(item: any): Promise<any> {
+        return this.dataService.post<any>(this.apiUrl + 'processamento/', item).toPromise();
+    }
+
+    GetDadosCheckList(idProcessamento: string): Observable<ChecklistModel[]> {
         const params = new HttpParams()
-            .set('idPedido', idPedido)
-            .set('codOs', codOs);
+            .set('idProcessamento', idProcessamento);
         return this._httpClient.get<ChecklistModel[]>(environment.Pedido.GetDadosCheckList, { params });
     }
 }

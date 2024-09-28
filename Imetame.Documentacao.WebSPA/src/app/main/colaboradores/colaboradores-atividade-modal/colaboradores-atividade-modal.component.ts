@@ -202,6 +202,12 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
         // Obtém os valores do formulário
         var filtroValues = this.formFiltro.getRawValue();
 
+        // Se for uma busca, reiniciar a página para a primeira
+        if (search != null) {
+            this.page = 1;  // Redefinir para a primeira página
+        }
+
+        // Recalcular as variáveis de paginação
         const skip = (this.page - 1) * this.pageSize;
         const take = this.pageSize;
 
@@ -217,14 +223,12 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
 
         if (search != null) {
             const filteredColaboradores = colaboradoresFiltrados.filter(x => x.NOME.toUpperCase().includes(search.toUpperCase()))
-            this.dataSource.data = filteredColaboradores;
             this.totalCount = filteredColaboradores.length;
-            colaboradoresFiltrados = filteredColaboradores.slice(skip, skip + take);
+            this.dataSource.data = filteredColaboradores.slice(skip, skip + take);
         }
         else {
-            this.dataSource.data = colaboradoresFiltrados;
             this.totalCount = colaboradoresFiltrados.length;
-            colaboradoresFiltrados = colaboradoresFiltrados.slice(skip, skip + take);
+            this.dataSource.data = colaboradoresFiltrados.slice(skip, skip + take);
         }
     }
 

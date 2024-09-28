@@ -24,10 +24,9 @@ import { ChecklistModel } from 'app/models/DTO/RelatorioModel';
 export const checklistListResolver: ResolveFn<ChecklistModel[]> = (route, state) => {
   const router = inject(Router);
   const service = inject(RelatorioService);
-  const idPedido = route.paramMap.get('idPedido');
-  const ordemServico = route.paramMap.get('ordemServico');
+  const idProcesso = route.paramMap.get('idProcesso');
   // Dados de uma semana
-  return service.GetDadosCheckList(idPedido, ordemServico).pipe(
+  return service.GetDadosCheckList(idProcesso).pipe(
     catchError(error => {
       router.navigate(['generic-error']);
       throw error;

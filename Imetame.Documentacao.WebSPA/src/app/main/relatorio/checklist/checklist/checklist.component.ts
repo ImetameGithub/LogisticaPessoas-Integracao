@@ -11,6 +11,8 @@ import { Pedido } from "app/models/Pedido";
 import { CustomOptionsSelect } from "app/shared/components/custom-select/components.types";
 import * as _ from "lodash";
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
+import { DataService } from "app/services/data.service";
+import { AutomacaoDeProcessosService } from "app/main/automacao-de-processos/automacao-de-processos.service";
 
 @Component({
   selector: 'checklist',
@@ -94,7 +96,7 @@ export class ChecklistComponent implements OnInit, OnDestroy {
       }
     );
   }
-  
+
   searchOs(searchValue) {
     if (!this.isTravarPesquisa && searchValue != '')
       this._relatorioService.getOss(searchValue).subscribe(
@@ -128,7 +130,26 @@ export class ChecklistComponent implements OnInit, OnDestroy {
     const idPedido = this.filtroForm.get("pedido").value;
     const codOs = this.filtroForm.get("oss").value;
     const values = this.filtroForm.getRawValue();
-    this.router.navigate([`checklist/${idPedido}/${codOs}`], { relativeTo: this.route });
+
+    this._relatorioService.getProcessoAtivo({ idPedido: values.pedido }).then(
+      (processo) => {
+        if (!processo.id) {
+          this._fuseProgressBarService.hide();
+          this._relatorioService.cadastrarProcessamento({ IdPedido: idPedido, Oss: codOs, OssString: '' }).then(
+            (processamento: any) => {
+              const idProcesso = processamento.Id;
+              this.router.navigate([`checklist/${idProcesso}`], { relativeTo: this.route });                         
+            }
+          );
+        } else {
+          this._fuseProgressBarService.hide();
+          const idProcesso = processo.id;
+          this.router.navigate([`checklist/${idProcesso}`], { relativeTo: this.route });
+        }
+      },
+    );
+
+
   }
 
 

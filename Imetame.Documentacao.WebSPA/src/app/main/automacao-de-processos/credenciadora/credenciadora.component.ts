@@ -141,7 +141,7 @@ export class CredenciadoraComponent implements OnInit, OnDestroy {
         const values = this.filtroForm.getRawValue();
         this.service.getProcessoAtivo({ idPedido: values.pedido }).then(
             (processo) => {
-                if (!processo.id) {
+                if (!processo.id) { 
                     this.service.cadastrarProcessamento({ IdPedido: values.pedido, Oss: values.oss.numero, OssString: '' }).then(
                         (processamento: any) => {
                             this.router.navigate([`${processamento.Id}/${values.pedido}/${values.oss.numero}`], { relativeTo: this.route });

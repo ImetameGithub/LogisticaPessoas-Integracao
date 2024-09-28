@@ -12,7 +12,7 @@ const routes: Routes = [
         resolve: { data: RelatorioService },
     }, 
     {
-        path: 'checklist/:idPedido/:ordemServico',
+        path: 'checklist/:idProcesso',
         component: ChecklistListComponent,
         resolve: { data: checklistListResolver }
     },
