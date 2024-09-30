@@ -221,7 +221,8 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
 
         // Recalcular as variáveis de paginação
         const skip = (this.page - 1) * this.pageSize;
-        const take = this.pageSize;
+        const take = skip + this.pageSize;
+
 
         let colaboradoresFiltrados = this._data._listColaboradores.filter(colaborador => {
             let matchPerfil = filtroValues.Perfil.length > 0 ? filtroValues.Perfil.includes(colaborador.PERFIL) : true;

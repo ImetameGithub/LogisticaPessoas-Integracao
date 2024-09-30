@@ -1,9 +1,9 @@
 import { Credenciadora } from "app/models/Crendenciadora";
 
-const baseUrl = 'https://jaguare.imetame.com.br:5012/api';
+// const baseUrl = 'https://jaguare.imetame.com.br:5012/api';
+const baseUrl = 'https://integracaologisticaapi.imetame.com.br:443/api';
 export const environment = {
     production: true,
-    //urlApi: 'https://jaguare.imetame.com.br:5012/api',
     hmr: false,
      Pedido: {
         GetItem: `${baseUrl}/Pedido/GetItem`,
