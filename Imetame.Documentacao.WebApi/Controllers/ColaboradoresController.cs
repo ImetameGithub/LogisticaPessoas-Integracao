@@ -199,6 +199,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 									AND UZJ.UZJ_CODTDO <> '01'
 								WHERE
 									RA_FILIAL = ''
+									AND SRA.RA_SITFOLH = ''
 									AND SRA.D_E_L_E_T_ = ''
                                     AND SRA.RA_DEMISSA = ''
 								GROUP BY SRA.RA_MAT)
@@ -240,6 +241,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 							JOIN CountDocumentos CD ON CD.RA_MAT = [numcad]
 							WHERE
 								ZNB_OS = @Oss
+								AND GETDATE() BETWEEN ZNB.ZNB_DTINI AND ZNB.ZNB_DTFIM
 							order by
 								Nome";
 #else
@@ -262,6 +264,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 									AND UZJ.UZJ_CODTDO <> '01'
 								WHERE
 									RA_FILIAL = ''
+									AND SRA.RA_SITFOLH = ''
 									AND SRA.D_E_L_E_T_ = ''
                                     AND SRA.RA_DEMISSA = ''
 								GROUP BY SRA.RA_MAT)
@@ -303,6 +306,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 							JOIN CountDocumentos CD ON CD.RA_MAT = [numcad]
 							WHERE
 								ZNB_OS = @Oss
+								AND GETDATE() BETWEEN ZNB.ZNB_DTINI AND ZNB.ZNB_DTFIM
 							order by
 								Nome";
 #endif
@@ -344,7 +348,6 @@ namespace Imetame.Documentacao.WebApi.Controllers
 						item.SincronizadoDestra = false;
 					}
 				}
-
 				return Ok(lista);
 			}
 			catch (Exception ex)
@@ -511,12 +514,12 @@ namespace Imetame.Documentacao.WebApi.Controllers
                                     AND ZG0.ZG0_TIPCOL = SRA.RA_YTIPCOL AND ZG0.D_E_L_E_T_ <> '*')
                                 WHERE SRA.RA_SITFOLH = ''
                                     AND GETDATE() BETWEEN ZNB.ZNB_DTINI AND ZNB.ZNB_DTFIM
-                                    AND SRA.D_E_L_E_T_ = ''";
+                                    AND SRA.D_E_L_E_T_ = ''
+                                ORDER BY NOME";
 				#endregion CONSULTA SQL - MATHEUS MONFREIDES FARTEC SISTEMAS
 
 
 				var lista = (await this.conn.QueryAsync<ColaboradorProtheusModel>(sql));
-
 				return Ok(lista);
 			}
 			catch (Exception ex)
@@ -937,8 +940,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
 				{
 					docsSemRelacao.Add(doc.DescArquivo);
 				}
-
-				EnviarDocumentoParaDestra(doc).Wait();
+				else
+				{
+					EnviarDocumentoParaDestra(doc).Wait();
+				}
 			}
 
 			if (docsVencidos.Any())
@@ -962,7 +967,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 				Documento? docRelacao = await _repDocumento.SelectContext().Include(x => x.DocumentoXProtheus).AsNoTracking().Where(m => m.DocumentoXProtheus!.Select(x => x.IdProtheus).Contains(documento.Codigo)).FirstOrDefaultAsync();
 
 				if (docRelacao is null)
-					throw new Exception("O documento " + documento.DescArquivo + " não possue nenhuma relação com os documentos da Destra");
+					throw new Exception("O documento " + documento.DescArquivo + " não possui nenhuma relação com os documentos da Destra");
 
 				Colaborador? colaboradorCadastrado = await _repColaborador.SelectContext().AsNoTracking().Where(m => m.Matricula == documento.Matricula.Remove(0, 1)).FirstOrDefaultAsync();
 

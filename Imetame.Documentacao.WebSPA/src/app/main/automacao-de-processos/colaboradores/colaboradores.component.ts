@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewEncapsulation, ViewChildren, } from "@angular/core";
+import { Component, OnInit, OnDestroy, ViewEncapsulation, ViewChildren, inject, ViewChild, } from "@angular/core";
 import { Subject } from "rxjs";
 import { fuseAnimations } from "@fuse/animations";
 import { FormControl, } from "@angular/forms";
@@ -28,6 +28,7 @@ import { Colaborador } from "app/models/Colaborador";
     animations: fuseAnimations,
 })
 export class ColaboradoresComponent implements OnInit, OnDestroy {
+    
     private _unsubscribeAll: Subject<any>;
     displayedColumns = [
         "check",
@@ -53,12 +54,11 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
 
     searchInput: FormControl;
     searchInputEl: any;
-    @ViewChildren("searchInputEl") searchInputField;
 
     documentos: DocumentoxColaboradorModel[]
 
-
     listStatus: ColaboradorStatusDestra[] = ColaboradorStatusDestra.values;
+    @ViewChildren("searchInputEl") searchInputField;
     constructor(
         public service: AutomacaoDeProcessosService,
 

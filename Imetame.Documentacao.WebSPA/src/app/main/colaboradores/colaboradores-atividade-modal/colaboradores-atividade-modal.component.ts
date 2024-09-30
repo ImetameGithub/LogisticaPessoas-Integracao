@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit, ViewChild, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -20,6 +20,8 @@ import * as _ from 'lodash';
 import { takeUntil, startWith, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { AutomacaoDeProcessosService } from 'app/main/automacao-de-processos/automacao-de-processos.service';
 import { PageEvent } from '@angular/material/paginator';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { MatSort, Sort, MatSortModule } from '@angular/material/sort';
 
 @Component({
     selector: 'colaboradores-atividade-modal',
@@ -27,6 +29,9 @@ import { PageEvent } from '@angular/material/paginator';
     styleUrls: ['./colaboradores-atividade-modal.component.scss']
 })
 export class ColaboradoresAtividadeModalComponent implements OnInit {
+    private _liveAnnouncer = inject(LiveAnnouncer);
+
+
     displayedColumns = ["check", "NOME", "MATRICULA", "CRACHA"];
     dataSource: MatTableDataSource<ColaboradorProtheusModel>;
     checkedColaboradores: ColaboradorProtheusModel[] = [];
@@ -72,6 +77,8 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
     OsOptions: CustomOptionsSelect[] = [];
     funcaoOptions: CustomOptionsSelect[] = [];
     disciplinaOptions: CustomOptionsSelect[] = [];
+
+    @ViewChild(MatSort) sort: MatSort;
 
     constructor(
         private titleService: Title,
@@ -121,6 +128,9 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
         this.titleService.setTitle("Novo - Colaborador - Imetame");
     }
 
+    ngAfterViewInit() {
+        this.dataSource.sort = this.sort;
+    }
 
     ngOnInit() {
         // this.getOs('');S
@@ -201,7 +211,9 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
     filtrarColaboradores(search?: string) {
         // Obtém os valores do formulário
         var filtroValues = this.formFiltro.getRawValue();
+        const searchInputValue = this.searchInput.getRawValue();
 
+        // TODO - CORRIGIR PARA PEGAR O NUMERO DE PAGINAS DISPONIVEIS
         // Se for uma busca, reiniciar a página para a primeira
         if (search != null) {
             this.page = 1;  // Redefinir para a primeira página
@@ -221,8 +233,8 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
             return matchPerfil && matchEquipe && matchOs && matchFuncao && matchDisciplina;
         });
 
-        if (search != null) {
-            const filteredColaboradores = colaboradoresFiltrados.filter(x => x.NOME.toUpperCase().includes(search.toUpperCase()))
+        if (searchInputValue != null) {
+            const filteredColaboradores = colaboradoresFiltrados.filter(x => x.NOME.toUpperCase().includes(searchInputValue.toUpperCase()))
             this.totalCount = filteredColaboradores.length;
             this.dataSource.data = filteredColaboradores.slice(skip, skip + take);
         }
@@ -261,7 +273,13 @@ export class ColaboradoresAtividadeModalComponent implements OnInit {
         }
     }
 
-
+    announceSortChange(sortState: Sort) {
+        if (sortState.direction) {
+            this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
+        } else {
+            this._liveAnnouncer.announce('Sorting cleared');
+        }
+    }
 
     update(model: Colaborador) {
         this._fuseProgressBarService.setMode("indeterminate");

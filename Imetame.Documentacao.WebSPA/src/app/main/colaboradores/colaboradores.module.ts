@@ -8,6 +8,7 @@ import { ColaboradoresFormComponent } from './colaboradores-form/colaboradores-f
 import { ColaboradoresAtividadeModalComponent } from './colaboradores-atividade-modal/colaboradores-atividade-modal.component';
 import { CustomSearchSelectComponent } from 'app/shared/components/custom-select/custom-select.component';
 import { ColaboradoresFiltroComponent } from './colaboradores-filtro/colaboradores-filtro.component';
+import { MatSortModule } from '@angular/material/sort';
 
 
 
@@ -18,6 +19,6 @@ import { ColaboradoresFiltroComponent } from './colaboradores-filtro/colaborador
     ColaboradoresAtividadeModalComponent,
     ColaboradoresFiltroComponent
   ],
-  imports: [CommonModule, ColaboradorRoutingModule, SharedModule, MatDialogModule, CustomSearchSelectComponent,],
+  imports: [CommonModule, ColaboradorRoutingModule, SharedModule, MatDialogModule, CustomSearchSelectComponent, MatSortModule],
 })
 export class ColaboradoresModule { }

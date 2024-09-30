@@ -5,7 +5,7 @@
 <mat-dialog-content class="mat-typography">
     <div class="padding-border">
 
-        <Form [formGroup]="formFiltro" class="grid-cols-12 gap-15">
+        <Form [formGroup]="formFiltro" style="column-gap:15px" class="grid-cols-12">
 
             <custom-search-select [multiple]="true" [options]="perfilOptions" [required]="false"
                 formControlName="Perfil" placeholder="Selecione os perfis" label="Perfil" class="col-span-4">
@@ -14,10 +14,6 @@
             <custom-search-select [multiple]="true" [options]="equipeOptions" formControlName="Equipe"
                 [required]="false" placeholder="Selecione as equipe" label="Equipes" class="col-span-4">
             </custom-search-select>
-
-            <!-- <custom-search-select [multiple]="true" onchange="teste()" [options]="OsOptions" formControlName="Os" [required]="false"
-                placeholder="Selecione as OS" label="OS" class="col-span-4">
-            </custom-search-select> -->
 
             <custom-search-select [multiple]="true" [options]="OsOptions" formControlName="Os" [required]="false"
                 placeholder="Selecione as OS" label="OS" class="col-span-4">
@@ -33,16 +29,16 @@
 
             <div class="col-span-1">
                 <button type="submit" mat-raised-button (click)="filtrarColaboradores()"
-                    style="background-color: rgb(22, 163, 75); color: white; margin-top: 15px;">Filtrar
+                    style="background-color: rgb(22, 163, 75); color: white; height: 55px;  margin-top: 5px;">Filtrar
                     Colaboradores</button>
             </div>
         </Form>
-        <Form [formGroup]="form" class="grid-cols-12 gap-15">
+        <Form [formGroup]="form" class="grid-cols-12" style="column-gap:15px">
             <custom-search-select [multiple]="true" [options]="atividadesOptions" [required]="true"
                 formControlName="ListAtividade" placeholder="Selecione as atividades" label="Atividades Específicas"
                 class="col-span-6">
             </custom-search-select>
-            
+
             <mat-form-field class="col-span-6" appearance="outline">
                 <!-- <mat-label>Pedido</mat-label> -->
                 <input matInput [formControl]="searchInput" placeholder="Nome do Colaborador" />
@@ -53,7 +49,7 @@
             [pageSizeOptions]="[3,5,10,20,50]" (page)="onPageChange($event)">
         </mat-paginator>
         <div class="border border-solid border-2 overflow-y-auto">
-            <mat-table mat-table #table [dataSource]="dataSource">
+            <mat-table mat-table #table [dataSource]="dataSource" matSort (matSortChange)="announceSortChange($event)">
                 <ng-container matColumnDef="check">
                     <mat-header-cell *matHeaderCellDef class="small-width">
                         <mat-checkbox (change)="checkAll($event)"></mat-checkbox>
@@ -63,17 +59,20 @@
                     </mat-cell>
                 </ng-container>
                 <ng-container matColumnDef="NOME">
-                    <mat-header-cell *matHeaderCellDef>Nome</mat-header-cell>
+                    <mat-header-cell *matHeaderCellDef mat-sort-header
+                        sortActionDescription="Sort by Nome">Nome</mat-header-cell>
                     <mat-cell *matCellDef="let row"> {{ row.NOME }}</mat-cell>
                 </ng-container>
                 <ng-container matColumnDef="MATRICULA">
-                    <mat-header-cell *matHeaderCellDef>Cadastro</mat-header-cell>
+                    <mat-header-cell *matHeaderCellDef mat-sort-header
+                        sortActionDescription="Sort by Cadastro">Cadastro</mat-header-cell>
                     <mat-cell *matCellDef="let row">
                         {{ row.MATRICULA }}</mat-cell>
                 </ng-container>
 
                 <ng-container matColumnDef="CRACHA">
-                    <mat-header-cell *matHeaderCellDef>Cracha</mat-header-cell>
+                    <mat-header-cell *matHeaderCellDef mat-sort-header
+                        sortActionDescription="Sort by Cracha">Cracha</mat-header-cell>
                     <mat-cell *matCellDef="let row"> {{ row.CRACHA }}</mat-cell>
                 </ng-container>
 

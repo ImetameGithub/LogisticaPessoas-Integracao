@@ -20,6 +20,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { CustomSearchSelectComponent } from 'app/shared/components/custom-select/custom-select.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LogComponent } from './logs/logs.component';
+import { MatSortModule } from '@angular/material/sort';
 
 
 
@@ -37,7 +38,8 @@ import { LogComponent } from './logs/logs.component';
       MatGridListModule,
       MatButtonModule,
       MatTableModule,
-      MatProgressSpinnerModule
+      MatProgressSpinnerModule,
+      MatSortModule
   ],
     providers: [AutomacaoDeProcessosService,PedidoService],
     entryComponents: [ShowLogDialogComponent]

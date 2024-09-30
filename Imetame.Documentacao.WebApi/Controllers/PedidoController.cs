@@ -31,8 +31,8 @@ namespace Imetame.Documentacao.WebApi.Controllers
 	{
 		private readonly IBaseRepository<Pedido> _repPedido;
 		private readonly IProcessamentoService _service;
-        private readonly IBaseRepository<Domain.Entities.Processamento> _repProcessamento;
-        private readonly IBaseRepository<ColaboradorxPedido> _repColaboradorxPedido;
+		private readonly IBaseRepository<Domain.Entities.Processamento> _repProcessamento;
+		private readonly IBaseRepository<ColaboradorxPedido> _repColaboradorxPedido;
 		private readonly IBaseRepository<Colaborador> _repColaborador;
 		private readonly IBaseRepository<Documento> _repDocumento;
 		private readonly IConfiguration _configuration;
@@ -198,9 +198,9 @@ namespace Imetame.Documentacao.WebApi.Controllers
 					throw new Exception("Parametros necessarios nao informados");
 
 				//Domain.Models.Processamento processamento = await _service.GetProcessamentoAtivo(idProcesso, cancellationToken);
-                Domain.Entities.Processamento? processamento = await _repProcessamento.SelectContext().Where(m => m.Id == idProcessamento).FirstOrDefaultAsync();
+				Domain.Entities.Processamento? processamento = await _repProcessamento.SelectContext().Where(m => m.Id == idProcessamento).FirstOrDefaultAsync();
 #if DEBUG
-                var sql = @"WITH CountDocumentos as
+				var sql = @"WITH CountDocumentos as
 											(	SELECT
 							    					SUBSTRING(SRA.RA_MAT,2,5) RA_MAT,
 							    					COUNT(*) as contagem
@@ -374,7 +374,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 					// COLABORADOR NÃO FOI CADASTRADO
 					if (colaborador == null)
 					{
-						atividadeFormatada="Colaborador não relacionado.";
+						atividadeFormatada = "Colaborador não relacionado.";
 					}
 					else
 					{
@@ -417,7 +417,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 						}
 
 						// GUARDA ATIVIDADE COM A FORMATAÇÃO SOLICITADA PARA A EXIBIÇÃO NO RELATÓRIO
-						
+
 						int numAtividade = 1;
 						foreach (AtividadeEspecifica atividade in atividades)
 						{
@@ -472,7 +472,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
 					colaboradoresModel.Add(checklistModel);
 				}
-				colaboradoresModel.OrderBy(x => x.Nome);
+				colaboradoresModel = colaboradoresModel.OrderBy(x => x.Nome).ToList();
 				return Ok(colaboradoresModel);
 			}
 			catch (Exception ex)

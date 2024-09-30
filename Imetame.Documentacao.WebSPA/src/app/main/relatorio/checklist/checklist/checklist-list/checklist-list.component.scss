@@ -16,14 +16,22 @@ mat-dialog-container {
 
 .mat-table {
     display: table;
-    /* Importante para o comportamento da tabela */
     width: 100%;
-    /* A tabela ocupa toda a largura do contêiner */
-    //    table-layout: auto;
+}
 
+.fixed-width-small {
+    min-width: 50px !important;
+    width: 50px !important;
+}
 
-
-
+.center-column {
+    text-align: center !important;
+    justify-content: center !important;
+    display: flex !important;
+    align-items: center !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow: visible !important;
 }
 
 .mat-header-cell,
@@ -36,15 +44,15 @@ mat-dialog-container {
     // /* Evita quebras de linha dentro das células */
     // overflow: hidden;
     // /* Esconde o conteúdo que ultrapassa a largura da célula */
-    white-space: normal;
+    white-space: normal !important;
     /* Permite a quebra de linha */
-    word-wrap: break-word;
+    word-wrap: break-word !important;
     /* Quebra palavras longas se necessário */
     overflow: visible;
     /* Permite que o conteúdo visível se ajuste corretamente */
-    text-align: center;
-    align-self: center;
-    align-items: center;
+    text-align: center !important;
+    align-self: center !important;
+    align-items: center !important;
     padding: 0 8px;
     //min-width: 170px;
     /* Defina uma largura mínima maior se necessário */
@@ -54,16 +62,4 @@ mat-dialog-container {
     // /* Esconde o conteúdo que ultrapassa a largura da célula */
     // text-overflow: ellipsis;
     /* Adiciona reticências ao conteúdo que ultrapassa a largura */
-}
-
-/* Especificamente para a célula de atividade */
-.break-line {
-    white-space: normal;
-    /* Permite a quebra de linha */
-    word-wrap: break-word;
-    /* Quebra palavras longas se necessário */
-    overflow: visible;
-    /* Permite que o conteúdo visível se ajuste corretamente */
-    align-self: center;
-    align-items: center;
 }
