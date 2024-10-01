@@ -1,5 +1,5 @@
-// const baseUrl = 'https://localhost:7030/api';
-const baseUrl = 'https://integracaologisticaapi.imetame.com.br:443/api';
+const baseUrl = 'https://localhost:7030/api';
+//const baseUrl = 'https://integracaologisticaapi.imetame.com.br:443/api';
 export const environment = {
     production: true,
     hmr: false,

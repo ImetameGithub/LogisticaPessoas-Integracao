@@ -618,8 +618,6 @@ namespace Imetame.Documentacao.WebApi.Controllers
 					documentos[0].NomeColaborador = documentos[0].NomeColaborador + " - " + listaDeNomes;
 				}
 
-
-
 				DateTime dataAtual = DateTime.Now;
 
 				foreach (DocumentoxColaboradorModel vencidos in documentos.Where(m => m.DtVencimento.Trim() != ""))
