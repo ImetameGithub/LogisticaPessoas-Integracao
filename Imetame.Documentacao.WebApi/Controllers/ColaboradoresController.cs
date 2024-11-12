@@ -1110,9 +1110,6 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
 
 
-
-
-
 		[HttpPost]
 		public async Task<IActionResult> GetDocumentosObrigatorios(List<DocumentoxColaboradorModel> lista)
 		{
@@ -1153,9 +1150,9 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
 				foreach (var docDestra in todosOsDocsDestra)
 				{
-					Documento docRelacao = await _repDocumento.SelectContext()
-						.Where(m => m.IdDestra == docDestra.codigo.ToString()) // Ajustado para usar IdDestra
-						.FirstOrDefaultAsync();
+					Documento docRelacao = await _repDocumento.SelectContext().AsNoTracking()
+                        .Where(m => m.IdDestra == docDestra.codigo.ToString()).Include(m => m.DocumentoXProtheus) // Ajustado para usar IdDestra
+                        .FirstOrDefaultAsync();
 
 					if (docRelacao == null)
 					{
@@ -1167,7 +1164,6 @@ namespace Imetame.Documentacao.WebApi.Controllers
 							  DocDestra = docDestra.nome,
 							  DocProtheus = "-",
 							  Status = "-"
-
 						  }
 						);
 					}
@@ -1211,6 +1207,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 					// ADICIONAR DOCUMENTOS MARCADOS COMO OBRIGATOÓRIO E RELACIONADOS A LISTA ENVIADA
 					IList<Documento> listDocumentos = await _repDocumento.SelectContext()
 									   .AsNoTracking()
+									   .Include(m => m.DocumentoXProtheus)
 									   .Where(x => lista.Select(y => y.DescArquivo).Contains(x.Descricao) && x.Obrigatorio == true)
 									   .ToListAsync();
 					foreach (var doc in listDocumentos)

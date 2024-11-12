@@ -96,7 +96,7 @@ namespace Imetame.Documentacao.WebApi.Controllers
 			if (!ModelState.IsValid)
 				throw new Exception("Parametros necessarios nao informados");
 
-			List<Pedido> listaPedido = await _repPedido.SelectContext()
+			List<Pedido> listaPedido = await _repPedido.SelectContext().AsNoTracking()
 															.ToListAsync();
 			return Ok(listaPedido);
 		}
