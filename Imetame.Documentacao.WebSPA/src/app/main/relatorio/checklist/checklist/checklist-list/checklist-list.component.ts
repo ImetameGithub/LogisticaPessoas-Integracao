@@ -26,7 +26,7 @@ export class ChecklistListComponent implements OnInit {
 
   documentosColumns: CheckDocumento[] = [];
   //displayedColumns = ["NOME", "ATIVIDADE"];
-  displayedColumns: string[] = ['nome', 'matricula', 'cracha', 'equipe', 'funcao', 'atividade'];
+  displayedColumns: string[] = ['nome', 'matricula', 'cracha', 'equipe', 'funcao', 'atividade', 'statusDestra'];
 
   todosRegistros: ChecklistModel[];
   constructor(
@@ -135,9 +135,10 @@ export class ChecklistListComponent implements OnInit {
     rowHeader.getCell(4).value = "EQUIPE";
     rowHeader.getCell(5).value = "FUNÇÃO";
     rowHeader.getCell(6).value = "ATIVIDADE";
+    rowHeader.getCell(7).value = "STATUS DESTRA";
 
     this.documentosColumns.forEach((documento, index) => {
-      rowHeader.getCell(7 + index).value = documento.nome;
+      rowHeader.getCell(8 + index).value = documento.nome;
     })
 
     dadosExcel.forEach((colaborador, rowIndex) => {
@@ -148,11 +149,12 @@ export class ChecklistListComponent implements OnInit {
       row.getCell(4).value = colaborador.Equipe;
       row.getCell(5).value = colaborador.Funcao;
       row.getCell(6).value = colaborador.Atividade;
+      row.getCell(7).value = colaborador.StatusDestra;
 
       this.documentosColumns.forEach((documento, index) => {
         const documentoColaborador: CheckDocumento | undefined = colaborador.Documentos.find(x => x.IdDestra == documento.IdDestra);
         if (documentoColaborador) {
-          row.getCell(7 + index).value = {
+          row.getCell(8 + index).value = {
             richText: [
               {
                 text: `Validade: \n ${documentoColaborador.validade} - Destra \n`,
@@ -165,7 +167,7 @@ export class ChecklistListComponent implements OnInit {
             ]
           };
         } else {
-          row.getCell(7 + index).value = "Não Relacionado";
+          row.getCell(8 + index).value = "Não Relacionado";
         }
       })
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Imetame.Documentacao.Domain.Entities;
+using System;
 using System.Buffers.Text;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,16 +26,20 @@ namespace Imetame.Documentacao.Domain.Models
         public bool SincronizadoDestra { get; set; } = false;
         public bool RelacionadoDestra { get; set; } = false;
         public string ConcatAtividades { get; set; } = "";
-        
-
-        public string TipoDocumento{ get; set; }
-		public string IdTipoDocumento { get; set; }
 
 
-		// REGRAS PARA VALIDAÇÃO DE DOCUMENTOS 
-		public bool Vencido { get; set; } = false;
+        public string TipoDocumento { get; set; }
+        public string IdTipoDocumento { get; set; }
+
+
+        // REGRAS PARA VALIDAÇÃO DE DOCUMENTOS 
+        public bool Vencido { get; set; } = false;
         public bool Vencer { get; set; } = false;
         public int DiasVencer { get; set; }
+
+        public DocumentoStatus? DocumentoStatus { get; set; }
+        public bool DocumentoStatusPendente => DocumentoStatus != null;
+
 
     }
 

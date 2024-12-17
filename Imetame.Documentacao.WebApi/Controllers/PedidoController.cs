@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Newtonsoft.Json;
 using OpenIddict.Validation.AspNetCore;
 using System.Linq;
 using System.Text;
@@ -329,8 +330,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
 
 				var listaColaboradores = (await this.conn.QueryAsync<ColaboradorModel>(sql, new { Oss = processamento.Oss }));
 
-				// RECEBE OS DOCUMENTOS CADASTRADOS COMO OBRIGATORIOS
-				IList<Documento> documentosBasicos = await _repDocumento.SelectByCondition(x => x.Obrigatorio == true).ToListAsync();
+                List<DocumentoStatus> docsStatusList = await _destraController.GetStatusDocumentos(processamento.Oss);
+
+                // RECEBE OS DOCUMENTOS CADASTRADOS COMO OBRIGATORIOS
+                IList<Documento> documentosBasicos = await _repDocumento.SelectByCondition(x => x.Obrigatorio == true).ToListAsync();
 
 				IList<ChecklistModel> colaboradoresModel = new List<ChecklistModel>();
 
@@ -344,9 +347,10 @@ namespace Imetame.Documentacao.WebApi.Controllers
 																			.ThenInclude(x => x.AtividadeEspecifica!)
 																		.FirstOrDefaultAsync();
 
+                    colaboradorModel.DocumentoStatus = docsStatusList.Where(m => m.Cpf == colaboradorModel.Cpf).ToList();
+                    colaboradorModel.DocumentoPendencia = colaboradorModel.DocumentoStatus.Any();
 
-
-					string json = await _destraController.GetColaborador(cpf);
+                    string json = await _destraController.GetColaborador(cpf);
 					ColaboradorDestraApiModel colaboradorDestra = JsonConvert.DeserializeObject<ColaboradorDestraApiModel>(json);
 					if (colaboradorDestra!.DADOS.Count == 0)
 						continue;
@@ -358,7 +362,8 @@ namespace Imetame.Documentacao.WebApi.Controllers
 						Equipe = colaboradorModel!.Equipe.Trim(),
 						Cracha = colaboradorModel!.NumCracha.Trim(),
 						Funcao = colaboradorModel!.FuncaoAtual.Trim(),
-						Documentos = new List<CheckDocumento>(),
+                        StatusDestra = colaboradorModel.DocumentoPendencia ? $"Desafio com os documentos {string.Join(", ", colaboradorModel.DocumentoStatus.Select(m => m.Nome))}" : "",
+                        Documentos = new List<CheckDocumento>(),
 					};
 
 					HistoricoDestraApiModel historicoDocumentoDestras = new HistoricoDestraApiModel() { LISTA = new List<HistoricoDocumentoDestra>() };

@@ -126,6 +126,11 @@
   /* Remover margens padrão */
 }
 
+.btnWarningH4 {
+  color:rgb(255, 196, 0);
+  font-weight: bold;
+  margin: 0;  
+}
 .vencidoXVencer {
   color: red !important;
   font-weight: bold;
@@ -232,4 +237,10 @@
   color: green;
   font-weight: bold;
   border: 1px solid green;
+}
+
+.docStatus-pendente {
+  color: rgb(255, 196, 0) !important;
+  font-weight: bold;
+  border: 3px solid rgb(255, 196, 0)!important;
 }

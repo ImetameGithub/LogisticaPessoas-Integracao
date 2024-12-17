@@ -211,7 +211,59 @@ namespace Imetame.Documentacao.WebApi.Controllers
 			}
 		}
 
-		[HttpGet]
+
+        [HttpGet]
+        public async Task<List<DocumentoStatus>> GetStatusDocumentos(string ordemServico)
+        {
+            try
+            {
+                AuthResponse response = await Login();
+
+                string endPoint = $"/pedido";
+
+                var queryParameters = new Dictionary<string, string>
+				{
+					{ "cnpj", "31790710001834" },
+					{ "numeroOS", ordemServico }
+				};
+
+                var result = await _destraService.GetAsyncParams(endPoint, queryParameters, response.Token);
+                if (result.IsSuccessStatusCode)
+                {
+                    var content = await result.Content.ReadAsStringAsync();
+                    var jsonDocument = JsonDocument.Parse(content);
+                    var items = jsonDocument.RootElement.GetProperty("LISTA");
+
+                    if (items.GetArrayLength() > 0)
+                    {
+                        var pendencias = items[0].GetProperty("pendencias");
+
+                        if (pendencias.GetArrayLength() > 0)
+                        {
+                            var documentos = pendencias[0].GetProperty("documentos").ToString();
+
+                            // Desserializar a lista de documentos
+                            var tickets = JsonSerializer.Deserialize<List<DocumentoStatus>>(documentos);
+                            return tickets;
+                        }
+                    }
+                }
+                else
+                {
+                    throw new Exception(response.MensagemErro);
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro ao obter documentos", ex);
+            }
+        }
+
+
+
+        [HttpGet]
 		public async Task<string> GetAtividades()
 		{
 			try

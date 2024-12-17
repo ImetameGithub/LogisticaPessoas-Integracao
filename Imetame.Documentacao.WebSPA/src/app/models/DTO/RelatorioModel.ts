@@ -12,6 +12,7 @@ export class ChecklistModel {
     //StatusDestra: number;
     //Rg: string;
     Atividade: string;
+    StatusDestra: string;
 }
 
 export class CheckDocumento {

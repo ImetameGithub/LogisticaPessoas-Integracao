@@ -3,7 +3,7 @@ export class ColaboradorStatusDestra {
     static Recebido = new ColaboradorStatusDestra(0, 'Recebido');
     static Processando = new ColaboradorStatusDestra(1, 'Processando');
     static Sucesso = new ColaboradorStatusDestra(10, 'Sincronizado');
-    static FalhaProcessamento = new ColaboradorStatusDestra(-1, 'Falha de Processamento');
+    static FalhaProcessamento = new ColaboradorStatusDestra(-1, 'Desafio nos Documentos');
     static Cancelado = new ColaboradorStatusDestra(-190, 'Cancelado');
 
     static values = [

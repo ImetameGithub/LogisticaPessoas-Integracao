@@ -36,7 +36,7 @@
             class="docs-obrigatorios" fxLayout="row" fxLayoutAlign="end center">
             <div class="docs-obrigatorios-icon">
                 <mat-icon style="padding-top: 4px;">warning</mat-icon>
-                
+
             </div>
             <span class="docs-obrigatorios-text">Documentos Obrigatórios</span>
         </div>
@@ -74,8 +74,9 @@
         <div class="modal">
             <div style="width: 100%;" class="tipoDocumentoFiltro" fxLayout="row">
                 <custom-search-select (selectionChange)="tipoDocumentoSelected($event)" [options]="tipoDocumentos"
-                    [multiple]="false" [ngClass]="{ 'tipoDocumentoFiltro': !visualizarImagem, 'tipoDocumentoFiltroExpanded': visualizarImagem }" placeholder="Selecione o Tipo de Documento"
-                    label="Tipo de Documento">
+                    [multiple]="false"
+                    [ngClass]="{ 'tipoDocumentoFiltro': !visualizarImagem, 'tipoDocumentoFiltroExpanded': visualizarImagem }"
+                    placeholder="Selecione o Tipo de Documento" label="Tipo de Documento">
                 </custom-search-select>
             </div>
             <div class="modal-content">
@@ -83,30 +84,39 @@
 
                     <div *ngFor="let doc of documentos, let i = index">
                         <div class="document-btn-envio-destra">
-                            <button (click)="enviarDocsParaDestra(doc,i)" mat-icon-button [ngStyle]="{
+                            <button *ngIf="!doc.DocumentoStatusPendente" (click)="enviarDocsParaDestra(doc,i)" mat-icon-button [ngStyle]="{
                                         'color': (doc.SincronizadoDestra) ? 'green' : 'red'
                                     }">
                                 <mat-icon>cloud_upload</mat-icon>
                             </button>
+                            <button *ngIf="doc.DocumentoStatusPendente" (click)="enviarDocsParaDestra(doc,i)" mat-icon-button style="color: rgb(255, 196, 0);">
+                                <mat-icon>warning</mat-icon>
+                            </button>
+
                         </div>
                         <div class="document-box">
                             <button matTooltip="{{doc.DescArquivo}}" mat-button mat-raised-button
                                 (click)="docDetalhes(doc)" [ngClass]="{
                                     'vencidoXVencer': doc.Vencido || doc.Vencer || !doc.RelacionadoDestra,            
-                                    'sincronizado-destra': doc.SincronizadoDestra
+                                    'sincronizado-destra': doc.SincronizadoDestra && !doc.DocumentoStatusPendente,
+                                    'docStatus-pendente': doc.DocumentoStatusPendente
                                 }">
                                 {{ doc.DescArquivo }}
                                 <h5
-                                    *ngIf="!doc.Vencido && !doc.Vencer && doc.DtVencimentoFormatada != '0001-01-01T00:00:00'">
+                                    *ngIf="!doc.Vencido && !doc.Vencer && doc.DtVencimentoFormatada != '0001-01-01T00:00:00' && !doc.DocumentoStatusPendente">
                                     Vencimento - {{ doc.DtVencimentoFormatada | date:'dd/MM/yyyy' }} <br>
                                     {{doc.DiasVencer}} Dias
                                 </h5>
                                 <h5 class="btnH4" *ngIf="doc.Vencido">
                                     Vencido - {{ doc.DtVencimentoFormatada | date:'dd/MM/yyyy' }}
                                 </h5>
-                                <h5 class="btnH4" *ngIf="doc.Vencer">
+                                <h5 class="btnH4" *ngIf="doc.Vencer && !doc.DocumentoStatusPendente">
                                     A vencer - {{ doc.DtVencimentoFormatada | date:'dd/MM/yyyy' }} <br>
                                     {{doc.DiasVencer}} Dias
+                                </h5>
+                                <h5 class="btnWarningH4" *ngIf="doc.DocumentoStatusPendente">
+                                    {{doc.DocumentoStatus.statusDescricao}} <br>
+                                    {{doc.DocumentoStatus.observacoes}}
                                 </h5>
                                 <h5 class="btnH4"
                                     *ngIf="!doc.RelacionadoDestra && !doc.Vencido && !doc.Vencer && doc.DtVencimentoFormatada == '0001-01-01T00:00:00'">

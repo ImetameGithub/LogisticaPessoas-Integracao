@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Web;
 using Imetame.Documentacao.CrossCutting.Services.Destra.Models;
 
 namespace Imetame.Documentacao.CrossCutting.Services.Destra;
@@ -71,6 +72,32 @@ public class DestraService : IDestraService
         catch (HttpRequestException ex)
         {
             throw new Exception("Desabio ao chamar a API", ex);
+        }
+    }
+
+    public async Task<HttpResponseMessage> GetAsyncParams(string endPoint, Dictionary<string, string> queryParams, string token)
+    {
+        try
+        {
+            // Montar a URL com os parâmetros de query
+            var builder = new UriBuilder($"{_url}{endPoint}");
+            var query = HttpUtility.ParseQueryString(builder.Query);
+
+            foreach (var param in queryParams)
+            {
+                query[param.Key] = param.Value;
+            }
+
+            builder.Query = query.ToString();
+            var url = builder.ToString();
+
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            return await _httpClient.SendAsync(request);
+        }
+        catch (HttpRequestException ex)
+        {            
+            throw new Exception("Desafio ao chamar a API");
         }
     }
 

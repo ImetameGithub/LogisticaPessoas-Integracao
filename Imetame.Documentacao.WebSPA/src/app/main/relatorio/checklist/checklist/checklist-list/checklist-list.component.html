@@ -78,6 +78,12 @@
                     <mat-cell class="center-column" *matCellDef="let colaborador"> {{ colaborador.Atividade }} </mat-cell>
                 </ng-container>
 
+                <!-- Coluna fixa: Status Destra -->
+                <ng-container matColumnDef="statusDestra">
+                    <mat-header-cell class="center-column" *matHeaderCellDef>Status Destra</mat-header-cell>
+                    <mat-cell class="center-column" *matCellDef="let colaborador"> {{ colaborador.StatusDestra }} </mat-cell>
+                </ng-container>
+
                 <!-- Colunas dinâmicas: Documentos -->
                 <ng-container *ngFor="let documentCol of getDocumentColumns()" [matColumnDef]="documentCol">
                     <mat-header-cell *matHeaderCellDef [style.width.px]="getHeaderWidth(documentCol)"> {{ documentCol }} </mat-header-cell>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Imetame.Documentacao.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -12,6 +13,8 @@ namespace Imetame.Documentacao.Domain.Models
 		public string Empresa { get; set; }
 		public string NumCad { get; set; }
 		public string NumCracha { get; set; }
+		public bool DocumentoPendencia { get; set; }
+		public List<DocumentoStatus> DocumentoStatus { get; set; }
 		public string Status { get; set; }
 		public string Nome { get; set; }
 		public string Cpf { get; set; }
@@ -60,4 +63,5 @@ namespace Imetame.Documentacao.Domain.Models
 		public string CODIGO_OS { get; set; }
 		public string NOME_OS { get; set; }
 	}
+	
 }

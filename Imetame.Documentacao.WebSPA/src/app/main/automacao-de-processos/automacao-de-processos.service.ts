@@ -10,7 +10,7 @@ import { Finalizado } from './finalizados/finalizados.component';
 import { environment } from 'environments/environment';
 import { Pedido } from 'app/models/Pedido';
 import { HttpClient, HttpEvent, HttpHeaders, HttpParams } from '@angular/common/http';
-import { ColaboradorModel } from 'app/models/DTO/ColaboradorModel';
+import { ColaboradorModel, DocumentoStatus } from 'app/models/DTO/ColaboradorModel';
 import { DocumentoxColaboradorModel, ImagemProtheus } from 'app/models/DTO/DocumentoxColaboradorModel';
 import { PaginatedResponse } from 'app/models/PaginatedResponse';
 import { OAuthService } from 'angular-oauth2-oidc';
@@ -154,13 +154,18 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
     }
 
 
-    GetDocumentosProtheus(matricula: string): Observable<DocumentoxColaboradorModel[]> {
-        return this._httpClient.get<DocumentoxColaboradorModel[]>(`${environment.Colaboradores.GetDocumentosProtheus}/${matricula}`)
-        // .pipe(
-        //     tap((documentoxColaboradorRetorno: DocumentoxColaboradorModel[]) => {
-        //         this._documentoxColaborador.next(documentoxColaboradorRetorno);
-        //     }));
+    GetDocumentosProtheus(matricula: string, docsStatusList: DocumentoStatus[] = null): Observable<any> {
+        const docsStatusListJson = encodeURIComponent(JSON.stringify(docsStatusList));
+        return this._httpClient.get<any>(
+            `${environment.Colaboradores.GetDocumentosProtheus}/${matricula}/${docsStatusListJson}`
+        );
     }
+    
+    // GetDocumentosProtheus(matricula: string, docsStatusList: DocumentoStatus[] = null): Observable<DocumentoxColaboradorModel[]> {
+    //     return this._httpClient.get<DocumentoxColaboradorModel[]>(`${environment.Colaboradores.GetDocumentosProtheus}/${matricula}/${docsStatusList}`)
+    // }
+    
+    
 
     GetImagemProtheus(recno: string): Observable<ImagemProtheus> {
         return this._httpClient.get<ImagemProtheus>(`${environment.Colaboradores.GetImagemProtheus}/${recno}`)
@@ -212,8 +217,8 @@ export class AutomacaoDeProcessosService implements Resolve<any> {
     GetColaboradoresPorOs(filtro: string = ''): Promise<ColaboradorModel> {
         const params = new HttpParams()
             .set('texto', filtro);
-        return new Promise((resolve, reject) => {
-            this.dataService.getList(`${environment.Colaboradores.GetColaboradoresPorOs}/${this.routeParams.processamento}`, { params })
+            return new Promise((resolve, reject) => {
+            this.dataService.getList(`${environment.Colaboradores.GetColaboradoresPorOs}/${this.routeParams.processamento}/${this.routeParams.ordemServico}`, { params })
                 .subscribe((response: any) => {
                     this.itens = response;
                     this.onItensChanged.next(this.itens);

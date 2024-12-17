@@ -1,3 +1,5 @@
+import { DocumentoStatus } from "./ColaboradorModel";
+
 export class DocumentoxColaboradorModel {
     // Id: string;
     Codigo: string;
@@ -18,6 +20,8 @@ export class DocumentoxColaboradorModel {
     ImageSource;
     TipoDocumento: string;
     IdTipoDocumento: string;
+    DocumentoStatus: DocumentoStatus;
+    DocumentoStatusPendente: boolean;
 }
 
 export class ImagemProtheus {

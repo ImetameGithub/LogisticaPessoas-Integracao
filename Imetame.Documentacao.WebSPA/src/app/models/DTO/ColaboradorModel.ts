@@ -26,6 +26,8 @@ export class ColaboradorModel extends BaseEntity {
     TempoEmpresaAnos: string;
     TempoEmpresaAnosInt: string;
     CountDocumento: number;
+    DocumentoPendencia: boolean;
+    DocumentoStatus: DocumentoStatus[];1
 
     ColaboradorxAtividade?: ColaboradorxAtividade[];
 
@@ -49,4 +51,13 @@ export class ColaboradorProtheusModel extends BaseEntity {
     PERFIL: string;
     CODIGO_OS: string;
     NOME_OS: string
+}
+export class DocumentoStatus {
+    Observacoes: string;
+    Codigo: number;
+    StatusDescricao: string;
+    Cpf: string;
+    Nome: string;
+    CodProtheus: string;
+    Status: number;
 }

@@ -174,7 +174,7 @@ export class ColaboradoresComponent implements OnInit, OnDestroy {
     getDocumentosProtheus(colaborador: ColaboradorModel) {
         this._fuseProgressBarService.setMode("indeterminate");
         this._fuseProgressBarService.show();
-        this.service.GetDocumentosProtheus('0' + colaborador.NumCad).subscribe(
+        this.service.GetDocumentosProtheus('0' + colaborador.NumCad, colaborador.DocumentoStatus).subscribe(
             {
                 next: (response: DocumentoxColaboradorModel[]) => {
                     this._fuseProgressBarService.hide();
